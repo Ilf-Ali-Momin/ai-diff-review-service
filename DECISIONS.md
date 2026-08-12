@@ -188,6 +188,77 @@ and needs JSON module handling in TypeScript, both for one string. Duplication
 has exactly one real cost, drift, and a two line test removes it.
 **Contract reference:** `GET /health`, `"version": "<semver>"`
 
+## D-018: A diff is parseable if it yields at least one hunk header
+**Decision:** `parseDiff` reports `hunkCount`. A submitted diff with a count of
+zero is what Phase 3 answers `422 invalid_diff` for. Presence of a file header
+alone is not enough, and neither is the presence of added lines.
+**Rejected:** Requiring a `diff --git` header, or accepting any text that
+contains a line starting with `+`.
+**Why:** The contract's example of an unparseable diff is "just some text",
+and the hunk header is the only construct that is both mandatory in a real
+unified diff and absent from arbitrary prose. Requiring `diff --git` would
+reject the plain `diff -u` output that the `---` and `+++` pair produces, which
+is still a unified diff. Accepting any `+` line would accept prose.
+**Contract reference:** "`diff` missing, empty, or not parseable as a unified
+diff → `422`", and TESTPLAN probe 55
+
+## D-019: File segments are recognized from `diff --git` or from a `---` and `+++` pair
+**Decision:** A new file segment begins at a `diff --git` line, or at a `---`
+line whose successor is a `+++` line when we are not already reading the header
+block of a file that a `diff --git` line just opened. Any preamble before the
+first header, such as a commit message from `git format-patch`, is carried
+inside the first file's segment rather than dropped.
+**Rejected:** Segmenting on `diff --git` alone, and dropping the preamble.
+**Why:** Both header styles are unified diffs and the contract does not name a
+producer. Carrying the preamble means the segment byte lengths sum to the whole
+submitted diff, so `usage.inputBytes` and the chunk packing describe the same
+document. Dropping it would make chunk counts unexplainable against the size
+the client sent.
+**Contract reference:** "split into chunks of at most 64 KiB, only on file
+boundaries"
+
+## D-020: An unterminated string literal runs to the end of the line
+**Decision:** MOCK-003's tokenizer treats a quote with no closing partner as
+opening a literal that extends to the end of the line, so anything after it,
+including a `+`, counts as inside a string.
+**Rejected:** Treating an unterminated quote as an ordinary character.
+**Why:** The line is scanned in isolation with no knowledge of the surrounding
+file, so a genuinely multi line template literal is indistinguishable from a
+typo. The chosen reading fails closed, producing a missed finding rather than a
+false one, which matches the direction RULES.md takes everywhere else. The
+visible cost is that an apostrophe in a comment, as in `don't`, suppresses
+MOCK-003 for the rest of that line.
+**Contract reference:** MOCK-003 trigger, and RULES.md "Backslash escapes are
+respected when scanning for the closing delimiter"
+
+## D-021: Line endings are never normalized
+**Decision:** The diff is split on `\n` only. A `\r` left by a CRLF document
+stays inside `text` and therefore inside `evidence`. Structural detection of
+headers and hunk headers tolerates the trailing `\r`, so a CRLF diff still
+parses; only the reported evidence carries the extra character.
+**Rejected:** Stripping a trailing `\r` from every line.
+**Why:** RULES.md states that `text` preserves the original characters exactly,
+with no normalization, and `evidence` is defined as `text`. Stripping would be
+a normalization that the authoritative interpretation forbids. Flagged rather
+than silently chosen because if a scoring probe ever did submit a CRLF diff,
+this is the decision that would cost the evidence assertions, and the fix is
+one line.
+**Contract reference:** RULES.md preprocessing, "No trimming, no normalization"
+
+## D-022: The mock provider re parses each chunk rather than reusing the whole file parse
+**Decision:** `Provider.review` receives chunk text and parses it. The full
+parse performed before chunking is used for segmentation and, later, for
+validating LLM output, but its added lines are not handed to the mock provider.
+**Rejected:** Parsing once and grouping the added lines by file, with chunks
+holding references.
+**Why:** The rejected design makes "a chunked scan equals an unchunked scan"
+true by definition, so TESTPLAN probe 31, the highest value test in the plan,
+would assert nothing. Re parsing means the property test exercises the real
+risk, that a file boundary drops or duplicates a finding. The cost is one extra
+parse of each byte, which is trivial next to the 30 second budget.
+**Contract reference:** "Findings must be identical to an unchunked scan: no
+duplicates, no losses, ordering preserved"
+
 ---
 
 ## Template for new entries
