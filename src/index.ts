@@ -1,6 +1,16 @@
 import { env } from './config';
 import { buildServer } from './http/server';
 
+/**
+ * Refuse to start without a token rather than start and reject everything, and
+ * rather than accept a bare `Bearer ` because the configured value is empty.
+ * See D-029.
+ */
+if (env.authToken === '') {
+  process.stderr.write('AUTH_TOKEN is not set. Refusing to start.\n');
+  process.exit(1);
+}
+
 const app = buildServer({ logger: true });
 
 /**

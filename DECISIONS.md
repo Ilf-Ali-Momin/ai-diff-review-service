@@ -259,6 +259,103 @@ parse of each byte, which is trivial next to the 30 second budget.
 **Contract reference:** "Findings must be identical to an unchunked scan: no
 duplicates, no losses, ordering preserved"
 
+## D-023: The cache holds a promise, so concurrent duplicates share one scan
+**Decision:** The cache maps a key to a deferred promise created at submission
+time, not to a finished result. The first submission owns the scan and settles
+the promise; any identical submission arriving while that scan is still running
+awaits the same promise and reports `cacheHit: true`. A rejected promise is
+deleted from the cache immediately, so a failure is never cached and a later
+submission retries.
+**Rejected:** Caching only completed results, which is what ARCHITECTURE.md
+describes.
+**Why:** The rejected design satisfies the contract only for submissions that
+are far enough apart. Two byte identical diffs submitted at the same moment
+both find an empty cache and both do the full work, which is exactly what the
+caching clause forbids. The promise closes that hole for the cost of about
+fifteen lines. The subtlety it introduces, that a rejected promise with no one
+awaiting it would raise an unhandled rejection, is handled by attaching an
+inert catch when the deferred is created.
+**Contract reference:** "a byte-identical `{diff, options}` submitted again
+(any key or none) must not redo the work"
+
+## D-024: `usage` is complete at job creation, and the validation parse is reused
+**Decision:** The route parses the diff once, to decide 422, and keeps the
+result. `inputBytes` and `chunks` are therefore known before the 202 is sent
+and are present on every poll, including while the job is `queued`. The cache
+stores findings only; usage is recomputed from the same diff and provider and
+is identical by construction.
+**Rejected:** Deferring the parse to the worker and leaving `usage` absent or
+partial until the job completes.
+**Why:** The contract shows `usage` in the polling response without the "when
+done" qualifier it puts on `findings`, so a caller polling a queued job should
+still learn the size of what it submitted. The parse has to happen in the route
+regardless, because 422 cannot be decided without it, so reusing it costs
+nothing and avoids parsing a megabyte twice.
+**Contract reference:** the `GET /v1/reviews/{jobId}` response body, where
+`findings` is marked "when done" and `usage` is not
+
+## D-025: A cache hit travels the same path as a fresh scan
+**Decision:** Every job is enqueued, acquires a semaphore slot, and runs
+through the same worker, whether it computes findings or reads them from the
+cache. Nothing special cases a cached job.
+**Rejected:** Completing a cached job inline in the route and skipping the
+queue.
+**Why:** The contract requires a cached job's stream to replay the full event
+sequence exactly like a computed one. One code path gets that for free; two
+paths mean the event sequence is written twice and will eventually differ. A
+cached job holds its slot for microseconds, so the concurrency cost is nil.
+**Contract reference:** TESTPLAN probe 41, and "Connecting to a finished job's
+stream must replay all events identically"
+
+## D-026: The 202 body always reports `status: "queued"`
+**Decision:** `POST /v1/reviews` answers `{ jobId, status: "queued" }` even
+when the request is an idempotent replay of a job that has since finished.
+**Rejected:** Reporting the job's live status on a replay, which is more
+truthful.
+**Why:** The contract writes the 202 body as a literal, with `queued` spelled
+out rather than described as a variable. Following D-001, the literal reading
+governs. A client that wants the live status has the polling endpoint, which is
+the endpoint that documents a variable status field.
+**Contract reference:** "`202` → `{ "jobId": "<opaque>", "status": "queued" }`"
+
+## D-027: `findings` appears only on a done job, `error` only on a failed one
+**Decision:** The polling response always carries `jobId`, `status` and
+`usage`. `findings` is present only when the status is `done`. `error` is
+present only when the status is `failed`.
+**Rejected:** Always sending `findings`, as an empty array before completion.
+**Why:** The contract annotates `findings` with "when done" and annotates
+nothing else, so an empty array on a running job would assert that the scan
+found nothing rather than that it has not finished. The distinction matters to
+a caller polling a large job.
+**Contract reference:** `"findings": [ ... ],  // when done`
+
+## D-028: Every status transition emits a status event, including the last one
+**Decision:** The event sequence is `status queued`, `status running`, one
+`finding` per finding, `status done`, then `done`. A failed job ends at
+`status failed` with no `done` event.
+**Rejected:** ARCHITECTURE.md's sequence, which goes straight from the last
+finding to `done` with no `status done` event.
+**Why:** This is a conflict between two of our own files, flagged here rather
+than resolved silently. The contract says the `status` event fires "at least on
+status transitions", and reaching `done` is a transition. CLAUDE.md sets the
+precedence: the contract outranks ARCHITECTURE.md, so the extra event is
+emitted. It cannot break a consumer that keys on the `done` event, since that
+event is still the terminator and still carries `total` and `usage`.
+**Contract reference:** "event `status` — at least on status transitions"
+
+## D-029: The bearer token is required at boot and compared in constant time
+**Decision:** The process refuses to start when `AUTH_TOKEN` is unset or empty,
+logging the reason. The comparison itself checks length first and then uses
+`timingSafeEqual`.
+**Rejected:** Starting with an empty token, or generating a random one at boot.
+**Why:** An empty configured token compared naively would authenticate a
+request whose header is a bare `Bearer `, turning a missing environment
+variable into an open service. A random token would start cleanly and then
+reject every scored request for 96 hours, which is a far worse failure than not
+starting at all. Constant time comparison costs nothing and removes the only
+credential oracle in the service.
+**Contract reference:** "Missing/wrong token → `401` with the error envelope"
+
 ---
 
 ## Template for new entries

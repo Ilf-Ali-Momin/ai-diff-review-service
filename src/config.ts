@@ -51,9 +51,21 @@ export const spec = {
  */
 export const rateLimitBurst = 40;
 
-/** Runtime environment. Only what Phase 1 needs; later phases extend this. */
+/**
+ * Defaults the contract states for optional request fields. An unusable value
+ * in a known option falls back to these rather than failing the request, since
+ * the taxonomy has no code for a bad option. See D-015.
+ */
+export const defaults = {
+  provider: 'mock',
+  maxFindings: 100,
+} as const;
+
+/** Runtime environment. */
 export const env = {
   port: Number.parseInt(process.env['PORT'] ?? '3000', 10),
   /** 0.0.0.0 rather than localhost, so the process is reachable inside a container. */
   host: '0.0.0.0',
+  /** Required. The process refuses to start without it. See D-029. */
+  authToken: process.env['AUTH_TOKEN'] ?? '',
 } as const;

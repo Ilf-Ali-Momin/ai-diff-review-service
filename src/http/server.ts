@@ -1,13 +1,35 @@
-import Fastify, { type FastifyInstance } from 'fastify';
+import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
 
-import { limits } from '../config';
+import { env, limits } from '../config';
+import { createQueue, type Queue } from '../jobs/queue';
+import { createJobStore, type JobStore } from '../jobs/store';
+import { mockProvider } from '../providers/mock';
+import type { Provider, ProviderName } from '../providers/types';
+import { registerAuth } from './auth';
 import { ApiError, type ErrorCode, sendError } from './errors';
 import { healthRoutes } from './routes/health';
+import { createReviewsRoutes } from './routes/reviews';
 import { specRoutes } from './routes/spec';
 
 export type ServerOptions = {
   /** Off in tests, on in the deployed process. */
   logger?: boolean;
+  authToken?: string;
+  /** Tests substitute providers here, for example one that always throws. */
+  providers?: Partial<Record<ProviderName, Provider>>;
+  store?: JobStore;
+  queue?: Queue;
+};
+
+/**
+ * Placeholder until Phase 5 builds the real client.
+ *
+ * It fails the job with a clear message rather than pretending to work, which
+ * is the same shape the real provider takes when the model is unreachable.
+ */
+const unconfiguredLlmProvider: Provider = {
+  name: 'llm',
+  review: () => Promise.reject(new Error('the llm provider is not configured yet')),
 };
 
 /**
@@ -16,12 +38,7 @@ export type ServerOptions = {
  * Fastify rejects an oversized or malformed body before any route runs, so
  * these arrive at the error handler rather than at a validation step. Mapping
  * them here is what keeps invariant 1 true for requests that never reach a
- * route: a 2 MiB body must answer `payload_too_large`, not a framework page,
- * and a truncated JSON document must answer `invalid_json`, not 500.
- *
- * `FST_ERR_CTP_INVALID_MEDIA_TYPE` has no exact counterpart in the taxonomy.
- * It means the body could not be read as JSON, so it shares `invalid_json`
- * rather than inventing a code the contract does not list.
+ * route: a 2 MiB body must answer `payload_too_large`, not a framework page.
  */
 const FRAMEWORK_ERROR_CODES: Record<string, ErrorCode> = {
   FST_ERR_CTP_BODY_TOO_LARGE: 'payload_too_large',
@@ -59,6 +76,65 @@ export function buildServer(options: ServerOptions = {}): FastifyInstance {
     bodyLimit: limits.maxPayloadBytes,
   });
 
+  const store = options.store ?? createJobStore();
+  const queue = options.queue ?? createQueue();
+  const providers: Record<ProviderName, Provider> = {
+    mock: options.providers?.mock ?? mockProvider,
+    llm: options.providers?.llm ?? unconfiguredLlmProvider,
+  };
+
+  // Auth is registered first so that it runs before every other hook and
+  // before any body is read. See D-012 and D-014.
+  registerAuth(app, options.authToken ?? env.authToken);
+
+  /**
+   * Size guard on the declared length, before Fastify buffers anything. The
+   * body limit above is the backstop for a chunked request that declares no
+   * length at all.
+   */
+  app.addHook('onRequest', async (request, reply) => {
+    const declared = Number(request.headers['content-length'] ?? '0');
+    if (Number.isFinite(declared) && declared > limits.maxPayloadBytes) {
+      sendError(reply, 'payload_too_large', 'the request body exceeds the declared limit');
+      return reply;
+    }
+    return;
+  });
+
+  /**
+   * Parses every body as JSON regardless of the declared content type, and
+   * keeps the raw bytes.
+   *
+   * The raw buffer is what idempotency hashes, because the contract says byte
+   * identical and two JSON documents differing only in key order are equal as
+   * objects but not as bytes. See D-010.
+   *
+   * Accepting any content type is deliberate: JSON is the only body this API
+   * has, so a caller who omits the header should get `invalid_json` if the
+   * bytes are not JSON, rather than a 415 that the taxonomy cannot express.
+   */
+  const parseJsonBody = (
+    request: FastifyRequest,
+    body: Buffer,
+    done: (error: Error | null, result?: unknown) => void,
+  ): void => {
+    (request as FastifyRequest & { rawBody?: Buffer }).rawBody = body;
+
+    if (body.length === 0) {
+      done(new ApiError('invalid_json', 'the request body is empty'));
+      return;
+    }
+
+    try {
+      done(null, JSON.parse(body.toString('utf8')));
+    } catch {
+      done(new ApiError('invalid_json', 'the request body is not valid JSON'));
+    }
+  };
+
+  app.addContentTypeParser('application/json', { parseAs: 'buffer' }, parseJsonBody);
+  app.addContentTypeParser('*', { parseAs: 'buffer' }, parseJsonBody);
+
   /**
    * Covers an unknown path and a method we do not register on a known path.
    * Both answer 404 `not_found`, because the taxonomy has no code for a method
@@ -89,6 +165,7 @@ export function buildServer(options: ServerOptions = {}): FastifyInstance {
 
   app.register(healthRoutes);
   app.register(specRoutes);
+  app.register(createReviewsRoutes({ store, queue, providers }));
 
   return app;
 }

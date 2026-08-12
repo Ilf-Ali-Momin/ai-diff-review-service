@@ -17,10 +17,13 @@ import type { FastifyInstance } from 'fastify';
 import { limits, version } from '../../src/config';
 import { buildServer } from '../../src/http/server';
 
+const TOKEN = 'phase-one-test-token';
+const auth = { authorization: `Bearer ${TOKEN}` };
+
 let app: FastifyInstance;
 
 beforeAll(async () => {
-  app = buildServer();
+  app = buildServer({ authToken: TOKEN });
   await app.ready();
 });
 
@@ -106,11 +109,20 @@ describe('probe 2: GET /spec', () => {
 
 describe('probe 58: an unknown route', () => {
   it('answers 404 through the envelope, not an HTML page', async () => {
-    const res = await app.inject({ method: 'GET', url: '/v1/nonsense' });
+    const res = await app.inject({ method: 'GET', url: '/v1/nonsense', headers: auth });
 
     expect(res.statusCode).toBe(404);
     expect(res.headers['content-type']).toMatch(/application\/json/);
     expectEnvelope(res.json(), 'not_found');
+  });
+
+  it('answers 401 rather than 404 when the caller has no token', async () => {
+    // Auth covers the whole /v1 prefix including paths that match no route, so
+    // an unauthenticated caller learns nothing about which paths exist. D-014.
+    const res = await app.inject({ method: 'GET', url: '/v1/nonsense' });
+
+    expect(res.statusCode).toBe(401);
+    expectEnvelope(res.json(), 'unauthorized');
   });
 
   it('answers the same way outside the /v1 prefix', async () => {
@@ -123,7 +135,7 @@ describe('probe 58: an unknown route', () => {
 
 describe('probe 59: a method we do not register', () => {
   it('answers through the envelope rather than a framework default', async () => {
-    const res = await app.inject({ method: 'DELETE', url: '/v1/reviews/x' });
+    const res = await app.inject({ method: 'DELETE', url: '/v1/reviews/x', headers: auth });
 
     expect(res.statusCode).toBe(404);
     expect(res.headers['content-type']).toMatch(/application\/json/);
