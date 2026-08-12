@@ -124,6 +124,70 @@ for a request that is going to be rejected anyway.
 **Contract reference:** "All `/v1/*` routes (every method, including GET)
 require `Authorization: Bearer <token>`"
 
+## D-013: Method not allowed is reported as `not_found`
+**Decision:** A request to a known path with a method we do not register returns
+404 with code `not_found`, through the envelope. Fastify's not found handler
+covers both an unknown path and an unregistered method, so one handler serves
+both cases.
+**Rejected:** Adding a `method_not_allowed` code, or returning 405 carrying the
+`internal` code.
+**Why:** The taxonomy in CONTRACT.md is closed and has no code for a method
+mismatch, and invariant 1 forbids inventing one. 404 is also Fastify's own
+default status here, so only the body shape departs from the framework, never
+the status. Returning 405 with a code that means something else would be a
+worse lie than returning 404 with a code that is merely coarse.
+**Contract reference:** the error envelope code list, and TESTPLAN probe 59
+
+## D-014: Auth covers the whole `/v1` prefix, including paths that match no route
+**Decision:** Bearer validation runs in an `onRequest` hook for every URL whose
+path begins with `/v1`, before route resolution and before body parsing.
+`GET /v1/nonsense` with no token gives 401; with a valid token it gives 404.
+**Rejected:** Resolving the route first, which returns 404 to an
+unauthenticated caller for any path that happens not to exist.
+**Why:** The contract requires auth on all `/v1/*` routes and TESTPLAN probe 10
+establishes that auth precedes existence for an unknown jobId. Extending the
+same order to an unknown path keeps one rule rather than two, and tells an
+unauthenticated caller nothing about which paths exist. `onRequest` is also the
+only hook that runs before Fastify buffers a body, which probe 60 requires: a
+2 MiB unauthenticated request must be 401 and not 413.
+**Contract reference:** "All `/v1/*` routes (every method, including GET)
+require `Authorization: Bearer <token>`"
+
+## D-015: An unusable value in a known option falls back to its default
+**Decision:** An `options.maxFindings` that is not a positive integer, and an
+`options.provider` that is neither `mock` nor `llm`, are ignored and the
+documented default is used. Only a missing, empty or unparseable `diff`
+produces `422 invalid_diff`.
+**Rejected:** Rejecting the request with `422 invalid_diff`, or introducing an
+`invalid_options` code.
+**Why:** The taxonomy has no code for a bad option value and invariant 1
+forbids adding one. Reusing `invalid_diff` would misreport the cause to a
+client whose diff is fine. The contract already instructs leniency for fields
+it does not recognize, so leniency for a value it cannot use is the consistent
+reading of the same intent.
+**Contract reference:** "Unknown body fields are ignored", and the error code list
+
+## D-016: `uptimeSeconds` carries fractional precision
+**Decision:** `/health` reports process uptime in seconds as a number with
+millisecond precision, not a whole number.
+**Rejected:** Rounding to whole seconds, which is the more conventional shape.
+**Why:** TESTPLAN probe 1 requires the value to increase between two calls, and
+two calls made inside the same second would return an identical integer and
+fail a probe that is otherwise trivially satisfiable. The contract types the
+field as a number and never says integer, so the fractional reading costs
+nothing and removes a timing dependent failure.
+**Contract reference:** `GET /health`, `"uptimeSeconds": <number>`
+
+## D-017: The reported version lives in `config.ts`, pinned to `package.json` by a test
+**Decision:** `config.version` is the single source of the semver that `/health`
+reports. A unit test asserts that the `version` field of `package.json` equals
+it, so the two cannot drift.
+**Rejected:** Importing `package.json` at runtime and reading its version.
+**Why:** A runtime import drags `package.json` into the Docker runtime stage
+and needs JSON module handling in TypeScript, both for one string. Duplication
+has exactly one real cost, drift, and a two line test removes it.
+**Contract reference:** `GET /health`, `"version": "<semver>"`
+
 ---
 
 ## Template for new entries
