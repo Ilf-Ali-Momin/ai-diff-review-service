@@ -14,8 +14,9 @@ phase and report before continuing.** Do not run ahead.
 5. `ARCHITECTURE.md` for module layout and the designs that matter.
 6. `TESTPLAN.md`, which is written before the code deliberately.
 7. `DECISIONS.md`, entries D-001 to D-012, so you know what has been settled.
-8. `SUBMISSION-TEMPLATE.md`, so you know from the start what evidence the final
-   write up will need and can collect it as you go.
+8. `SUBMISSION.md`, so you know from the start what evidence the final write up
+   will need and can collect it as you go. It began as a skeleton whose section
+   list came from the client's email, and was filled in as each phase completed.
 
 Then confirm you have read them and state anything you believe is
 contradictory **before** starting phase 1.
@@ -105,7 +106,7 @@ finished minutes earlier, and verify GETs are never rate limited.
 - work through the DEPLOY.md pre submission checklist top to bottom
 - write `SUBMISSION.md`
 
-Write `SUBMISSION.md` from `SUBMISSION-TEMPLATE.md`. The client's email is more
+Write `SUBMISSION.md`. The client's email is more
 specific than the task file about what it must contain, and **names the four
 cross cutting behaviors explicitly**: chunking, caching, idempotency and SSE
 replay. Each gets its own subsection naming the specific test that proves it,
