@@ -5,7 +5,14 @@ import { defaults, limits } from '../../config';
 import { chunkSegments } from '../../core/chunk';
 import { parseDiff } from '../../core/parseDiff';
 import type { Chunk } from '../../core/types';
-import { createDeferred, type Job, type JobStore, type ScanResult } from '../../jobs/store';
+import {
+  createDeferred,
+  type Job,
+  type JobEvent,
+  type JobStatus,
+  type JobStore,
+  type ScanResult,
+} from '../../jobs/store';
 import type { Queue } from '../../jobs/queue';
 import { runJob } from '../../jobs/worker';
 import type { Provider, ProviderName } from '../../providers/types';
@@ -89,6 +96,35 @@ function planJob(
       );
     },
   };
+}
+
+/** Long enough to be invisible on a normal job, short enough for any proxy. */
+const HEARTBEAT_MS = 15_000;
+
+function isTerminal(status: JobStatus): boolean {
+  return status === 'done' || status === 'failed';
+}
+
+/**
+ * The last event a stream will ever see.
+ *
+ * A successful job ends with `done`. A failed one ends at its status event,
+ * because the contract defines `done` as a completion event and a failure does
+ * not fabricate one. See D-028.
+ */
+function isFinalEvent(event: JobEvent): boolean {
+  if (event.type === 'done') {
+    return true;
+  }
+  return event.type === 'status' && event.data.status === 'failed';
+}
+
+/**
+ * SSE framing. `id` carries the sequence number so the sequence is self
+ * describing, though `Last-Event-ID` is deliberately not honored. See D-034.
+ */
+function formatEvent(event: JobEvent): string {
+  return `id: ${event.seq}\nevent: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`;
 }
 
 function accepted(reply: FastifyReply, job: Job): FastifyReply {
@@ -175,6 +211,64 @@ export function createReviewsRoutes(deps: ReviewsDeps): FastifyPluginAsync {
       }
 
       return reply.status(200).send(payload);
+    });
+
+    app.get<{ Params: { jobId: string } }>('/v1/reviews/:jobId/stream', async (request, reply) => {
+      const job = deps.store.getJob(request.params.jobId);
+      if (job === undefined) {
+        // Thrown before hijacking, while Fastify can still send an envelope.
+        throw new ApiError('not_found', 'no job with that id');
+      }
+
+      reply.hijack();
+      const socket = reply.raw;
+
+      socket.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+        // The failure that survives local testing and breaks behind a proxy:
+        // nginx buffers the stream and delivers it all at once on close.
+        'X-Accel-Buffering': 'no',
+      });
+
+      /**
+       * Replay, then subscribe, with no `await` between the two. Node runs this
+       * block to completion before any worker can append, which is what makes
+       * a mid flight connection see every event exactly once. See D-032.
+       */
+      for (const event of job.events) {
+        socket.write(formatEvent(event));
+      }
+
+      if (isTerminal(job.status)) {
+        socket.end();
+        return;
+      }
+
+      let heartbeat: NodeJS.Timeout | undefined;
+      const close = (): void => {
+        unsubscribe();
+        if (heartbeat !== undefined) {
+          clearInterval(heartbeat);
+          heartbeat = undefined;
+        }
+      };
+
+      const unsubscribe = deps.store.subscribe(job, (event) => {
+        socket.write(formatEvent(event));
+        if (isFinalEvent(event)) {
+          close();
+          socket.end();
+        }
+      });
+
+      // A comment, never an event, so replay stays byte identical. See D-033.
+      heartbeat = setInterval(() => socket.write(': heartbeat\n\n'), HEARTBEAT_MS);
+      heartbeat.unref();
+
+      // The client hanging up must not leave a subscriber or a timer behind.
+      request.raw.on('close', close);
     });
   };
 }

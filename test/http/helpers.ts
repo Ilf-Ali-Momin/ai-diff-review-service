@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import type { LightMyRequestResponse } from 'fastify';
 
 import type { Finding } from '../../src/core/types';
+import { createRateLimiter } from '../../src/http/rateLimit';
 import { buildServer, type ServerOptions } from '../../src/http/server';
 import type { Usage } from '../../src/jobs/store';
 import type { Provider } from '../../src/providers/types';
@@ -17,8 +18,18 @@ export type JobView = {
   error?: { code: string; message: string };
 };
 
+/**
+ * Rate limiting is exercised deliberately in rateLimit.test.ts with the real
+ * configured numbers. Everywhere else it is turned up out of the way, so that
+ * a test file which happens to submit forty times does not start failing for a
+ * reason it is not testing.
+ */
 export function testServer(options: Omit<ServerOptions, 'authToken'> = {}): FastifyInstance {
-  return buildServer({ authToken: TOKEN, ...options });
+  return buildServer({
+    authToken: TOKEN,
+    rateLimiter: createRateLimiter({ capacity: 100_000, refillPerMinute: 100_000 }),
+    ...options,
+  });
 }
 
 /**

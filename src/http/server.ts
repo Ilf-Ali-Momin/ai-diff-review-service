@@ -7,6 +7,7 @@ import { mockProvider } from '../providers/mock';
 import type { Provider, ProviderName } from '../providers/types';
 import { registerAuth } from './auth';
 import { ApiError, type ErrorCode, sendError } from './errors';
+import { createRateLimiter, registerRateLimit, type RateLimiter } from './rateLimit';
 import { healthRoutes } from './routes/health';
 import { createReviewsRoutes } from './routes/reviews';
 import { specRoutes } from './routes/spec';
@@ -19,6 +20,8 @@ export type ServerOptions = {
   providers?: Partial<Record<ProviderName, Provider>>;
   store?: JobStore;
   queue?: Queue;
+  /** Tests supply one with an injected clock so refill can be observed. */
+  rateLimiter?: RateLimiter;
 };
 
 /**
@@ -83,9 +86,14 @@ export function buildServer(options: ServerOptions = {}): FastifyInstance {
     llm: options.providers?.llm ?? unconfiguredLlmProvider,
   };
 
-  // Auth is registered first so that it runs before every other hook and
-  // before any body is read. See D-012 and D-014.
+  /**
+   * Hook order is the request pipeline and it is scored. Auth first, so that
+   * an unauthenticated request costs nothing and cannot spend anyone's rate
+   * limit budget. Then the limiter. Then the size guard. Fastify runs
+   * `onRequest` hooks in registration order, so this order is this code.
+   */
   registerAuth(app, options.authToken ?? env.authToken);
+  registerRateLimit(app, options.rateLimiter ?? createRateLimiter());
 
   /**
    * Size guard on the declared length, before Fastify buffers anything. The

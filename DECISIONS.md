@@ -356,6 +356,77 @@ starting at all. Constant time comparison costs nothing and removes the only
 credential oracle in the service.
 **Contract reference:** "Missing/wrong token → `401` with the error envelope"
 
+## D-030: The declared rate limit is the sustained rate, and the burst is larger
+**Decision:** The token bucket has a capacity of 40 and refills continuously at
+30 tokens per minute. `/spec` declares `rateLimitPerMinute: 30`.
+**Rejected:** A capacity of 30, so that the declared number is also the
+observable ceiling.
+**Why:** The contract requires that a sustained 30 per minute always succeeds.
+A bucket whose capacity equals its refill rate cannot guarantee that, because
+any jitter in arrival times rejects a request that the contract says must
+succeed. The contract also speaks of "your declared burst" as something
+separate from the per minute figure, while fixing the shape of `/spec` so that
+there is no field to declare a burst in. This is the one place where invariant
+3 in CLAUDE.md, that declared limits cannot drift from actual behavior, is not
+fully achievable, and it is recorded here rather than left to be discovered. A
+probe reading `rateLimitPerMinute` as a hard ceiling would see requests 31
+through 40 succeed.
+**Contract reference:** "Sustained 30 submissions/minute must succeed; beyond
+your declared burst, respond `429`"
+
+## D-031: The bucket is keyed on the bearer token, behind auth
+**Decision:** The limiter runs as an `onRequest` hook after the auth hook, on
+`POST` only, keyed on the bearer token value.
+**Rejected:** Keying on the client IP address, or running the limiter before
+auth.
+**Why:** Every scored request carries the same single token, so the token is
+the only meaningful key the service has; an IP key would behave differently
+behind a proxy, which is exactly where this will run. Placing it after auth
+means an unauthenticated caller can never consume another caller's budget, so
+the limiter cannot be used to deny service to the real client.
+**Contract reference:** "Applies to `POST /v1/reviews` only — GETs are never
+rate limited"
+
+## D-032: The stream is written directly to the socket, not through the reply
+**Decision:** The SSE route calls `reply.hijack()` and writes to `reply.raw`.
+**Rejected:** Returning a Node stream from the handler and letting Fastify
+serialize it.
+**Why:** Fastify's reply lifecycle is built to produce one response body, and
+the framing here has to be flushed event by event. Writing to the socket
+directly is also what lets the route set `X-Accel-Buffering: no` and keep the
+connection open with no serializer sitting between the event log and the wire.
+The replay loop and the subscription happen in the same synchronous block, with
+no `await` between them, which is what guarantees an event appended in that
+window cannot be either missed or delivered twice.
+**Contract reference:** "Server-Sent Events (`Content-Type: text/event-stream`)"
+
+## D-033: The heartbeat is a comment and never enters the event log
+**Decision:** A running job's stream emits `: heartbeat` every 15 seconds. It
+is written straight to the socket, is never appended to `job.events`, and is
+never emitted for a job that has already reached a terminal state.
+**Rejected:** Modelling the heartbeat as an event type.
+**Why:** Invariant 5 says the event log is the only source of stream content,
+and a heartbeat is not content: it exists to stop a proxy closing an idle
+connection. Keeping it out of the log is also what keeps replay byte identical,
+since a job replayed an hour later must produce exactly what it produced live,
+and a logged heartbeat would make the two differ by however long the job ran.
+**Contract reference:** "Connecting to a finished job's stream must replay all
+events identically"
+
+## D-034: `Last-Event-ID` is ignored and every connection replays from the start
+**Decision:** Each event carries an `id:` field holding its sequence number,
+but a `Last-Event-ID` request header is not honored. Every connection replays
+the whole log.
+**Rejected:** Resuming from the sequence number a reconnecting client sends,
+which is what the `id:` field conventionally enables.
+**Why:** The contract asks that connecting to a finished job's stream replays
+all events. A client, or a probe, that reconnected after a dropped connection
+would then receive a partial sequence and the contract's requirement would fail
+in exactly the case it was written for. The `id:` field is still emitted
+because it costs nothing and makes the sequence self describing.
+**Contract reference:** "Connecting to a finished job's stream must replay all
+events identically"
+
 ---
 
 ## Template for new entries
