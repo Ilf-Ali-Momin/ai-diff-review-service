@@ -140,18 +140,27 @@ stream would have delivered all six events together at the end.
 
 ## AI tools used
 
-Claude Code, used heavily and throughout, for essentially all of the
-implementation and the tests.
+Claude Code, used heavily and throughout, for all of it: the planning
+documents, the implementation, the tests and the deployment. That includes
+`RULES.md`, `ARCHITECTURE.md` and `TESTPLAN.md`, which were AI assisted the
+same way the code was. Stating that plainly seems more useful than a flattering
+account, particularly for a role that is explicitly AI first.
 
-The workflow is the part worth describing, because it is a judgment call rather
-than a tool choice. The context files were written before any code:
-`CONTRACT.md` verbatim from the task, then `RULES.md` resolving every rule
-ambiguity, `ARCHITECTURE.md` for the designs that matter, `TESTPLAN.md`
-enumerating 84 probes, and `DECISIONS.md` starting at D-001. Implementation
-then ran against those documents phase by phase, with a stop and a report at
-each phase gate, and `DECISIONS.md` appended to before writing the code that
-depended on a decision rather than reconstructed afterwards. It now holds 42
-entries.
+What I contributed is the shape of the work rather than the typing. The working
+method is the part I chose and enforced: context first, then a pure core with
+no I/O, then the service, then deployment, with a hard stop and a review at
+every phase gate before the next one started. So are the two standing rules
+that made it hold, that an ambiguity is resolved in writing before any code
+depends on it, and that `DECISIONS.md` is appended to before that code rather
+than reconstructed after it. I reviewed at each gate and accepted or
+redirected, and a conflict between two of the documents was surfaced to me
+rather than quietly resolved in favour of whichever was easier to implement.
+
+The documents themselves are the artifact of that. `CONTRACT.md` is the task
+verbatim and was never edited. `RULES.md` resolves every ambiguity in the rule
+table. `TESTPLAN.md` enumerates 84 probes and was written before the code they
+test. `DECISIONS.md` now holds 42 entries, each recorded before the code that
+depended on it.
 
 Resolving the rule ambiguities in writing first is what kept the implementation
 and the tests from drifting apart. Both were written against the same
