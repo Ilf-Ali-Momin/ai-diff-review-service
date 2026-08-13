@@ -363,6 +363,18 @@ describe('probes 80 to 82: failure modes', () => {
     expect(endpoint.requests).toHaveLength(1);
   });
 
+  it('flattens the upstream error body it quotes back', async () => {
+    // A real 401 from Groq ends with a newline. Echoing an upstream body into
+    // our own message means echoing whatever control characters it contains.
+    const endpoint = await fakeEndpoint([
+      { status: 401, raw: '{"error":\n  {"message":"Invalid API Key"}}\n' },
+    ]);
+
+    await expect(provider(endpoint.baseUrl).review(chunksOf(DIFF), signal)).rejects.toThrow(
+      /HTTP 401: \{"error": \{"message":"Invalid API Key"\}\}$/,
+    );
+  });
+
   it('probe 82: malformed model JSON fails cleanly', async () => {
     const endpoint = await fakeEndpoint([
       { raw: JSON.stringify({ choices: [{ message: { content: 'not json at all' } }] }) },

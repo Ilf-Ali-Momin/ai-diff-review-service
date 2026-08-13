@@ -62,6 +62,25 @@ export const defaults = {
 } as const;
 
 /**
+ * Reads a positive integer from the environment.
+ *
+ * A variable present but empty, which is what a `.env` file with a blank line
+ * value or an unset platform secret produces, counts as absent. Without this
+ * the pattern `Number.parseInt(process.env.X ?? '20000')` yields NaN, because
+ * `??` only catches null and undefined and an empty string is neither. A NaN
+ * timeout fires instantly and a NaN port binds somewhere random. See D-041.
+ */
+function positiveIntFromEnv(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (raw === undefined || raw.trim() === '') {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+/**
  * The llm provider's configuration, entirely from the environment so that no
  * vendor leaks into the pipeline. Any OpenAI compatible endpoint works
  * unchanged: Groq, OpenRouter, Together, a self hosted Ollama.
@@ -74,7 +93,7 @@ export const llm = {
   baseUrl: (process.env['LLM_BASE_URL'] ?? '').replace(/\/+$/, ''),
   apiKey: process.env['LLM_API_KEY'] ?? '',
   model: process.env['LLM_MODEL'] ?? '',
-  timeoutMs: Number.parseInt(process.env['LLM_TIMEOUT_MS'] ?? '20000', 10),
+  timeoutMs: positiveIntFromEnv('LLM_TIMEOUT_MS', 20_000),
 } as const;
 
 export function isLlmConfigured(config: { baseUrl: string; apiKey: string; model: string }): boolean {
@@ -83,7 +102,7 @@ export function isLlmConfigured(config: { baseUrl: string; apiKey: string; model
 
 /** Runtime environment. */
 export const env = {
-  port: Number.parseInt(process.env['PORT'] ?? '3000', 10),
+  port: positiveIntFromEnv('PORT', 3000),
   /** 0.0.0.0 rather than localhost, so the process is reachable inside a container. */
   host: '0.0.0.0',
   /** Required. The process refuses to start without it. See D-029. */

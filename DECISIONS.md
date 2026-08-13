@@ -514,6 +514,22 @@ parsed ground truth regardless.
 **Contract reference:** "a real-LLM code path behind the same pipeline (any
 vendor)"
 
+## D-041: An environment variable that is present but empty counts as absent
+**Decision:** Numeric configuration goes through a reader that treats an empty
+or whitespace only value as missing and falls back to the documented default,
+and that rejects a parsed value which is not a positive safe integer.
+**Rejected:** The idiomatic `Number.parseInt(process.env.X ?? 'default', 10)`.
+**Why:** Found by the first live run rather than by reasoning, which is the
+reason it is recorded rather than quietly patched. `??` catches null and
+undefined, and an empty string is neither, so a `.env` written from
+`.env.example` with `LLM_TIMEOUT_MS=` left blank produced `NaN`. A NaN timeout
+makes `setTimeout` fire on the next tick, so every model request timed out
+instantly and the retry did too. The same expression governs `PORT`, where a
+blank value would have bound the deployed service to a random port and passed
+every local test first.
+**Contract reference:** DEPLOY.md environment table, where `LLM_TIMEOUT_MS` and
+`PORT` are both documented as optional with defaults
+
 ---
 
 ## Template for new entries

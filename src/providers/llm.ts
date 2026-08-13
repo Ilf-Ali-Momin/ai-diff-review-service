@@ -118,21 +118,31 @@ function extractFindingArray(content: string): unknown[] {
   throw new Error('the model did not return a JSON array of findings');
 }
 
+/**
+ * Collapses text we did not author into a single safe line.
+ *
+ * Used for both places where a string we did not author reaches our response:
+ * a finding title, and the body of an upstream error. Control characters go
+ * first, then runs of whitespace collapse, so neither can carry a line break
+ * into our JSON or into whatever reads it next. See D-037.
+ */
+function flatten(value: string, maxLength: number): string {
+  return value
+    .replace(/[\u0000-\u001f\u007f]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLength);
+}
+
 function sanitizeTitle(value: unknown): string | null {
   if (typeof value !== 'string') {
     return null;
   }
 
   // The only field with no ground truth to check against, so it is flattened
-  // and capped rather than trusted. Control characters go first, then runs of
-  // whitespace collapse, so a title can never carry a line break into our
-  // JSON or into whatever reads it next. See D-037.
-  const flattened = value
-    .replace(/[\u0000-\u001f\u007f]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  return flattened === '' ? null : flattened.slice(0, MAX_TITLE_LENGTH);
+  // and capped rather than trusted.
+  const flattened = flatten(value, MAX_TITLE_LENGTH);
+  return flattened === '' ? null : flattened;
 }
 
 function normalizeRuleId(value: unknown): string | null {
@@ -230,7 +240,7 @@ export function createLlmProvider(config: LlmConfig): Provider {
       if (!response.ok) {
         // The body may carry a vendor error worth reading, but it is untrusted
         // text, so only a short prefix of it is quoted.
-        const detail = (await response.text().catch(() => '')).slice(0, 200);
+        const detail = flatten(await response.text().catch(() => ''), 200);
         throw new Error(`the model returned HTTP ${response.status}: ${detail}`);
       }
 
