@@ -1,0 +1,28 @@
+# TLS termination in front of the service.
+#
+# Caddy obtains and renews a Let's Encrypt certificate for SITE_ADDRESS on its
+# own, and redirects plain HTTP to HTTPS.
+#
+# The stream route is handled separately and deliberately. DEPLOY.md names the
+# failure that survives local testing and breaks in production: a proxy that
+# buffers the event stream and delivers it in one burst when the connection
+# closes, which turns streaming into a slow poll. Compression does the same
+# thing. So the stream gets no `encode` and an explicit immediate flush, while
+# every other route is compressed normally.
+
+{$SITE_ADDRESS} {
+	@stream path_regexp stream ^/v1/reviews/[^/]+/stream$
+
+	handle @stream {
+		reverse_proxy api:3000 {
+			# Negative interval means flush to the client as bytes arrive,
+			# rather than accumulating them in a buffer.
+			flush_interval -1
+		}
+	}
+
+	handle {
+		encode zstd gzip
+		reverse_proxy api:3000
+	}
+}

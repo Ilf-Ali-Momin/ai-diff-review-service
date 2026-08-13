@@ -1,23 +1,23 @@
 # Deployment unit for the VPS.
 #
 # `restart: always` rather than `unless-stopped`, because the scoring window is
-# 96 hours and the service has to come back from a host reboot with nobody
-# watching. The health check is inherited from the Dockerfile, so a hung
-# process is restarted rather than left serving a dead port.
+# 96 hours and both containers have to come back from a host reboot with nobody
+# watching. The service's health check is inherited from the Dockerfile, so a
+# hung process is restarted rather than left serving a dead port.
 
 services:
   api:
     build: .
     image: ai-diff-review:latest
     restart: always
-    ports:
-      # Bound to the host loopback only when a reverse proxy is in front.
-      # Change to "80:3000" to serve directly.
-      - '3000:3000'
+    # Not published to the host. Caddy is the only way in, so the service is
+    # never reachable over plain HTTP by accident.
+    expose:
+      - '3000'
     environment:
       PORT: 3000
-      # Supplied by the host environment or an .env file beside this one.
-      # Never written into this file and never committed.
+      # Supplied by the .env file beside this one on the server. Never written
+      # into this file and never committed.
       AUTH_TOKEN: ${AUTH_TOKEN:?AUTH_TOKEN must be set}
       LLM_BASE_URL: ${LLM_BASE_URL:-}
       LLM_API_KEY: ${LLM_API_KEY:-}
@@ -30,3 +30,29 @@ services:
       options:
         max-size: '10m'
         max-file: '3'
+
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?SITE_ADDRESS must be set to the public hostname}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+volumes:
+  # Certificates live here. Without persistence a restart would ask
+  # Let's Encrypt for a new certificate every time and hit the rate limit.
+  caddy_data:
+  caddy_config:

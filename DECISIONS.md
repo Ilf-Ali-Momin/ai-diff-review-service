@@ -530,6 +530,29 @@ every local test first.
 **Contract reference:** DEPLOY.md environment table, where `LLM_TIMEOUT_MS` and
 `PORT` are both documented as optional with defaults
 
+## D-042: HTTPS through Caddy, on a free subdomain rather than a purchased one
+**Decision:** Caddy terminates TLS in front of the service and obtains a
+Let's Encrypt certificate automatically. The hostname is a free DuckDNS
+subdomain. The stream route is matched separately in the proxy configuration so
+it is never compressed and never buffered.
+**Rejected:** Plain HTTP over the bare IP address, which needs no domain and
+has fewer moving parts. Also rejected: a Hetzner reverse DNS name, and buying a
+domain.
+**Why:** The client sends a bearer token on every single request, and four days
+of that in cleartext is not a defensible choice on a submission that is partly
+judged on judgment. The bare IP cannot have a publicly trusted certificate at
+all. The Hetzner rDNS name would resolve, but `your-server.de` is one
+registered domain shared by every Hetzner customer, so the Let's Encrypt rate
+limit for it is routinely exhausted and issuance is unreliable. DuckDNS is on
+the Public Suffix List, which means each subdomain gets its own rate limit
+budget, so issuance is dependable and free. The contract says nothing about
+TLS and explicitly permits a tunnel, so this is above the bar rather than
+required; the cost is one extra container and a DNS dependency, and a failure
+to issue would be visible immediately when the probe suite runs against the
+deployed URL rather than silently during the window.
+**Contract reference:** "Deployment: any option works", and DEPLOY.md's
+requirement that the stream is neither buffered nor compressed
+
 ---
 
 ## Template for new entries
