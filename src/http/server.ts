@@ -1,8 +1,9 @@
 import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
 
-import { env, limits } from '../config';
+import { env, isLlmConfigured, limits, llm } from '../config';
 import { createQueue, type Queue } from '../jobs/queue';
 import { createJobStore, type JobStore } from '../jobs/store';
+import { createLlmProvider, unconfiguredLlmProvider } from '../providers/llm';
 import { mockProvider } from '../providers/mock';
 import type { Provider, ProviderName } from '../providers/types';
 import { registerAuth } from './auth';
@@ -25,15 +26,14 @@ export type ServerOptions = {
 };
 
 /**
- * Placeholder until Phase 5 builds the real client.
- *
- * It fails the job with a clear message rather than pretending to work, which
- * is the same shape the real provider takes when the model is unreachable.
+ * The llm provider is built from the environment, or replaced by one that
+ * fails clearly when the environment carries no model access. Absent
+ * configuration must not stop the service starting: only the mock provider is
+ * scored, so a missing key costs one job, not the window.
  */
-const unconfiguredLlmProvider: Provider = {
-  name: 'llm',
-  review: () => Promise.reject(new Error('the llm provider is not configured yet')),
-};
+function defaultLlmProvider(): Provider {
+  return isLlmConfigured(llm) ? createLlmProvider(llm) : unconfiguredLlmProvider;
+}
 
 /**
  * Fastify's own body errors, translated into the closed taxonomy.
@@ -83,7 +83,7 @@ export function buildServer(options: ServerOptions = {}): FastifyInstance {
   const queue = options.queue ?? createQueue();
   const providers: Record<ProviderName, Provider> = {
     mock: options.providers?.mock ?? mockProvider,
-    llm: options.providers?.llm ?? unconfiguredLlmProvider,
+    llm: options.providers?.llm ?? defaultLlmProvider(),
   };
 
   /**

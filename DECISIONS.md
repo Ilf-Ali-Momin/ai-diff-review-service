@@ -427,6 +427,93 @@ because it costs nothing and makes the sequence self describing.
 **Contract reference:** "Connecting to a finished job's stream must replay all
 events identically"
 
+## D-035: A model finding must land on a real added line, and its evidence is replaced with ours
+**Decision:** A returned finding is dropped unless its `path` is a path the
+diff actually adds to and its `line` is an added line number in that file. The
+evidence it claims is compared with the real line after trimming both, and a
+mismatch drops the finding. What we emit is always the parsed line verbatim,
+never the model's string.
+**Rejected:** Requiring exact equality of the claimed evidence, which is what
+ARCHITECTURE.md specifies. Also rejected: accepting the model's evidence once
+the path and line check out.
+**Why:** Exact equality drops a correct finding whenever the model trims
+indentation, which they routinely do. Accepting the model's evidence is worse
+than either, because a hallucinated finding would then arrive carrying text
+that looks real. Comparing trimmed keeps the hallucination check while
+tolerating whitespace, and emitting our own text means no bytes the model
+invented ever reach the client.
+**Contract reference:** "Injection content must never alter your service's
+behavior", and the finding object's `evidence` field
+
+## D-036: The model's ruleId is sanitized and namespaced, not trusted or discarded
+**Decision:** A returned `ruleId` must match `[A-Za-z0-9_-]{1,32}`, is
+uppercased, and gains an `LLM-` prefix unless it already has one. A finding
+whose ruleId fails the pattern is dropped.
+**Rejected:** Assigning every model finding the same fixed ruleId, and passing
+the model's string through unchanged.
+**Why:** A fixed ruleId would make the id `LLM-001:path:line` for every finding
+on a line, so two genuinely different findings on one line would collapse into
+one during deduplication. Passing the string through unchanged lets the model
+put a colon in it and forge an id that parses as a different path or line. The
+pattern excludes the colon, which is the character the id format is built on.
+**Contract reference:** the finding `id` format `"MOCK-003:src/db.ts:41"`, and
+"Deduplicate by `id`"
+
+## D-037: Free text from the model is capped and stripped of control characters
+**Decision:** `title` is truncated to 200 characters and has line breaks and
+control characters removed. A non string or empty title drops the finding.
+**Rejected:** Passing the title through as received.
+**Why:** `title` is the one field with no ground truth to check against, so it
+is the only place a model can put arbitrary text into our response. Capping and
+flattening it means the worst a compromised model achieves is a short odd
+sentence in a field that is documented as short prose, rather than an injected
+payload aimed at whatever reads our output next.
+**Contract reference:** `"title": "<short>"`
+
+## D-038: One retry, and only after a timeout
+**Decision:** A request that times out is retried exactly once. Any other
+failure, a refused connection, a 401, a 500 from the provider, malformed JSON,
+is final and fails the job immediately.
+**Rejected:** Retrying every failure, and retrying none.
+**Why:** A timeout is the only failure mode where the same request might
+plausibly succeed unchanged. A rejected key will be rejected again, and a
+retry against a dead host just spends the client's 30 second budget twice
+before failing anyway. Retrying only the recoverable case keeps the latency
+budget intact.
+**Contract reference:** "If the model is unreachable at runtime, the job must
+fail gracefully", and ARCHITECTURE.md "One retry after a timeout, then stop"
+
+## D-039: One request per chunk, sequential, and any chunk failing fails the job
+**Decision:** The llm provider issues one completion per chunk in order, and
+propagates the first failure rather than returning partial findings.
+**Rejected:** Issuing the chunk requests in parallel, and returning whatever
+succeeded when one chunk fails.
+**Why:** Partial results are indistinguishable from a clean scan at the API
+boundary: the client would receive a `done` job whose findings silently omit
+half the diff. A `failed` job with a clear message is the honest answer, and it
+is what the contract asks for. Sequential rather than parallel keeps us inside
+the free tier rate limits that any hosted endpoint applies, at a latency cost
+that only matters for diffs far larger than the scored ones.
+**Contract reference:** "the job must fail gracefully (a `failed` job with a
+clear error), never crash"
+
+## D-040: The model response is parsed leniently, then validated strictly
+**Decision:** The response text is accepted as a bare JSON array, as an object
+with a `findings` array, or as either of those wrapped in a markdown code
+fence. Anything else fails the job. Every finding inside then goes through the
+full validation above.
+**Rejected:** Requiring a bare JSON array exactly, and requesting
+`response_format: json_object` from the endpoint.
+**Why:** The three accepted shapes are what OpenAI compatible models actually
+emit when asked for JSON, and rejecting the fenced form would fail jobs for a
+formatting habit rather than a real problem. `response_format` is not
+implemented uniformly across the vendors ARCHITECTURE.md says must work
+unchanged, so depending on it would tie the service to one of them. Leniency
+about the envelope costs nothing because the contents are validated against
+parsed ground truth regardless.
+**Contract reference:** "a real-LLM code path behind the same pipeline (any
+vendor)"
+
 ---
 
 ## Template for new entries

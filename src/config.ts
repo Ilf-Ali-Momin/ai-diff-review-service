@@ -61,6 +61,26 @@ export const defaults = {
   maxFindings: 100,
 } as const;
 
+/**
+ * The llm provider's configuration, entirely from the environment so that no
+ * vendor leaks into the pipeline. Any OpenAI compatible endpoint works
+ * unchanged: Groq, OpenRouter, Together, a self hosted Ollama.
+ *
+ * Absent configuration is not a startup failure. Only the mock provider is
+ * scored, so a service with no model access must still start and serve; a job
+ * asking for `llm` is the thing that fails, with a clear message.
+ */
+export const llm = {
+  baseUrl: (process.env['LLM_BASE_URL'] ?? '').replace(/\/+$/, ''),
+  apiKey: process.env['LLM_API_KEY'] ?? '',
+  model: process.env['LLM_MODEL'] ?? '',
+  timeoutMs: Number.parseInt(process.env['LLM_TIMEOUT_MS'] ?? '20000', 10),
+} as const;
+
+export function isLlmConfigured(config: { baseUrl: string; apiKey: string; model: string }): boolean {
+  return config.baseUrl !== '' && config.apiKey !== '' && config.model !== '';
+}
+
 /** Runtime environment. */
 export const env = {
   port: Number.parseInt(process.env['PORT'] ?? '3000', 10),
