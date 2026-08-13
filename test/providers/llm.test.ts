@@ -346,11 +346,24 @@ describe('probes 63 and 64: injection reaching the llm path changes nothing', ()
 });
 
 describe('probes 80 to 82: failure modes', () => {
-  it('probe 80: a dead host rejects with a clear message', async () => {
+  it('probe 80: a dead host rejects with a message naming the real cause', async () => {
     // Port 1 refuses immediately rather than hanging.
     const dead = provider('http://127.0.0.1:1');
 
-    await expect(dead.review(chunksOf(DIFF), signal)).rejects.toThrow();
+    // Not the bare "fetch failed" that fetch reports for every network fault.
+    // The contract asks a failed job to carry a clear error, and the reader
+    // needs to know whether the host is wrong or the port is closed.
+    await expect(dead.review(chunksOf(DIFF), signal)).rejects.toThrow(
+      /could not reach the model endpoint: .+/,
+    );
+  });
+
+  it('names the cause when the host does not resolve', async () => {
+    const unresolvable = provider('http://no-such-host.invalid');
+
+    await expect(unresolvable.review(chunksOf(DIFF), signal)).rejects.toThrow(
+      /could not reach the model endpoint: /,
+    );
   });
 
   it('probe 81: a rejected key fails without retrying', async () => {

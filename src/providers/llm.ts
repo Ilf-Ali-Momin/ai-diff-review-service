@@ -208,6 +208,25 @@ export function validateFinding(raw: unknown, truth: GroundTruth): Finding | nul
   };
 }
 
+/**
+ * Turns a transport failure into something a human can act on.
+ *
+ * `fetch` reports every network problem as the same three word message and
+ * hides the real reason on `cause`. The contract asks a failed job to carry a
+ * clear error, and "fetch failed" tells the reader nothing about whether the
+ * host is wrong, the DNS name does not resolve, or the port is closed.
+ */
+function describeTransportFailure(error: unknown): Error {
+  if (error instanceof Error && error.message === 'fetch failed') {
+    const cause = (error as { cause?: unknown }).cause;
+    const detail =
+      cause instanceof Error && cause.message !== '' ? cause.message : 'no further detail';
+    return new Error(`could not reach the model endpoint: ${detail}`);
+  }
+
+  return error instanceof Error ? error : new Error(String(error));
+}
+
 export function createLlmProvider(config: LlmConfig): Provider {
   async function complete(chunkText: string, outer: AbortSignal): Promise<string> {
     // One controller for both reasons a request should stop: the caller
@@ -257,7 +276,7 @@ export function createLlmProvider(config: LlmConfig): Provider {
       if (timedOut) {
         throw new TimeoutError(config.timeoutMs);
       }
-      throw error;
+      throw describeTransportFailure(error);
     } finally {
       clearTimeout(timer);
       outer.removeEventListener('abort', onOuterAbort);
