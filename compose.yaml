@@ -1,0 +1,32 @@
+# Deployment unit for the VPS.
+#
+# `restart: always` rather than `unless-stopped`, because the scoring window is
+# 96 hours and the service has to come back from a host reboot with nobody
+# watching. The health check is inherited from the Dockerfile, so a hung
+# process is restarted rather than left serving a dead port.
+
+services:
+  api:
+    build: .
+    image: ai-diff-review:latest
+    restart: always
+    ports:
+      # Bound to the host loopback only when a reverse proxy is in front.
+      # Change to "80:3000" to serve directly.
+      - '3000:3000'
+    environment:
+      PORT: 3000
+      # Supplied by the host environment or an .env file beside this one.
+      # Never written into this file and never committed.
+      AUTH_TOKEN: ${AUTH_TOKEN:?AUTH_TOKEN must be set}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_TIMEOUT_MS: ${LLM_TIMEOUT_MS:-}
+    logging:
+      # A four day window on a small instance, with a request log per call.
+      # Capped so logs cannot fill the disk and take the service down with them.
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
