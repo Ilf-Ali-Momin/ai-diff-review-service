@@ -2,10 +2,6 @@
 
 Running log of every ambiguity resolved and every alternative rejected.
 
-**This file is appended to during the build, before the code that depends on
-the decision is written.** It is not reconstructed at the end. It is the raw
-material for SUBMISSION.md and for the interview, where the question will be
-"why did you do it that way" and the answer needs to be immediate.
 
 Entries D-001 to D-012 were decided during planning, before any code. Continue
 numbering from D-013.
