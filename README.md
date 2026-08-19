@@ -4,17 +4,14 @@ An HTTP service that reviews unified diffs. A client submits a diff, receives a
 job id immediately, and collects structured findings either by polling or over
 a Server Sent Events stream.
 
-Built as a take home task. The scored deployment has been taken down; the
-service runs locally with one command.
-
 ## What it does
 
 ```
-POST /v1/reviews          submit a diff, get a job id back straight away
-GET  /v1/reviews/:id      poll for status and findings
+POST /v1/reviews              submit a diff, get a job id back straight away
+GET  /v1/reviews/:id          poll for status and findings
 GET  /v1/reviews/:id/stream   watch findings arrive, or replay a finished job
-GET  /health              public
-GET  /spec                public, the service's own declared limits
+GET  /health                  public
+GET  /spec                    public, the service's own declared limits
 ```
 
 Diffs are parsed, split into chunks on file boundaries, and scanned by a
@@ -54,11 +51,11 @@ without them; only a job asking for that provider fails, with a clear message.
 ## Tests
 
 ```bash
-npm test     # 219 unit and integration tests, in process, about two seconds
+npm test
 ```
 
-A separate black box suite runs the full probe plan over real HTTP against any
-running instance:
+219 unit and integration tests, in process, about two seconds. A separate black
+box suite runs the full probe plan over real HTTP against any running instance:
 
 ```bash
 PROBE_BASE_URL=http://127.0.0.1:3000 PROBE_TOKEN=local-dev-token npm run probe
@@ -75,7 +72,7 @@ terminates TLS in front and is configured so the stream route is neither
 buffered nor compressed, which is the failure that survives local testing and
 breaks streaming in production.
 
-## Layout
+## Design notes
 
 ```
 src/
@@ -89,25 +86,27 @@ test/
   probe/                   black box suite against a base URL
 ```
 
-The core is pure and was written and fully tested before any HTTP route
-existed. Workers never write to a socket: they append to a job's event log and
-the stream route reads it, which is what makes replay, late connection,
-multiple concurrent streams and cached jobs all work without special cases.
+A few choices worth calling out, since they shape everything else.
 
-## Documents
+**The core is pure.** The parser, the nine rules, the ordering function and the
+chunker have no I/O, no clock and no randomness, and they were written and
+fully tested before any HTTP route existed.
 
-The repository is deliberately document heavy. These were written before the
-code and are the reasoning behind it.
+**Workers never write to a socket.** They append to a job's append only event
+log, and the stream route reads that log. That single decision is what makes
+replay, late connection, multiple concurrent streams and cached jobs all work
+with no special cases: a stream opened before a job starts, midway, or an hour
+after it finished produces byte identical output.
 
-| File | What it is |
-|---|---|
-| `SUBMISSION.md` | the write up: architecture, provider design, how each cross cutting behaviour was verified |
-| `DECISIONS.md` | 42 entries, each recorded before the code that depended on it |
-| `CONTRACT.md` | the task as given, verbatim, never edited |
-| `RULES.md` | the authoritative resolution of every ambiguity in the rule table |
-| `ARCHITECTURE.md` | module layout and the designs that matter |
-| `TESTPLAN.md` | 84 probes, written before the implementation |
-| `DEPLOY.md` | deployment and the pre submission checklist |
+**Caching and idempotency are separate mechanisms.** Idempotency is keyed on
+the `Idempotency-Key` header plus a hash of the raw request bytes and returns
+the same job. Caching is keyed on the diff hash plus the provider and returns a
+new job that skipped the work. The cache key deliberately excludes
+`maxFindings`, so one scan serves every limit and truncation happens at read
+time.
+
+**Ordering happens in exactly one place**, feeding both the JSON result and the
+event log, so the stream and the polled result cannot disagree.
 
 ## Stack
 
