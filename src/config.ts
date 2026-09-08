@@ -1,7 +1,7 @@
 /**
  * The single source of every limit this service declares and enforces.
  *
- * CONTRACT.md requires that "declared limits must match your actual behavior".
+ * The API contract requires that declared limits match actual behavior.
  * The way that guarantee is made structural rather than aspirational is that
  * `GET /spec` serializes the `spec` object below verbatim, while the rate
  * limiter, the chunker, the body size guard and the job semaphore all read
@@ -14,7 +14,7 @@ export const version = '1.0.0';
 
 /**
  * Every value here is enforced somewhere in the runtime. The shape of this
- * object is fixed by the `limits` block of the /spec example in CONTRACT.md
+ * object is fixed by the `limits` block the contract specifies for /spec
  * and must not gain or lose keys.
  */
 export const limits = {
@@ -32,7 +32,7 @@ export const limits = {
  * The exact document served by GET /spec.
  *
  * Serving this object directly, rather than rebuilding a similar one in the
- * route, is what makes invariant 3 in CLAUDE.md hold by construction.
+ * route, is what stops the two drifting apart.
  */
 export const spec = {
   specVersion: '1.0',

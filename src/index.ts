@@ -14,7 +14,7 @@ if (env.authToken === '') {
 const app = buildServer({ logger: true });
 
 /**
- * Invariant 7 in CLAUDE.md: the service never crashes.
+ * A hard requirement: the service never crashes.
  *
  * These handlers are the last line rather than the first. A worker already
  * wraps its own body and marks its job `failed`, so anything arriving here has

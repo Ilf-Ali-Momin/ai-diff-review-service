@@ -1,7 +1,7 @@
 /**
  * The error envelope and the closed code taxonomy.
  *
- * Invariant 1 in CLAUDE.md: every non 2xx response in the service leaves
+ * A hard requirement: every non 2xx response in the service leaves
  * through `sendError`. No framework default pages, no bare strings, no code
  * outside the list below. That includes unknown routes, unregistered methods
  * and unhandled exceptions, which is why the not found handler and the error
@@ -11,7 +11,7 @@
 import type { FastifyReply } from 'fastify';
 
 /**
- * The complete taxonomy from CONTRACT.md, paired with the status each one is
+ * The complete taxonomy from the API contract, paired with the status each one is
  * sent with. Deriving `ErrorCode` from these keys means a typo in a call site
  * is a compile error rather than a response the scorer rejects.
  */

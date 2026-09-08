@@ -1,5 +1,5 @@
 /**
- * Phase 1 gate: TESTPLAN.md probes 1, 2, 58 and 59, plus the invariant that
+ * Contract probes 1, 2, 58 and 59, plus the requirement that
  * every non 2xx response leaves through the error envelope.
  *
  * These run against the Fastify instance through `inject`, so they need no
@@ -76,7 +76,7 @@ describe('probe 1: GET /health', () => {
 });
 
 describe('probe 2: GET /spec', () => {
-  it('matches the document in CONTRACT.md exactly', async () => {
+  it('matches the document the contract specifies, exactly', async () => {
     const res = await app.inject({ method: 'GET', url: '/spec' });
 
     expect(res.statusCode).toBe(200);

@@ -1,5 +1,5 @@
 /**
- * The black box probe suite from TESTPLAN.md, run against a base URL.
+ * The black box probe suite, run against a base URL.
  *
  * Identical against localhost and against the deployed service, which is the
  * whole point: the failures that matter here, a proxy buffering the stream, a

@@ -2,7 +2,7 @@
  * The three in memory stores, plus the event log that makes streaming work.
  *
  * Nothing here is persisted. A restart loses every job, which is declared in
- * SUBMISSION.md rather than hidden: it is acceptable for a bounded scoring
+ * the README rather than hidden: it is acceptable for a bounded scoring
  * window behind an always restart policy, and wrong for production.
  *
  * The store is created by a factory rather than living at module scope so that

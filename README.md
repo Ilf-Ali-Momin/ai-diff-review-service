@@ -108,6 +108,22 @@ time.
 **Ordering happens in exactly one place**, feeding both the JSON result and the
 event log, so the stream and the polled result cannot disagree.
 
+## Reasoning
+
+Two documents from the build are kept because the source comments refer to
+them by name.
+
+| File | What it is |
+|---|---|
+| `RULES.md` | the authoritative resolution of every ambiguity in the rule table, written before the rules were implemented |
+| `DECISIONS.md` | 42 entries, each recording a decision, the alternative rejected, and why, appended before the code that depended on it |
+
+`DECISIONS.md` is the more interesting of the two. A sample of what is in it:
+why `=== null` must not match a rule looking for `== null`; why the cache key
+excludes `maxFindings`; why idempotency hashes raw request bytes rather than
+the parsed object; and why a model returned finding is dropped unless the diff
+actually contains the line it claims to have found.
+
 ## Stack
 
 Node 20, TypeScript strict, Fastify, Vitest. Fastify is the only runtime

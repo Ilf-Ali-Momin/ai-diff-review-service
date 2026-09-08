@@ -3,7 +3,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import { version } from '../../config';
 
 /**
- * GET /health, public. Never behind auth, per CONTRACT.md.
+ * GET /health, public. Never behind auth, as the contract requires.
  *
  * `uptimeSeconds` keeps millisecond precision rather than rounding to whole
  * seconds. Two probes fired inside the same second must see the number

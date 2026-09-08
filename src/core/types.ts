@@ -12,7 +12,7 @@ export type Severity = 'critical' | 'high' | 'medium' | 'low';
 
 export type Category = 'security' | 'correctness' | 'performance' | 'style';
 
-/** The finding object, shaped exactly as CONTRACT.md defines it. */
+/** The finding object, shaped exactly as the API contract defines it. */
 export type Finding = {
   /** `<ruleId>:<path>:<line>`, the deduplication key. */
   id: string;

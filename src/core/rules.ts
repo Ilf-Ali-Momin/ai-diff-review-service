@@ -19,7 +19,7 @@ type RuleMeta = {
   title: string;
 };
 
-/** Transcribed from the rule table in CONTRACT.md, which scores these exactly. */
+/** Transcribed from the rule table in the API contract, which fixes these exactly. */
 const RULE_META: Record<string, RuleMeta> = {
   'MOCK-001': { severity: 'critical', category: 'security', title: 'eval usage' },
   'MOCK-002': { severity: 'critical', category: 'security', title: 'hardcoded credential' },

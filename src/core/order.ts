@@ -1,7 +1,7 @@
 /**
  * Deduplication and ordering, in one place.
  *
- * Invariant 4 in CLAUDE.md: this function is called once per job, and its
+ * A hard requirement: this function is called once per job, and its
  * output feeds both the JSON result and the event log. Sorting in two places
  * is how the stream and the poll response quietly stop agreeing.
  */
