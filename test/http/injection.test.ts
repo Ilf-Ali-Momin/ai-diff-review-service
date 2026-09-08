@@ -1,5 +1,5 @@
 /**
- * TESTPLAN rows 61, 62, 64 and 84, at the service boundary.
+ * Probes 61, 62, 64 and 84, at the service boundary.
  *
  * The unit tests prove the predicates and the validation. These prove the
  * property the contract actually states: that content in a diff cannot change

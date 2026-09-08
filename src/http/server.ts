@@ -40,7 +40,7 @@ function defaultLlmProvider(): Provider {
  *
  * Fastify rejects an oversized or malformed body before any route runs, so
  * these arrive at the error handler rather than at a validation step. Mapping
- * them here is what keeps invariant 1 true for requests that never reach a
+ * them here is what keeps the envelope rule true for requests that never reach a
  * route: a 2 MiB body must answer `payload_too_large`, not a framework page.
  */
 const FRAMEWORK_ERROR_CODES: Record<string, ErrorCode> = {
@@ -146,7 +146,7 @@ export function buildServer(options: ServerOptions = {}): FastifyInstance {
   /**
    * Covers an unknown path and a method we do not register on a known path.
    * Both answer 404 `not_found`, because the taxonomy has no code for a method
-   * mismatch and inventing one would violate invariant 1. See D-013.
+   * mismatch and inventing one would violate the closed taxonomy. See D-013.
    */
   app.setNotFoundHandler((request, reply) => {
     sendError(reply, 'not_found', `no route for ${request.method} ${request.url}`);

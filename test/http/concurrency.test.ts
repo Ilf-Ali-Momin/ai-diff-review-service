@@ -1,5 +1,5 @@
 /**
- * TESTPLAN rows 70 to 74.
+ * Probes 70 to 74.
  *
  * Every diff here is distinct on purpose. Identical diffs would share one scan
  * through the cache and the test would measure deduplication rather than

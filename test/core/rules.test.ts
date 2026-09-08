@@ -1,5 +1,5 @@
 /**
- * TESTPLAN rows 13 to 21, 25 and 26, plus every row of every table in
+ * Probes 13 to 21, 25 and 26, plus every row of every table in
  * RULES.md, positive and negative.
  *
  * The negative rows matter more than the positive ones. A rule that fires

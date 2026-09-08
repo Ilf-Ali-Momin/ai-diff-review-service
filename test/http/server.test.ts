@@ -151,7 +151,7 @@ describe('probe 59: a method we do not register', () => {
   });
 });
 
-describe('invariant 1: unhandled errors leave through the envelope', () => {
+describe('the envelope rule: unhandled errors leave through it', () => {
   it('turns a thrown exception into internal, never a stack trace', async () => {
     const throwing = buildServer();
     throwing.get('/boom', async () => {

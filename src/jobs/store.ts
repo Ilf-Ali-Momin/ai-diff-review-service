@@ -71,7 +71,7 @@ export function createDeferred<T>(): Deferred<T> {
 
   // When a scan fails and no duplicate submission is waiting on it, nothing
   // else would ever attach a handler and Node would report an unhandled
-  // rejection. This inert handler is what keeps invariant 7 true here.
+  // rejection. This inert handler is what keeps the never crash rule true here.
   promise.catch(() => undefined);
 
   return { promise, resolve, reject };

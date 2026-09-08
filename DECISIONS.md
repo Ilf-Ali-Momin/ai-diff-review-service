@@ -127,12 +127,12 @@ covers both an unknown path and an unregistered method, so one handler serves
 both cases.
 **Rejected:** Adding a `method_not_allowed` code, or returning 405 carrying the
 `internal` code.
-**Why:** The taxonomy in CONTRACT.md is closed and has no code for a method
-mismatch, and invariant 1 forbids inventing one. 404 is also Fastify's own
+**Why:** The taxonomy in the contract is closed and has no code for a method
+mismatch, and the closed taxonomy forbids inventing one. 404 is also Fastify's own
 default status here, so only the body shape departs from the framework, never
 the status. Returning 405 with a code that means something else would be a
 worse lie than returning 404 with a code that is merely coarse.
-**Contract reference:** the error envelope code list, and TESTPLAN probe 59
+**Contract reference:** the error envelope code list, and probe 59 in `test/probe`
 
 ## D-014: Auth covers the whole `/v1` prefix, including paths that match no route
 **Decision:** Bearer validation runs in an `onRequest` hook for every URL whose
@@ -140,7 +140,7 @@ path begins with `/v1`, before route resolution and before body parsing.
 `GET /v1/nonsense` with no token gives 401; with a valid token it gives 404.
 **Rejected:** Resolving the route first, which returns 404 to an
 unauthenticated caller for any path that happens not to exist.
-**Why:** The contract requires auth on all `/v1/*` routes and TESTPLAN probe 10
+**Why:** The contract requires auth on all `/v1/*` routes and probe 10 in `test/probe`
 establishes that auth precedes existence for an unknown jobId. Extending the
 same order to an unknown path keeps one rule rather than two, and tells an
 unauthenticated caller nothing about which paths exist. `onRequest` is also the
@@ -156,8 +156,8 @@ documented default is used. Only a missing, empty or unparseable `diff`
 produces `422 invalid_diff`.
 **Rejected:** Rejecting the request with `422 invalid_diff`, or introducing an
 `invalid_options` code.
-**Why:** The taxonomy has no code for a bad option value and invariant 1
-forbids adding one. Reusing `invalid_diff` would misreport the cause to a
+**Why:** The taxonomy has no code for a bad option value and the closed
+taxonomy forbids adding one. Reusing `invalid_diff` would misreport the cause to a
 client whose diff is fine. The contract already instructs leniency for fields
 it does not recognize, so leniency for a value it cannot use is the consistent
 reading of the same intent.
@@ -167,7 +167,7 @@ reading of the same intent.
 **Decision:** `/health` reports process uptime in seconds as a number with
 millisecond precision, not a whole number.
 **Rejected:** Rounding to whole seconds, which is the more conventional shape.
-**Why:** TESTPLAN probe 1 requires the value to increase between two calls, and
+**Why:** probe 1 in `test/probe` requires the value to increase between two calls, and
 two calls made inside the same second would return an identical integer and
 fail a probe that is otherwise trivially satisfiable. The contract types the
 field as a number and never says integer, so the fractional reading costs
@@ -196,7 +196,7 @@ unified diff and absent from arbitrary prose. Requiring `diff --git` would
 reject the plain `diff -u` output that the `---` and `+++` pair produces, which
 is still a unified diff. Accepting any `+` line would accept prose.
 **Contract reference:** "`diff` missing, empty, or not parseable as a unified
-diff → `422`", and TESTPLAN probe 55
+diff → `422`", and probe 55 in `test/probe`
 
 ## D-019: File segments are recognized from `diff --git` or from a `---` and `+++` pair
 **Decision:** A new file segment begins at a `diff --git` line, or at a `---`
@@ -248,7 +248,7 @@ validating LLM output, but its added lines are not handed to the mock provider.
 **Rejected:** Parsing once and grouping the added lines by file, with chunks
 holding references.
 **Why:** The rejected design makes "a chunked scan equals an unchunked scan"
-true by definition, so TESTPLAN probe 31, the highest value test in the plan,
+true by definition, so probe 31 in `test/probe`, the highest value test in the plan,
 would assert nothing. Re parsing means the property test exercises the real
 risk, that a file boundary drops or duplicates a finding. The cost is one extra
 parse of each byte, which is trivial next to the 30 second budget.
@@ -262,8 +262,8 @@ the promise; any identical submission arriving while that scan is still running
 awaits the same promise and reports `cacheHit: true`. A rejected promise is
 deleted from the cache immediately, so a failure is never cached and a later
 submission retries.
-**Rejected:** Caching only completed results, which is what ARCHITECTURE.md
-describes.
+**Rejected:** Caching only completed results, which is what the architecture
+notes described.
 **Why:** The rejected design satisfies the contract only for submissions that
 are far enough apart. Two byte identical diffs submitted at the same moment
 both find an empty cache and both do the full work, which is exactly what the
@@ -300,7 +300,7 @@ queue.
 sequence exactly like a computed one. One code path gets that for free; two
 paths mean the event sequence is written twice and will eventually differ. A
 cached job holds its slot for microseconds, so the concurrency cost is nil.
-**Contract reference:** TESTPLAN probe 41, and "Connecting to a finished job's
+**Contract reference:** probe 41 in `test/probe`, and "Connecting to a finished job's
 stream must replay all events identically"
 
 ## D-026: The 202 body always reports `status: "queued"`
@@ -329,12 +329,12 @@ a caller polling a large job.
 **Decision:** The event sequence is `status queued`, `status running`, one
 `finding` per finding, `status done`, then `done`. A failed job ends at
 `status failed` with no `done` event.
-**Rejected:** ARCHITECTURE.md's sequence, which goes straight from the last
+**Rejected:** The architecture notes' sequence, which goes straight from the last
 finding to `done` with no `status done` event.
 **Why:** This is a conflict between two of our own files, flagged here rather
 than resolved silently. The contract says the `status` event fires "at least on
-status transitions", and reaching `done` is a transition. CLAUDE.md sets the
-precedence: the contract outranks ARCHITECTURE.md, so the extra event is
+status transitions", and reaching `done` is a transition. The precedence rule
+settles it: the contract outranks our own design notes, so the extra event is
 emitted. It cannot break a consumer that keys on the `done` event, since that
 event is still the terminator and still carries `total` and `usage`.
 **Contract reference:** "event `status` — at least on status transitions"
@@ -363,7 +363,7 @@ any jitter in arrival times rejects a request that the contract says must
 succeed. The contract also speaks of "your declared burst" as something
 separate from the per minute figure, while fixing the shape of `/spec` so that
 there is no field to declare a burst in. This is the one place where invariant
-3 in CLAUDE.md, that declared limits cannot drift from actual behavior, is not
+that declared limits cannot drift from actual behavior, is not
 fully achievable, and it is recorded here rather than left to be discovered. A
 probe reading `rateLimitPerMinute` as a hard ceiling would see requests 31
 through 40 succeed.
@@ -430,7 +430,7 @@ evidence it claims is compared with the real line after trimming both, and a
 mismatch drops the finding. What we emit is always the parsed line verbatim,
 never the model's string.
 **Rejected:** Requiring exact equality of the claimed evidence, which is what
-ARCHITECTURE.md specifies. Also rejected: accepting the model's evidence once
+the architecture notes specified. Also rejected: accepting the model's evidence once
 the path and line check out.
 **Why:** Exact equality drops a correct finding whenever the model trims
 indentation, which they routinely do. Accepting the model's evidence is worse
@@ -477,7 +477,7 @@ retry against a dead host just spends the client's 30 second budget twice
 before failing anyway. Retrying only the recoverable case keeps the latency
 budget intact.
 **Contract reference:** "If the model is unreachable at runtime, the job must
-fail gracefully", and ARCHITECTURE.md "One retry after a timeout, then stop"
+fail gracefully", and the design rule "One retry after a timeout, then stop"
 
 ## D-039: One request per chunk, sequential, and any chunk failing fails the job
 **Decision:** The llm provider issues one completion per chunk in order, and
@@ -503,7 +503,7 @@ full validation above.
 **Why:** The three accepted shapes are what OpenAI compatible models actually
 emit when asked for JSON, and rejecting the fenced form would fail jobs for a
 formatting habit rather than a real problem. `response_format` is not
-implemented uniformly across the vendors ARCHITECTURE.md says must work
+implemented uniformly across the vendors the design requires to work
 unchanged, so depending on it would tie the service to one of them. Leniency
 about the envelope costs nothing because the contents are validated against
 parsed ground truth regardless.
@@ -523,7 +523,7 @@ makes `setTimeout` fire on the next tick, so every model request timed out
 instantly and the retry did too. The same expression governs `PORT`, where a
 blank value would have bound the deployed service to a random port and passed
 every local test first.
-**Contract reference:** DEPLOY.md environment table, where `LLM_TIMEOUT_MS` and
+**Contract reference:** the environment table, where `LLM_TIMEOUT_MS` and
 `PORT` are both documented as optional with defaults
 
 ## D-042: HTTPS through Caddy, on a free subdomain rather than a purchased one
@@ -546,8 +546,8 @@ TLS and explicitly permits a tunnel, so this is above the bar rather than
 required; the cost is one extra container and a DNS dependency, and a failure
 to issue would be visible immediately when the probe suite runs against the
 deployed URL rather than silently during the window.
-**Contract reference:** "Deployment: any option works", and DEPLOY.md's
-requirement that the stream is neither buffered nor compressed
+**Contract reference:** "Deployment: any option works", and the requirement
+that the stream is neither buffered nor compressed
 
 ---
 

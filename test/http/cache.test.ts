@@ -1,5 +1,5 @@
 /**
- * TESTPLAN rows 43 to 50.
+ * Probes 43 to 50.
  *
  * Caching and idempotency are two mechanisms that are easy to conflate. They
  * are keyed differently and they return different things: idempotency returns

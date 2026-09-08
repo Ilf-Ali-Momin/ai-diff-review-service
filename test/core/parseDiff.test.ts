@@ -1,5 +1,5 @@
 /**
- * TESTPLAN rows 22, 23 and 24, plus the parser level behavior the rule tests
+ * Probes 22, 23 and 24, plus the parser level behavior the rule tests
  * depend on: line numbering from hunk headers, path resolution, segment
  * boundaries, and the parseability signal that drives 422.
  */

@@ -1,7 +1,7 @@
 # RULES.md
 
 Authoritative interpretation of the mock provider rules. This file resolves
-every ambiguity in the CONTRACT.md rule table. Implement exactly this. Do not
+every ambiguity in the contract's rule table. Implement exactly this. Do not
 re resolve, do not improve, do not generalize.
 
 ## Governing principle
@@ -294,7 +294,7 @@ A line matching two phrases yields one finding, same id.
 **Inertness is a hard requirement.** The matched content is reported as
 `evidence` like any other finding and is never interpreted. In the mock
 provider this is automatic. In the LLM provider it is enforced by the wrapping
-and validation described in ARCHITECTURE.md. Diff content never reaches a
+and validation described in the provider design. Diff content never reaches a
 model as anything other than delimited data.
 
 ---

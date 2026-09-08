@@ -1,5 +1,5 @@
 /**
- * Ordering and deduplication, the function invariant 4 says is called exactly
+ * Ordering and deduplication. This function is called exactly
  * once per job and feeds both the JSON result and the event log.
  */
 

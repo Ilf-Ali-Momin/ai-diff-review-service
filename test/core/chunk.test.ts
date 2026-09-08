@@ -1,5 +1,5 @@
 /**
- * TESTPLAN rows 28 to 33.
+ * Probes 28 to 33.
  *
  * Row 31, the property test, is the highest value test in the plan and is
  * written first. It is only meaningful because the mock provider re parses

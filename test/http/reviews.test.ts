@@ -1,5 +1,5 @@
 /**
- * TESTPLAN rows 3 to 6, the auth rows 7 to 12, and the error taxonomy rows
+ * Probes 3 to 6, the auth rows 7 to 12, and the error taxonomy rows
  * 51 to 56 and 60.
  */
 

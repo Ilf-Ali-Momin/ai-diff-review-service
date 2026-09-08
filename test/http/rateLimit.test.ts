@@ -1,5 +1,5 @@
 /**
- * TESTPLAN rows 65 to 69.
+ * Probes 65 to 69.
  *
  * These use the real configured numbers, capacity 40 refilling at 30 per
  * minute, with an injected clock so that a minute of refill can be observed

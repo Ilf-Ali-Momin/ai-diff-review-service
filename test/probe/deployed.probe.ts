@@ -722,7 +722,7 @@ describe('rate limiting, probes 65 to 69', () => {
     }
 
     const statuses = responses.map((r) => r.status);
-    // TESTPLAN asks for "some 429, zero 5xx". How many succeed depends on how
+    // The probe plan asks for "some 429, zero 5xx". How many succeed depends on how
     // much budget the preceding sections left, so it is not asserted here;
     // acceptance under load is what probe 65 above covers.
     expect(statuses.filter((s) => s === 429).length).toBeGreaterThan(0);

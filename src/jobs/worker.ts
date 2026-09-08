@@ -95,7 +95,7 @@ export async function runJob(plan: JobPlan, deps: WorkerDeps): Promise<void> {
   } catch {
     // Unreachable in practice: the inner handler catches everything the task
     // can raise. Present so that a fire and forget call site cannot produce an
-    // unhandled rejection, which invariant 7 forbids.
+    // unhandled rejection, which the never crash rule forbids.
     if (job.status !== 'failed') {
       job.error = { code: 'internal', message: 'the job could not be scheduled' };
       deps.store.setStatus(job, 'failed');

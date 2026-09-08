@@ -1,5 +1,5 @@
 /**
- * TESTPLAN rows 63, 79 to 84, plus the validation that makes the injection
+ * Probes 63, 79 to 84, plus the validation that makes the injection
  * clause hold for the llm path.
  *
  * Everything runs against a local fake OpenAI compatible endpoint, so the

@@ -1,5 +1,5 @@
 /**
- * TESTPLAN rows 34 to 42.
+ * Probes 34 to 42.
  *
  * These run against a real listening socket rather than through `inject`,
  * because the framing, the flush behavior and the headers that stop a proxy
