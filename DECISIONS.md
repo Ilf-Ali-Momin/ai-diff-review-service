@@ -3,9 +3,6 @@
 Running log of every ambiguity resolved and every alternative rejected.
 
 
-Entries D-001 to D-012 were decided during planning, before any code. Continue
-numbering from D-013.
-
 ---
 
 ## D-001: Prefer the literal reading of every rule trigger
