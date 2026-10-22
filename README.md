@@ -4,6 +4,9 @@ An HTTP service that reviews unified diffs. A client submits a diff, receives a
 job id immediately, and collects structured findings either by polling or over
 a Server Sent Events stream.
 
+<img width="2400" height="1254" alt="ai-diff-review-service" src="https://github.com/user-attachments/assets/cf9fc66c-6856-4e67-acdd-5c21d1fd6e2a" />
+
+
 ## What it does
 
 ```
