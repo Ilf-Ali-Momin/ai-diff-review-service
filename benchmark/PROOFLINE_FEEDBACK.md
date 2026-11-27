@@ -37,9 +37,9 @@ only when it is more than one; the ledger carries the exact figure either way.
 | 17 | This file's counts do not add up | 3 | 3 | fixed | `1675e71` |
 | 18 | Prompts carry blob hashes that identify the upstream fix | 1 | 3 | fixed | `1675e71` |
 | 19 | The strict row validated metadata differently | 1 | 3 | fixed | `1675e71` |
-| 20 | The entry numbering convention was never stated | 1 | 4 | fixed | DOCCOMMIT |
-| 21 | Round 3 rows point at commits the entries do not name | 1 | 4 | fixed | DOCCOMMIT |
-| 22 | The recap's repeat counts are wrong and call a rejection fixed | 2 | 4 | fixed | DOCCOMMIT |
+| 20 | The entry numbering convention was never stated | 1 | 4 | fixed | `343f804` |
+| 21 | Round 3 rows point at commits the entries do not name | 1 | 4 | fixed | `343f804` |
+| 22 | The recap's repeat counts are wrong and call a rejection fixed | 2 | 4 | fixed | `343f804` |
 | 23 | The manifest note says descriptions appear only in the report | 1 | 4 | fixed | `852b0cd` |
 | 24 | Published slugs are an unsalted hash of committed ids | 1 | 4 | fixed | `852b0cd` |
 | 25 | The fixture test compares ids only | 1 | 4 | fixed | `852b0cd` |
