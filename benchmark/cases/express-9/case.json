@@ -6,7 +6,7 @@
   "description": "mountpath is set from the raw first argument instead of the resolved mount path, so app.use(subapp) without a path gives subapp the wrong mountpath.",
   "upstreamFixSha": "3e32721e24bb0169cbb348ae4654caa90fdfb1c0",
   "upstreamFixSubject": "Fix subapp.mountpath regression for app.use(subapp)",
-  "diff": "diff --git a/lib/application.js b/lib/application.js\nindex 2ab00b0..352d57e 100644\n--- a/lib/application.js\n+++ b/lib/application.js\n@@ -168,7 +168,7 @@ app.use = function use(path, fn) {\n   // express app\n   if (mount_app && mount_app.handle && mount_app.set) {\n     debug('.use app under %s', mount_path);\n-    mount_app.mountpath = mount_path;\n+    mount_app.mountpath = path;\n     mount_app.parent = this;\n \n     // restore .app property on req and res\n",
+  "diff": "diff --git a/lib/application.js b/lib/application.js\n--- a/lib/application.js\n+++ b/lib/application.js\n@@ -168,7 +168,7 @@ app.use = function use(path, fn) {\n   // express app\n   if (mount_app && mount_app.handle && mount_app.set) {\n     debug('.use app under %s', mount_path);\n-    mount_app.mountpath = mount_path;\n+    mount_app.mountpath = path;\n     mount_app.parent = this;\n \n     // restore .app property on req and res\n",
   "files": [
     "lib/application.js"
   ],

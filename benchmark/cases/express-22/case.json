@@ -6,7 +6,7 @@
   "description": "Splitting the Host header on ':' truncates IPv6 literals such as [::1]:3000 to '['.",
   "upstreamFixSha": "c99fa6a19268e87b300c1775f90814a23095f199",
   "upstreamFixSubject": "Fix req.host for IPv6 literals",
-  "diff": "diff --git a/lib/request.js b/lib/request.js\nindex 10c1421..3d41617 100644\n--- a/lib/request.js\n+++ b/lib/request.js\n@@ -476,13 +476,7 @@ req.__defineGetter__('host', function(){\n   var host = trustProxy && this.get('X-Forwarded-Host');\n   host = host || this.get('Host');\n   if (!host) return;\n-  var offset = host[0] === '['\n-    ? host.indexOf(']') + 1\n-    : 0;\n-  var index = host.indexOf(':', offset);\n-  return ~index\n-    ? host.substring(0, index)\n-    : host;\n+  return host.split(':')[0];\n });\n \n /**\n",
+  "diff": "diff --git a/lib/request.js b/lib/request.js\n--- a/lib/request.js\n+++ b/lib/request.js\n@@ -476,13 +476,7 @@ req.__defineGetter__('host', function(){\n   var host = trustProxy && this.get('X-Forwarded-Host');\n   host = host || this.get('Host');\n   if (!host) return;\n-  var offset = host[0] === '['\n-    ? host.indexOf(']') + 1\n-    : 0;\n-  var index = host.indexOf(':', offset);\n-  return ~index\n-    ? host.substring(0, index)\n-    : host;\n+  return host.split(':')[0];\n });\n \n /**\n",
   "files": [
     "lib/request.js"
   ],

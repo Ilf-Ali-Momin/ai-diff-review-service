@@ -6,7 +6,7 @@
   "description": "Without the leading slash check, any path containing :// (for example /proxy/http://x) is treated as a fully qualified URL and routed wrongly.",
   "upstreamFixSha": "eabd4564aaa8d209260497b5f3f2dda3591a9dea",
   "upstreamFixSubject": "Fix handling of URLs containing :// in the path",
-  "diff": "diff --git a/lib/router/index.js b/lib/router/index.js\nindex c6e6ba2..0ca1b6f 100644\n--- a/lib/router/index.js\n+++ b/lib/router/index.js\n@@ -126,7 +126,7 @@ proto.handle = function(req, res, done) {\n \n   var search = 1 + req.url.indexOf('?');\n   var pathlength = search ? search - 1 : req.url.length;\n-  var fqdn = req.url[0] !== '/' && 1 + req.url.substr(0, pathlength).indexOf('://');\n+  var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');\n   var protohost = fqdn ? req.url.substr(0, req.url.indexOf('/', 2 + fqdn)) : '';\n   var idx = 0;\n   var removed = '';\n",
+  "diff": "diff --git a/lib/router/index.js b/lib/router/index.js\n--- a/lib/router/index.js\n+++ b/lib/router/index.js\n@@ -126,7 +126,7 @@ proto.handle = function(req, res, done) {\n \n   var search = 1 + req.url.indexOf('?');\n   var pathlength = search ? search - 1 : req.url.length;\n-  var fqdn = req.url[0] !== '/' && 1 + req.url.substr(0, pathlength).indexOf('://');\n+  var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');\n   var protohost = fqdn ? req.url.substr(0, req.url.indexOf('/', 2 + fqdn)) : '';\n   var idx = 0;\n   var removed = '';\n",
   "files": [
     "lib/router/index.js"
   ],

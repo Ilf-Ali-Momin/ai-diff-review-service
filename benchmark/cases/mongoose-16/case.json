@@ -6,7 +6,7 @@
   "description": "With full versioning, increment() alone leaves no dirty paths, so $__delta returns early and the version bump is never saved.",
   "upstreamFixSha": "f5097a3db29da5e29a69222e1827979842840cb1",
   "upstreamFixSubject": "fixed; increment() works without other changes",
-  "diff": "diff --git a/lib/model.js b/lib/model.js\nindex a722068..7d85047 100644\n--- a/lib/model.js\n+++ b/lib/model.js\n@@ -339,7 +339,7 @@ function handleAtomics (self, where, delta, data, value) {\n \n Model.prototype.$__delta = function () {\n   var dirty = this.$__dirty();\n-  if (!dirty.length && VERSION_ALL != this.$__.version) return;\n+  if (!dirty.length) return;\n \n   var where = {}\n     , delta = {}\n",
+  "diff": "diff --git a/lib/model.js b/lib/model.js\n--- a/lib/model.js\n+++ b/lib/model.js\n@@ -339,7 +339,7 @@ function handleAtomics (self, where, delta, data, value) {\n \n Model.prototype.$__delta = function () {\n   var dirty = this.$__dirty();\n-  if (!dirty.length && VERSION_ALL != this.$__.version) return;\n+  if (!dirty.length) return;\n \n   var where = {}\n     , delta = {}\n",
   "files": [
     "lib/model.js"
   ],

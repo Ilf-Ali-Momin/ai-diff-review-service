@@ -17,10 +17,36 @@ export function writeJson(path: string, value: unknown): void {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+export const CASES_CONFIG = join(BENCH_DIR, 'cases.config.json');
+
+/**
+ * Every built case directory, checked against the manifest first.
+ *
+ * `bench:cases` prunes a directory whose id has left cases.config.json, but it
+ * only runs when someone runs it. Until then the fixtures are still on disk
+ * and this function would happily load and score a case the manifest no
+ * longer lists. Refusing to load is the honest answer: the benchmark says
+ * which cases it runs in one place, and a stale directory means the build is
+ * out of date, not that the extra case belongs in the results.
+ */
 export function loadCases(): BenchCase[] {
-  return readdirSync(CASES_DIR, { withFileTypes: true })
+  const config = readJson<{ cases: Array<{ id: string }> }>(CASES_CONFIG);
+  const wanted = new Set(config.cases.map((entry) => entry.id));
+
+  const built = readdirSync(CASES_DIR, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
-    .map((entry) => readJson<BenchCase>(join(CASES_DIR, entry.name, 'case.json')))
+    .map((entry) => entry.name);
+
+  const orphans = built.filter((name) => !wanted.has(name));
+  if (orphans.length > 0) {
+    throw new Error(
+      `benchmark/cases has ${orphans.join(', ')}, which cases.config.json does not list: ` +
+        'run `npm run bench:cases` to rebuild, or restore the manifest entry',
+    );
+  }
+
+  return built
+    .map((name) => readJson<BenchCase>(join(CASES_DIR, name, 'case.json')))
     .sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true }));
 }
 

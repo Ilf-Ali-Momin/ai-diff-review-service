@@ -28,32 +28,6 @@ import {
 import { loadCases, RUNS_DIR, writeJson, type RunFile } from '../core/io';
 import type { ReviewerFinding } from '../core/types';
 
-/**
- * The rule validateFinding used before re anchoring: the quote must match the
- * line at exactly the number the model gave. Kept here so a run records both
- * rules against the same responses, which is the only way the two rows are
- * comparable: the model is not deterministic across runs.
- */
-function strictValidate(
-  item: Record<string, unknown>,
-  truth: ReturnType<typeof groundTruthFor>,
-): { path: string; line: number; text: string } | null {
-  const path = item['path'];
-  const line = item['line'];
-  const evidence = item['evidence'];
-  if (typeof path !== 'string' || typeof line !== 'number' || !Number.isInteger(line)) {
-    return null;
-  }
-  if (typeof evidence !== 'string') {
-    return null;
-  }
-  const actual = truth.get(path)?.get(line);
-  if (actual === undefined || actual.trim() !== evidence.trim()) {
-    return null;
-  }
-  return { path, line, text: actual };
-}
-
 /** `--runs N`, default 1. Each run writes its own files. */
 function runCountFromArgv(): number {
   const flag = process.argv.indexOf('--runs');
@@ -197,20 +171,20 @@ async function runOnce(
             });
           }
 
-          // Same response, the rule as it was before re anchoring.
-          if (typeof item === 'object' && item !== null) {
-            const strictHit = strictValidate(item as Record<string, unknown>, truth);
-            if (strictHit !== null) {
-              keptStrict += 1;
-              strict.findings.push({
-                reviewer: strict.reviewer,
-                caseId: benchCase.id,
-                path: strictHit.path,
-                line: strictHit.line,
-                title: validated?.title ?? String(((item as Record<string, unknown>)['title'] ?? '')).slice(0, 200),
-                evidence: strictHit.text,
-              });
-            }
+          // The same response under the rule as it was before re anchoring.
+          // This is validateFinding with one step turned off, not a second
+          // implementation of it, so the two rows differ only on anchoring.
+          const strictHit = validateFinding(item, truth, { exactLineOnly: true });
+          if (strictHit !== null) {
+            keptStrict += 1;
+            strict.findings.push({
+              reviewer: strict.reviewer,
+              caseId: benchCase.id,
+              path: strictHit.path,
+              line: strictHit.line,
+              title: strictHit.title,
+              evidence: strictHit.evidence,
+            });
           }
         }
       }

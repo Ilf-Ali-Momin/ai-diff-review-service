@@ -6,7 +6,7 @@
   "description": "Drops the guard for an empty key list, so res.format with only a default handler passes an empty array to req.accepts and errors instead of using the default.",
   "upstreamFixSha": "24d1c98c0ae4cc5dfd79bfff5d536a95034f7569",
   "upstreamFixSubject": "Fix res.format error when only default provided",
-  "diff": "diff --git a/lib/response.js b/lib/response.js\nindex 5334515..50b0579 100644\n--- a/lib/response.js\n+++ b/lib/response.js\n@@ -606,9 +606,7 @@ res.format = function(obj){\n   if (fn) delete obj.default;\n   var keys = Object.keys(obj);\n \n-  var key = keys.length > 0\n-    ? req.accepts(keys)\n-    : false;\n+  var key = req.accepts(keys);\n \n   this.vary(\"Accept\");\n \n",
+  "diff": "diff --git a/lib/response.js b/lib/response.js\n--- a/lib/response.js\n+++ b/lib/response.js\n@@ -606,9 +606,7 @@ res.format = function(obj){\n   if (fn) delete obj.default;\n   var keys = Object.keys(obj);\n \n-  var key = keys.length > 0\n-    ? req.accepts(keys)\n-    : false;\n+  var key = req.accepts(keys);\n \n   this.vary(\"Accept\");\n \n",
   "files": [
     "lib/response.js"
   ],

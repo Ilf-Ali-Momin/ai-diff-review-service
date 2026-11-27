@@ -186,12 +186,21 @@ function anchor(
   lines: Map<number, string>,
   claimedLine: number,
   claimedText: string,
+  exactLineOnly: boolean,
 ): { line: number; text: string } | null {
   const wanted = claimedText.trim();
 
   const atClaimed = lines.get(claimedLine);
   if (atClaimed !== undefined && atClaimed.trim() === wanted) {
     return { line: claimedLine, text: atClaimed };
+  }
+
+  // The rule as it was before re anchoring existed: the quote had to match the
+  // line the model named. The benchmark scores both rules against one response
+  // and the only honest way to do that is to run the same validation with this
+  // one step changed.
+  if (exactLineOnly) {
+    return null;
   }
 
   // Too short, or no letters and digits, means the quote is punctuation that
@@ -223,7 +232,18 @@ function anchor(
   return { line: best, text: lines.get(best) as string };
 }
 
-export function validateFinding(raw: unknown, truth: GroundTruth): Finding | null {
+/**
+ * `exactLineOnly` turns off the re anchor and nothing else: every other check,
+ * including severity, category, ruleId and title, stays exactly the same. The
+ * benchmark's strict row needs that, because a row that also validated
+ * metadata differently would differ for two reasons at once and would stop
+ * measuring what re anchoring buys.
+ */
+export function validateFinding(
+  raw: unknown,
+  truth: GroundTruth,
+  options: { exactLineOnly?: boolean } = {},
+): Finding | null {
   if (typeof raw !== 'object' || raw === null) {
     return null;
   }
@@ -245,7 +265,7 @@ export function validateFinding(raw: unknown, truth: GroundTruth): Finding | nul
     return null;
   }
 
-  const anchored = anchor(linesForPath, line, claimed);
+  const anchored = anchor(linesForPath, line, claimed, options.exactLineOnly === true);
   if (anchored === null) {
     return null;
   }

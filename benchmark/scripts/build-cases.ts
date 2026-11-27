@@ -68,12 +68,29 @@ function writeFile(path: string, content: string): void {
   writeFileSync(path, content);
 }
 
+/**
+ * Drops `index <old>..<new>` headers from a generated diff.
+ *
+ * Those are the upstream repository's blob hashes. They say nothing a reviewer
+ * can use, and they identify the exact file versions on either side of a
+ * public BugsJS fix, which is a lookup key into the answer for anyone who can
+ * search those repositories. Hosted reviewers never see these: bench:push
+ * commits the file contents and GitHub computes its own headers, so removing
+ * them from the prompt makes the two inputs more alike, not less.
+ */
+function stripBlobHashes(diff: string): string {
+  return diff
+    .split('\n')
+    .filter((line) => !/^index [0-9a-f]{4,40}\.\.[0-9a-f]{4,40}( [0-7]{6})?\r?$/.test(line))
+    .join('\n');
+}
+
 function build(entry: ConfigCase): BenchCase {
   const dir = ensureTags(entry.repo, entry.bug);
   const buggy = `Bug-${entry.bug}`;
   const fixed = `Bug-${entry.bug}-fix`;
 
-  const diff = git(dir, ['diff', '-U3', fixed, buggy, '--', ...PATHSPEC]);
+  const diff = stripBlobHashes(git(dir, ['diff', '-U3', fixed, buggy, '--', ...PATHSPEC]));
   const files = git(dir, ['diff', '--name-only', fixed, buggy, '--', ...PATHSPEC])
     .split('\n')
     .filter((line) => line !== '');

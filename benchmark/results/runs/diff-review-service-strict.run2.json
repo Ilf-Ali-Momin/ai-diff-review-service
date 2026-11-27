@@ -1,7 +1,7 @@
 {
   "reviewer": "diff-review-service-strict",
   "source": "openai/gpt-oss-120b + validateFinding (strict: exact line and quote)",
-  "ranAt": "2026-11-27T16:40:19.827Z",
+  "ranAt": "2026-11-27T17:01:03.248Z",
   "caseIds": [
     "express-3",
     "express-4",
@@ -25,32 +25,24 @@
       "caseId": "express-4",
       "path": "lib/request.js",
       "line": 457,
-      "title": "Removed IP address check when computing subdomains",
+      "title": "Subdomains parsing no longer checks for IP addresses, may misinterpret IP hosts",
       "evidence": "  var subdomains = host.split('.').reverse();"
-    },
-    {
-      "reviewer": "diff-review-service-strict",
-      "caseId": "express-22",
-      "path": "lib/request.js",
-      "line": 479,
-      "title": "Incorrect host parsing for IPv6 addresses",
-      "evidence": "  return host.split(':')[0];"
     },
     {
       "reviewer": "diff-review-service-strict",
       "caseId": "hexo-7",
       "path": "lib/plugins/helper/toc.js",
       "line": 28,
-      "title": "Using raw HTML for heading text may introduce XSS",
+      "title": "Using raw HTML for heading text may introduce XSS vulnerabilities",
       "evidence": "    var text = $(this).html();"
     },
     {
       "reviewer": "diff-review-service-strict",
-      "caseId": "mongoose-8",
-      "path": "lib/document.js",
-      "line": 355,
-      "title": "Missing return statement in Document.update breaks expected return value",
-      "evidence": "  this.constructor.update.apply(this.constructor, args);"
+      "caseId": "karma-3",
+      "path": "lib/reporter.js",
+      "line": 99,
+      "title": "Overwrites error message before concatenation, may cause type errors",
+      "evidence": "      msg = config.formatError(msg)"
     }
   ],
   "errors": []

@@ -1,7 +1,7 @@
 {
   "reviewer": "model-raw",
   "source": "openai/gpt-oss-120b",
-  "ranAt": "2026-11-27T16:39:08.384Z",
+  "ranAt": "2026-11-27T17:00:07.321Z",
   "caseIds": [
     "express-3",
     "express-4",
@@ -22,42 +22,26 @@
   "findings": [
     {
       "reviewer": "model-raw",
-      "caseId": "express-3",
-      "path": "lib/response.js",
-      "line": 608,
-      "title": "Unconditional call to req.accepts may mis-handle empty key list",
-      "evidence": "var key = req.accepts(keys);"
-    },
-    {
-      "reviewer": "model-raw",
       "caseId": "express-4",
       "path": "lib/request.js",
-      "line": 454,
-      "title": "Improper handling of IP addresses when computing subdomains",
+      "line": 456,
+      "title": "Removed IP address check when parsing subdomains",
       "evidence": "var subdomains = host.split('.').reverse();"
     },
     {
       "reviewer": "model-raw",
       "caseId": "express-5",
       "path": "lib/utils.js",
-      "line": 71,
-      "title": "Removed support for forward slash in Windows device paths",
-      "evidence": "if (':' === path[1] && '\\' === path[2]) return true;"
-    },
-    {
-      "reviewer": "model-raw",
-      "caseId": "express-9",
-      "path": "lib/application.js",
-      "line": 171,
-      "title": "Assigning mount_app.mountpath to raw path argument may break routing",
-      "evidence": "mount_app.mountpath = path;"
+      "line": 70,
+      "title": "Windows device path detection no longer accepts forward slash separator",
+      "evidence": "if (':' === path[1] && '\\\\' === path[2]) return true;"
     },
     {
       "reviewer": "model-raw",
       "caseId": "express-22",
       "path": "lib/request.js",
       "line": 476,
-      "title": "Naive split on ':' breaks IPv6 host parsing",
+      "title": "Improper host parsing breaks IPv6 handling",
       "evidence": "return host.split(':')[0];"
     },
     {
@@ -65,14 +49,14 @@
       "caseId": "express-26",
       "path": "lib/router/index.js",
       "line": 126,
-      "title": "Removed leading slash check, may misidentify FQDN for paths starting with '/'",
+      "title": "Removed check for leading '/' may misclassify relative URLs",
       "evidence": "var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');"
     },
     {
       "reviewer": "model-raw",
       "caseId": "hexo-7",
       "path": "lib/plugins/helper/toc.js",
-      "line": 28,
+      "line": 29,
       "title": "Unescaped HTML inserted into TOC may lead to XSS",
       "evidence": "var text = $(this).html();"
     },
@@ -80,33 +64,33 @@
       "reviewer": "model-raw",
       "caseId": "hexo-12",
       "path": "lib/hexo/post.js",
-      "line": 49,
-      "title": "Removing .toString() may pass non‑string values to slugize, causing runtime errors",
+      "line": 47,
+      "title": "Removing .toString() may cause non-string slug leading to runtime errors",
       "evidence": "data.slug = slugize(data.slug || data.title, {transform: config.filename_case});"
     },
     {
       "reviewer": "model-raw",
       "caseId": "hexo-12",
       "path": "lib/hexo/post.js",
-      "line": 205,
-      "title": "Removing .toString() may pass non‑string values to slugize, leading to unexpected behavior",
+      "line": 204,
+      "title": "Redundant assignment of data.slug when initializing slug variable",
       "evidence": "var slug = data.slug = slugize(data.slug, {transform: config.filename_case});"
     },
     {
       "reviewer": "model-raw",
       "caseId": "karma-3",
       "path": "lib/reporter.js",
-      "line": 96,
-      "title": "Changing error formatting return behavior and adding newline",
+      "line": 98,
+      "title": "Overwrites msg instead of returning formatted error, may cause type errors",
       "evidence": "msg = config.formatError(msg)"
     },
     {
       "reviewer": "model-raw",
       "caseId": "karma-22",
       "path": "lib/reporter.js",
-      "line": 31,
-      "title": "Broad URL regex permits any host, weakening URL validation",
-      "evidence": "var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/\\s]*)?\\/?'"
+      "line": 25,
+      "title": "Overly permissive URL regular expression may allow unintended URLs",
+      "evidence": "var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/\\s]*)?\\/?' +"
     },
     {
       "reviewer": "model-raw",
@@ -121,15 +105,15 @@
       "caseId": "mongoose-11",
       "path": "lib/query.js",
       "line": 514,
-      "title": "Removed existence check may cause duplicate field inclusion",
+      "title": "Removed duplicate path check, may add duplicate fields to projection",
       "evidence": "if (false === exclude && keys.length > 1) {"
     },
     {
       "reviewer": "model-raw",
       "caseId": "mongoose-16",
       "path": "lib/model.js",
-      "line": 339,
-      "title": "Removed version check may cause premature return",
+      "line": 343,
+      "title": "Removed version check may cause stale updates",
       "evidence": "if (!dirty.length) return;"
     },
     {
@@ -137,7 +121,7 @@
       "caseId": "mongoose-22",
       "path": "lib/model.js",
       "line": 764,
-      "title": "Removing query conditions may cause deletion of all documents",
+      "title": "Query initialized with empty conditions may delete all documents unintentionally",
       "evidence": "var mq = new Query({}, {}, this, this.collection);"
     }
   ],

@@ -1,7 +1,7 @@
 {
   "reviewer": "model-raw",
   "source": "openai/gpt-oss-120b",
-  "ranAt": "2026-11-27T16:42:21.346Z",
+  "ranAt": "2026-11-27T17:02:54.468Z",
   "caseIds": [
     "express-3",
     "express-4",
@@ -25,54 +25,38 @@
       "caseId": "express-3",
       "path": "lib/response.js",
       "line": 606,
-      "title": "Calling req.accepts with empty array may change behavior when no response formats are defined",
+      "title": "Calling req.accepts with an empty array may produce unexpected results",
       "evidence": "var key = req.accepts(keys);"
     },
     {
       "reviewer": "model-raw",
       "caseId": "express-4",
       "path": "lib/request.js",
-      "line": 457,
-      "title": "Subdomain parsing fails for IP addresses after removing isIP check",
+      "line": 456,
+      "title": "Removed IP check when parsing subdomains, causing incorrect subdomain extraction for IP addresses",
       "evidence": "var subdomains = host.split('.').reverse();"
     },
     {
       "reviewer": "model-raw",
       "caseId": "express-5",
       "path": "lib/utils.js",
-      "line": 68,
-      "title": "Windows absolute path detection no longer accepts forward slash after colon",
-      "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;"
+      "line": 69,
+      "title": "Removed forward‑slash check for Windows device paths, may misclassify absolute paths",
+      "evidence": "if (':' === path[1] && '\\\\' === path[2]) return true;"
     },
     {
       "reviewer": "model-raw",
       "caseId": "express-9",
       "path": "lib/application.js",
-      "line": 172,
-      "title": "Assigning mount_app.mountpath to request path instead of mount_path breaks routing",
-      "evidence": "mount_app.mountpath = path;"
-    },
-    {
-      "reviewer": "model-raw",
-      "caseId": "express-16",
-      "path": "lib/response.js",
-      "line": 822,
-      "title": "Potential XSS: URL inserted into HTML without proper sanitization",
-      "evidence": "body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);"
-    },
-    {
-      "reviewer": "model-raw",
-      "caseId": "express-16",
-      "path": "lib/response.js",
-      "line": 828,
-      "title": "Potential XSS: URL inserted into HTML anchor without proper sanitization",
-      "evidence": "var u = escapeHtml(url);"
+      "line": 168,
+      "title": "Incorrect assignment of mount_app.mountpath may break routing",
+      "evidence": "    mount_app.mountpath = path;"
     },
     {
       "reviewer": "model-raw",
       "caseId": "express-22",
       "path": "lib/request.js",
-      "line": 480,
+      "line": 476,
       "title": "Improper host parsing breaks IPv6 handling",
       "evidence": "return host.split(':')[0];"
     },
@@ -80,48 +64,40 @@
       "reviewer": "model-raw",
       "caseId": "express-26",
       "path": "lib/router/index.js",
-      "line": 126,
-      "title": "Removed leading slash check when detecting protocol in URL",
+      "line": 127,
+      "title": "Removed leading slash check when detecting fully qualified URLs",
       "evidence": "var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');"
     },
     {
       "reviewer": "model-raw",
       "caseId": "hexo-7",
       "path": "lib/plugins/helper/toc.js",
-      "line": 25,
-      "title": "Unescaped HTML inserted into TOC can lead to XSS",
+      "line": 28,
+      "title": "HTML not escaped, potential XSS vulnerability",
       "evidence": "var text = $(this).html();"
     },
     {
       "reviewer": "model-raw",
       "caseId": "hexo-12",
       "path": "lib/hexo/post.js",
-      "line": 51,
-      "title": "Removing .toString() may cause non-string slug values leading to errors",
+      "line": 47,
+      "title": "Removing .toString() may cause TypeError when slug or title is undefined or non‑string",
       "evidence": "data.slug = slugize(data.slug || data.title, {transform: config.filename_case});"
     },
     {
       "reviewer": "model-raw",
       "caseId": "hexo-12",
       "path": "lib/hexo/post.js",
-      "line": 208,
-      "title": "Removing .toString() may cause undefined slug to cause slugize error",
+      "line": 204,
+      "title": "Removing .toString() may cause TypeError if data.slug is undefined or non‑string",
       "evidence": "var slug = data.slug = slugize(data.slug, {transform: config.filename_case});"
-    },
-    {
-      "reviewer": "model-raw",
-      "caseId": "karma-3",
-      "path": "lib/reporter.js",
-      "line": 98,
-      "title": "Changing return behavior may cause type errors",
-      "evidence": "msg = config.formatError(msg)"
     },
     {
       "reviewer": "model-raw",
       "caseId": "karma-22",
       "path": "lib/reporter.js",
-      "line": 27,
-      "title": "Overly permissive URL regular expression allows any hostname",
+      "line": 28,
+      "title": "Regex now allows any host, reducing validation and may enable SSRF",
       "evidence": "var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/\\s]*)?\\/?' +"
     },
     {
@@ -129,7 +105,7 @@
       "caseId": "mongoose-8",
       "path": "lib/document.js",
       "line": 355,
-      "title": "Missing return statement; function no longer returns result of update",
+      "title": "Missing return statement in Document.prototype.update",
       "evidence": "this.constructor.update.apply(this.constructor, args);"
     },
     {
@@ -137,7 +113,7 @@
       "caseId": "mongoose-11",
       "path": "lib/query.js",
       "line": 514,
-      "title": "Removed check for existing key may cause duplicate field inclusion",
+      "title": "Removed check for existing path may cause duplicate field inclusion",
       "evidence": "if (false === exclude && keys.length > 1) {"
     },
     {
@@ -145,7 +121,7 @@
       "caseId": "mongoose-16",
       "path": "lib/model.js",
       "line": 339,
-      "title": "Removed version check may cause incorrect early return",
+      "title": "Removed version check may skip necessary delta processing",
       "evidence": "if (!dirty.length) return;"
     },
     {
@@ -153,7 +129,7 @@
       "caseId": "mongoose-22",
       "path": "lib/model.js",
       "line": 764,
-      "title": "Remove operation ignores conditions, may delete all documents",
+      "title": "Empty query passed to remove may delete all documents",
       "evidence": "var mq = new Query({}, {}, this, this.collection);"
     }
   ],

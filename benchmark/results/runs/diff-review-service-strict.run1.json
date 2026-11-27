@@ -1,7 +1,7 @@
 {
   "reviewer": "diff-review-service-strict",
   "source": "openai/gpt-oss-120b + validateFinding (strict: exact line and quote)",
-  "ranAt": "2026-11-27T16:39:08.384Z",
+  "ranAt": "2026-11-27T17:00:07.321Z",
   "caseIds": [
     "express-3",
     "express-4",
@@ -22,19 +22,11 @@
   "findings": [
     {
       "reviewer": "diff-review-service-strict",
-      "caseId": "express-9",
-      "path": "lib/application.js",
-      "line": 171,
-      "title": "Assigning mount_app.mountpath to raw path argument may break routing",
-      "evidence": "    mount_app.mountpath = path;"
-    },
-    {
-      "reviewer": "diff-review-service-strict",
-      "caseId": "hexo-7",
-      "path": "lib/plugins/helper/toc.js",
-      "line": 28,
-      "title": "Unescaped HTML inserted into TOC may lead to XSS",
-      "evidence": "    var text = $(this).html();"
+      "caseId": "express-5",
+      "path": "lib/utils.js",
+      "line": 70,
+      "title": "Windows device path detection no longer accepts forward slash separator",
+      "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;"
     }
   ],
   "errors": []

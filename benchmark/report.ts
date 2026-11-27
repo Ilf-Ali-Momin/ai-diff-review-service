@@ -16,7 +16,7 @@ import { CASES_DIR, loadCases, loadRuns, readJson, RESULTS_DIR, writeJson } from
 import { LINE_TOLERANCE, normalizePath, scoreCase, summarize, type ReviewerSummary } from './core/score';
 import type { BenchCase, CaseScore, ScoredFinding, TriageLabel } from './core/types';
 
-type TriageEntry = {
+export type TriageEntry = {
   key: string;
   reviewer: string;
   caseId: string;
@@ -24,6 +24,13 @@ type TriageEntry = {
   title: string;
   code: string;
   label: TriageLabel | null;
+  /**
+   * False when this report's runs did not produce the finding. The entry is
+   * kept anyway, because the label on it is a human judgement and the model is
+   * not deterministic: a finding can vanish from one set of runs and return in
+   * the next.
+   */
+  present?: boolean;
 };
 
 const TRIAGE_PATH = join(RESULTS_DIR, 'triage.json');
@@ -157,6 +164,26 @@ export function render(
   ].join('\n');
 }
 
+/**
+ * This report's triage entries, plus the labelled entries it did not produce.
+ *
+ * A label is a human judgement and README promises labels survive reruns.
+ * Writing only the current findings would break that promise the first time a
+ * labelled finding failed to reappear: the entry would go, and with it the
+ * label, so the same finding would come back unlabelled in a later run. An
+ * unlabelled entry that disappeared is dropped, because there is nothing in it
+ * to lose.
+ */
+export function mergeTriage(previous: TriageEntry[], current: TriageEntry[]): TriageEntry[] {
+  const emitted = new Set(current.map((entry) => entry.key));
+  return [
+    ...current,
+    ...previous
+      .filter((entry) => entry.label !== null && !emitted.has(entry.key))
+      .map((entry) => ({ ...entry, present: false })),
+  ];
+}
+
 function main(): void {
   const cases = loadCases();
   const runs = loadRuns();
@@ -207,10 +234,11 @@ function main(): void {
         title: f.title,
         code: codeAt(benchCase, f),
         label: labels.get(f.key) ?? null,
+        present: true,
       }));
   });
 
-  writeJson(TRIAGE_PATH, triage);
+  writeJson(TRIAGE_PATH, mergeTriage(previous, triage));
   writeJson(join(RESULTS_DIR, 'scores.json'), { aggregates, scores });
   const sources = new Map(runs.map((run) => [run.reviewer, run.source]));
   writeFileSync(join(RESULTS_DIR, 'summary.md'), render(cases, scores, aggregates, sources));

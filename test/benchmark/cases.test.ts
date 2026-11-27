@@ -9,7 +9,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { CASES_DIR, loadCases } from '../../benchmark/core/io';
+import { CASES_CONFIG, CASES_DIR, loadCases } from '../../benchmark/core/io';
 import type { BenchCase } from '../../benchmark/core/types';
 import { groundTruthFromDiff, indexDiff } from '../../benchmark/core/score';
 
@@ -83,6 +83,20 @@ describe('benchmark cases', () => {
   it('has the expected set', () => {
     expect(cases).toHaveLength(15);
     expect(new Set(cases.map((c) => c.id)).size).toBe(15);
+  });
+
+  it('is exactly what cases.config.json lists', () => {
+    const config = JSON.parse(readFileSync(CASES_CONFIG, 'utf8')) as { cases: Array<{ id: string }> };
+    expect(cases.map((c) => c.id).sort()).toEqual(config.cases.map((c) => c.id).sort());
+  });
+
+  it('carries no index blob hash headers, which are a lookup key into the fix', () => {
+    for (const benchCase of cases) {
+      const offenders = benchCase.diff
+        .split('\n')
+        .filter((line) => /^index [0-9a-f]{4,40}\.\.[0-9a-f]{4,40}( [0-7]{6})?\r?$/.test(line));
+      expect(offenders, benchCase.id).toEqual([]);
+    }
   });
 
   for (const benchCase of cases) {

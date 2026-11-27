@@ -16,7 +16,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { chunkSegments } from '../../src/core/chunk';
 import { parseDiff } from '../../src/core/parseDiff';
 import type { Chunk, Finding } from '../../src/core/types';
-import { createLlmProvider } from '../../src/providers/llm';
+import { createLlmProvider, groundTruthFor, validateFinding } from '../../src/providers/llm';
 
 type ModelReply = { status?: number; body?: unknown; raw?: string; delayMs?: number };
 
@@ -612,5 +612,55 @@ describe('D-039: one request per chunk', () => {
     // Partial findings would reach the client as a done job that silently
     // omitted half the diff. See D-039.
     await expect(provider(endpoint.baseUrl).review(chunks, signal)).rejects.toThrow(/HTTP 500/);
+  });
+});
+
+/**
+ * The benchmark's strict row is this same function with the re anchor turned
+ * off. If any other check differed between the two, the two rows would differ
+ * for two reasons at once and would stop measuring what re anchoring buys.
+ */
+describe('exactLineOnly: the rule the benchmark scores against re anchoring', () => {
+  const truth = groundTruthFor(chunksOf(DIFF)[0]?.text ?? '');
+  const strict = (raw: unknown): Finding | null =>
+    validateFinding(raw, truth, { exactLineOnly: true });
+
+  it('keeps a quote that matches the line the model named', () => {
+    expect(strict(validFinding)?.line).toBe(2);
+  });
+
+  it('drops a correct quote reported at the wrong line, which re anchoring keeps', () => {
+    const offByOne = { ...validFinding, line: 1 };
+
+    expect(strict(offByOne)).toBeNull();
+    expect(validateFinding(offByOne, truth)?.line).toBe(2);
+  });
+
+  it('rejects an invalid severity, exactly as the re anchored rule does', () => {
+    const bad = { ...validFinding, severity: 'catastrophic' };
+
+    expect(strict(bad)).toBeNull();
+    expect(validateFinding(bad, truth)).toBeNull();
+  });
+
+  it('rejects an invalid category, exactly as the re anchored rule does', () => {
+    const bad = { ...validFinding, category: 'vibes' };
+
+    expect(strict(bad)).toBeNull();
+    expect(validateFinding(bad, truth)).toBeNull();
+  });
+
+  it('rejects a missing title, exactly as the re anchored rule does', () => {
+    const bad = { ...validFinding, title: '' };
+
+    expect(strict(bad)).toBeNull();
+    expect(validateFinding(bad, truth)).toBeNull();
+  });
+
+  it('rejects a path that is not in the diff, exactly as the re anchored rule does', () => {
+    const bad = { ...validFinding, path: 'src/elsewhere.ts' };
+
+    expect(strict(bad)).toBeNull();
+    expect(validateFinding(bad, truth)).toBeNull();
   });
 });

@@ -98,8 +98,12 @@ npm run bench:pull -- --reviewer proofline --login proofline
 npm run bench:report
 ```
 
-Any other GitHub review app can be added the same way with
-`bench:pull -- --reviewer <name> --login <app login>`.
+Any other GitHub review app can be added the same way. Replace both example
+values with the name you want in the results and the app's GitHub login:
+
+```bash
+npm run bench:pull -- --reviewer example-reviewer --login example-app
+```
 
 The cases are committed, so none of this needs BugsJS. `npm run bench:cases`
 rebuilds them from scratch.
@@ -132,7 +136,16 @@ rebuilds them from scratch.
   and recorded here instead.
 - **BugsJS projects are public**, so a model may have seen the original fixes
   in training. That favours every reviewer equally, and the reversal means the
-  exact diff shown is not the one that was published.
+  exact diff shown is not the one that was published. The cases carry no
+  `index` blob hash headers for the same reason: those identify the exact file
+  versions on either side of a public fix, and a reviewer that can search
+  those repositories could score by lookup instead of by review. Removing them
+  narrows that path, it does not close it. Closing it needs cases that are
+  never published, which this benchmark does not have.
+- **`triage.json` keeps a label after its finding disappears.** The entry comes
+  back with `"present": false` rather than being dropped, so a label survives
+  a run in which the model did not repeat the finding. A label on an absent
+  finding counts for nothing in the tables.
 
 ## Code
 

@@ -6,7 +6,7 @@
   "description": "Without the indexOf check, a +field already present in the projection is overwritten with 1, clobbering a $slice projection on that path.",
   "upstreamFixSha": "bf7bee94e99fb9088386c9c87b9e98f19c773aed",
   "upstreamFixSubject": "fixed; +field conflict with $slice",
-  "diff": "diff --git a/lib/query.js b/lib/query.js\nindex 84b98e3..4932adc 100644\n--- a/lib/query.js\n+++ b/lib/query.js\n@@ -514,7 +514,7 @@ Query.prototype._applyPaths = function applyPaths () {\n \n       // if there are other fields being included, add this one\n       // if no other included fields, leave this out (implied inclusion)\n-      if (false === exclude && keys.length > 1 && !~keys.indexOf(path)) {\n+      if (false === exclude && keys.length > 1) {\n         fields[path] = 1;\n       }\n \n",
+  "diff": "diff --git a/lib/query.js b/lib/query.js\n--- a/lib/query.js\n+++ b/lib/query.js\n@@ -514,7 +514,7 @@ Query.prototype._applyPaths = function applyPaths () {\n \n       // if there are other fields being included, add this one\n       // if no other included fields, leave this out (implied inclusion)\n-      if (false === exclude && keys.length > 1 && !~keys.indexOf(path)) {\n+      if (false === exclude && keys.length > 1) {\n         fields[path] = 1;\n       }\n \n",
   "files": [
     "lib/query.js"
   ],
