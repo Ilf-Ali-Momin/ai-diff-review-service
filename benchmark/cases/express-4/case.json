@@ -1,0 +1,21 @@
+{
+  "id": "express-4",
+  "repo": "express",
+  "bug": 4,
+  "severity": "medium",
+  "description": "Removes the IP check, so a host like 127.0.0.1 is split on dots and req.subdomains returns IP octets as subdomains.",
+  "upstreamFixSha": "2de6514b4b4cc7e9629664faa56859da7e597265",
+  "upstreamFixSubject": "Support IP address host in req.subdomains",
+  "diff": "diff --git a/lib/request.js b/lib/request.js\nindex 24e8748..485c296 100644\n--- a/lib/request.js\n+++ b/lib/request.js\n@@ -13,7 +13,6 @@ var http = require('http')\n   , parse = require('parseurl')\n   , proxyaddr = require('proxy-addr')\n   , mime = connect.mime;\n-var isIP = require('net').isIP;\n \n /**\n  * Request prototype.\n@@ -455,9 +454,7 @@ req.__defineGetter__('auth', function(){\n req.__defineGetter__('subdomains', function(){\n   var host = this.host;\n   var offset = this.app.get('subdomain offset');\n-  var subdomains = !isIP(host)\n-    ? host.split('.').reverse()\n-    : [host];\n+  var subdomains = host.split('.').reverse();\n \n   return subdomains.slice(offset);\n });\n",
+  "files": [
+    "lib/request.js"
+  ],
+  "groundTruth": [
+    {
+      "path": "lib/request.js",
+      "lines": [
+        457
+      ]
+    }
+  ]
+}

@@ -45,7 +45,7 @@ class TimeoutError extends Error {
 /** path to line number to the exact added text, built from our own parse. */
 type GroundTruth = Map<string, Map<number, string>>;
 
-function groundTruthFor(chunkText: string): GroundTruth {
+export function groundTruthFor(chunkText: string): GroundTruth {
   const truth: GroundTruth = new Map();
 
   for (const added of parseDiff(chunkText).addedLines) {
@@ -57,7 +57,7 @@ function groundTruthFor(chunkText: string): GroundTruth {
   return truth;
 }
 
-function buildMessages(chunkText: string, delimiter: string): Array<{
+export function buildMessages(chunkText: string, delimiter: string): Array<{
   role: 'system' | 'user';
   content: string;
 }> {
@@ -96,7 +96,7 @@ function buildMessages(chunkText: string, delimiter: string): Array<{
  * fence, because those are the three shapes models actually produce. The
  * leniency is safe: what comes out is validated regardless. See D-040.
  */
-function extractFindingArray(content: string): unknown[] {
+export function extractFindingArray(content: string): unknown[] {
   const withoutFence = content
     .trim()
     .replace(/^```(?:json)?\s*/i, '')

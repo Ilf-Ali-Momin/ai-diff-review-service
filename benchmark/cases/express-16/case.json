@@ -1,0 +1,22 @@
+{
+  "id": "express-16",
+  "repo": "express",
+  "bug": 16,
+  "severity": "low",
+  "description": "The redirect body uses the raw url argument instead of the resolved address, so the body shows a different target than the Location header.",
+  "upstreamFixSha": "6f0302fb78f636da320d3ffd329c18fed36aeda9",
+  "upstreamFixSubject": "Fix res.redirect body when redirect status specified",
+  "diff": "diff --git a/lib/response.js b/lib/response.js\nindex c26f68a..32c098a 100644\n--- a/lib/response.js\n+++ b/lib/response.js\n@@ -818,11 +818,11 @@ res.redirect = function redirect(url) {\n   // Support text/{plain,html} by default\n   this.format({\n     text: function(){\n-      body = statusCodes[status] + '. Redirecting to ' + encodeURI(address);\n+      body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);\n     },\n \n     html: function(){\n-      var u = escapeHtml(address);\n+      var u = escapeHtml(url);\n       body = '<p>' + statusCodes[status] + '. Redirecting to <a href=\"' + u + '\">' + u + '</a></p>';\n     },\n \n",
+  "files": [
+    "lib/response.js"
+  ],
+  "groundTruth": [
+    {
+      "path": "lib/response.js",
+      "lines": [
+        821,
+        825
+      ]
+    }
+  ]
+}

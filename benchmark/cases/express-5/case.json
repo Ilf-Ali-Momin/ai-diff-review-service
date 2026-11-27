@@ -1,0 +1,21 @@
+{
+  "id": "express-5",
+  "repo": "express",
+  "bug": 5,
+  "severity": "medium",
+  "description": "Windows absolute paths written with forward slashes (C:/dir) are no longer recognised as absolute.",
+  "upstreamFixSha": "2e1284beb6210444932d050b9d31d3908afb7591",
+  "upstreamFixSubject": "Fix Windows absolute path check using forward slashes",
+  "diff": "diff --git a/lib/utils.js b/lib/utils.js\nindex f418c58..c2d3af1 100644\n--- a/lib/utils.js\n+++ b/lib/utils.js\n@@ -67,7 +67,7 @@ exports.wetag = function wetag(body, encoding){\n \n exports.isAbsolute = function(path){\n   if ('/' === path[0]) return true;\n-  if (':' === path[1] && ('\\\\' === path[2] || '/' === path[2])) return true; // Windows device path\n+  if (':' === path[1] && '\\\\' === path[2]) return true;\n   if ('\\\\\\\\' === path.substring(0, 2)) return true; // Microsoft Azure absolute path\n };\n \n",
+  "files": [
+    "lib/utils.js"
+  ],
+  "groundTruth": [
+    {
+      "path": "lib/utils.js",
+      "lines": [
+        70
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "mongoose-8",
+  "repo": "mongoose",
+  "bug": 8,
+  "severity": "medium",
+  "description": "Document#update no longer returns the Query, so callers cannot chain, exec or await it.",
+  "upstreamFixSha": "41912f9bfe3bb0fc5f001ed1bac61e761f8f6ecb",
+  "upstreamFixSubject": "fixed; document#update returns a Query",
+  "diff": "diff --git a/lib/document.js b/lib/document.js\nindex 366c499..14259ee 100644\n--- a/lib/document.js\n+++ b/lib/document.js\n@@ -352,7 +352,7 @@ for (var k in hooks) {\n Document.prototype.update = function update () {\n   var args = utils.args(arguments);\n   args.unshift({_id: this._id});\n-  return this.constructor.update.apply(this.constructor, args);\n+  this.constructor.update.apply(this.constructor, args);\n }\n \n /**\n",
+  "files": [
+    "lib/document.js"
+  ],
+  "groundTruth": [
+    {
+      "path": "lib/document.js",
+      "lines": [
+        355
+      ]
+    }
+  ]
+}

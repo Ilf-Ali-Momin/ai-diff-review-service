@@ -12,13 +12,19 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "probe": "vitest run --config vitest.probe.config.mts",
-    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json"
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json",
+    "bench:cases": "tsx benchmark/scripts/build-cases.ts",
+    "bench:model": "tsx --env-file=.env benchmark/runners/model.ts",
+    "bench:push": "tsx benchmark/scripts/push-cases.ts",
+    "bench:pull": "tsx benchmark/runners/github-pr.ts",
+    "bench:report": "tsx benchmark/report.ts"
   },
   "dependencies": {
     "fastify": "^5.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.0",
     "vitest": "^4.1.10"
   }

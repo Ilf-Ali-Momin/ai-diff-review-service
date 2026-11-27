@@ -1,0 +1,21 @@
+{
+  "id": "karma-3",
+  "repo": "karma",
+  "bug": 3,
+  "severity": "low",
+  "description": "The user's formatError result is no longer returned as is; a newline is appended to output the user explicitly controls.",
+  "upstreamFixSha": "17c2c43a7ce3f6346ddffdeb2b283f286e9e4bb8",
+  "upstreamFixSubject": "fix(reporter): keep users exact formatError result",
+  "diff": "diff --git a/lib/reporter.js b/lib/reporter.js\nindex 75d7bb5..72754c4 100644\n--- a/lib/reporter.js\n+++ b/lib/reporter.js\n@@ -96,7 +96,7 @@ var createErrorFormatter = function (config, emitter, SourceMapConsumer) {\n \n     // allow the user to format the error\n     if (config.formatError) {\n-      return config.formatError(msg)\n+      msg = config.formatError(msg)\n     }\n \n     return msg + '\\n'\n",
+  "files": [
+    "lib/reporter.js"
+  ],
+  "groundTruth": [
+    {
+      "path": "lib/reporter.js",
+      "lines": [
+        99
+      ]
+    }
+  ]
+}

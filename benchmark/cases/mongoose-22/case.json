@@ -1,0 +1,21 @@
+{
+  "id": "mongoose-22",
+  "repo": "mongoose",
+  "bug": 22,
+  "severity": "critical",
+  "description": "Model.remove ignores its conditions and builds the query from {}, deleting every document in the collection.",
+  "upstreamFixSha": "2128c7a73f70dad364bce0d0ba02246d224dff0d",
+  "upstreamFixSubject": "fixed; model.remove() removes only what is necessary",
+  "diff": "diff --git a/lib/model.js b/lib/model.js\nindex 6922b44..a0e1cd4 100644\n--- a/lib/model.js\n+++ b/lib/model.js\n@@ -764,7 +764,7 @@ Model.remove = function remove (conditions, callback) {\n   }\n \n   // get the mongodb collection object\n-  var mq = new Query(conditions, {}, this, this.collection);\n+  var mq = new Query({}, {}, this, this.collection);\n \n   return mq.remove(callback);\n };\n",
+  "files": [
+    "lib/model.js"
+  ],
+  "groundTruth": [
+    {
+      "path": "lib/model.js",
+      "lines": [
+        767
+      ]
+    }
+  ]
+}

@@ -4,5 +4,13 @@
     "noEmit": true,
     "rootDir": "."
   },
-  "include": ["src", "test"]
+  "include": [
+    "src",
+    "test",
+    "benchmark"
+  ],
+  "exclude": [
+    "benchmark/cases",
+    "benchmark/.cache"
+  ]
 }

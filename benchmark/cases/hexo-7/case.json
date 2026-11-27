@@ -1,0 +1,21 @@
+{
+  "id": "hexo-7",
+  "repo": "hexo",
+  "bug": 7,
+  "severity": "high",
+  "description": "TOC entries use the heading's raw HTML instead of escaped text, so markup in a heading is injected into the generated TOC (XSS).",
+  "upstreamFixSha": "c8d47b8a963e94f8a36c51f825c3d204fe626bd9",
+  "upstreamFixSubject": "fix(toc): use escaped text to generate toc from heading (#2898)",
+  "diff": "diff --git a/lib/plugins/helper/toc.js b/lib/plugins/helper/toc.js\nindex cb45495..ef7d058 100644\n--- a/lib/plugins/helper/toc.js\n+++ b/lib/plugins/helper/toc.js\n@@ -1,7 +1,6 @@\n 'use strict';\n \n var cheerio;\n-const _ = require('lodash');\n \n function tocHelper(str, options) {\n   options = options || {};\n@@ -26,7 +25,7 @@ function tocHelper(str, options) {\n   headings.each(function() {\n     var level = +this.name[1];\n     var id = $(this).attr('id');\n-    var text = _.escape($(this).text());\n+    var text = $(this).html();\n \n     lastNumber[level - 1]++;\n \n",
+  "files": [
+    "lib/plugins/helper/toc.js"
+  ],
+  "groundTruth": [
+    {
+      "path": "lib/plugins/helper/toc.js",
+      "lines": [
+        28
+      ]
+    }
+  ]
+}

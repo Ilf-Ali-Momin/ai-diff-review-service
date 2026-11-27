@@ -57,12 +57,20 @@ without them; only a job asking for that provider fails, with a clear message.
 npm test
 ```
 
-219 unit and integration tests, in process, about two seconds. A separate black
+219 unit and integration tests for the service, in process, about two seconds,
+plus 57 for the benchmark scorer and case data. A separate black
 box suite runs the full probe plan over real HTTP against any running instance:
 
 ```bash
 PROBE_BASE_URL=http://127.0.0.1:3000 PROBE_TOKEN=local-dev-token npm run probe
 ```
+
+## Benchmark
+
+[`benchmark/`](benchmark/README.md) runs several AI reviewers, this service
+included, on 15 real bugs from BugsJS and scores every finding against the
+parsed diff: real catches, fabricated lines and misquotes are counted
+separately.
 
 ## Deployment
 

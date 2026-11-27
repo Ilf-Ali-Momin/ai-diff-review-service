@@ -1,0 +1,22 @@
+{
+  "id": "hexo-12",
+  "repo": "hexo",
+  "bug": 12,
+  "severity": "medium",
+  "description": "The toString() calls are removed, so a numeric title or slug makes slugize throw.",
+  "upstreamFixSha": "fc145f72a104aeb1451a7f78ce6d421946a6e385",
+  "upstreamFixSubject": "Fixed using non-string title/slug in hexo.post.create/publish. Fixed #1100",
+  "diff": "diff --git a/lib/hexo/post.js b/lib/hexo/post.js\nindex db1ccb5..e1f0fff 100644\n--- a/lib/hexo/post.js\n+++ b/lib/hexo/post.js\n@@ -47,7 +47,7 @@ Post.prototype.create = function(data, replace, callback){\n   var ctx = this.context;\n   var config = ctx.config;\n \n-  data.slug = slugize((data.slug || data.title).toString(), {transform: config.filename_case});\n+  data.slug = slugize(data.slug || data.title, {transform: config.filename_case});\n   data.layout = (data.layout || config.default_layout).toLowerCase();\n   data.date = data.date ? moment(data.date) : moment();\n \n@@ -204,7 +204,7 @@ Post.prototype.publish = function(data, replace, callback){\n   var ctx = this.context;\n   var config = ctx.config;\n   var draftDir = pathFn.join(ctx.source_dir, '_drafts');\n-  var slug = data.slug = slugize(data.slug.toString(), {transform: config.filename_case});\n+  var slug = data.slug = slugize(data.slug, {transform: config.filename_case});\n   var regex = new RegExp('^' + escapeRegExp(slug) + '(?:[^\\\\/\\\\\\\\]+)');\n   var self = this;\n   var src = '';\n",
+  "files": [
+    "lib/hexo/post.js"
+  ],
+  "groundTruth": [
+    {
+      "path": "lib/hexo/post.js",
+      "lines": [
+        50,
+        207
+      ]
+    }
+  ]
+}

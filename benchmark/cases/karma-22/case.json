@@ -1,0 +1,21 @@
+{
+  "id": "karma-22",
+  "repo": "karma",
+  "bug": 22,
+  "severity": "medium",
+  "description": "The URL pattern now strips any host from stack traces instead of only karma's own hostname and port, mangling third party URLs.",
+  "upstreamFixSha": "fbbeccf936a08e5296ffbe41e02c82c4a014c80e",
+  "upstreamFixSubject": "fix(reporter): strip only hostname/port",
+  "diff": "diff --git a/lib/reporter.js b/lib/reporter.js\nindex 72754c4..fcde0ad 100644\n--- a/lib/reporter.js\n+++ b/lib/reporter.js\n@@ -25,8 +25,7 @@ var createErrorFormatter = function (config, emitter, SourceMapConsumer) {\n     return null\n   }\n \n-  var URL_REGEXP = new RegExp('(?:https?:\\\\/\\\\/' +\n-    config.hostname + '(?:\\\\:' + config.port + ')?' + ')?\\\\/?' +\n+  var URL_REGEXP = new RegExp('(?:https?:\\\\/\\\\/[^\\\\/\\\\s]*)?\\\\/?' +\n     '(base/|absolute)' + // prefix, including slash for base/ to create relative paths.\n     '((?:[A-z]\\\\:)?[^\\\\?\\\\s\\\\:]*)' + // path\n     '(\\\\?\\\\w*)?' + // sha\n",
+  "files": [
+    "lib/reporter.js"
+  ],
+  "groundTruth": [
+    {
+      "path": "lib/reporter.js",
+      "lines": [
+        28
+      ]
+    }
+  ]
+}
