@@ -45,6 +45,18 @@ export function loadCases(): BenchCase[] {
     );
   }
 
+  // The other direction matters just as much. A manifest id with no directory
+  // is not an error anywhere downstream: the runner, the report and the
+  // publisher all take whatever this returns, so fourteen cases would be run,
+  // scored and published as if that were the whole benchmark.
+  const missing = [...wanted].filter((id) => !built.includes(id));
+  if (missing.length > 0) {
+    throw new Error(
+      `cases.config.json lists ${missing.join(', ')}, which benchmark/cases does not hold: ` +
+        'run `npm run bench:cases` to build them, or remove the manifest entry',
+    );
+  }
+
   return built
     .map((name) => readJson<BenchCase>(join(CASES_DIR, name, 'case.json')))
     .sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true }));

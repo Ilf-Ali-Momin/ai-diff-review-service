@@ -4,7 +4,7 @@
  * loud instead.
  */
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
@@ -95,6 +95,18 @@ describe('benchmark cases', () => {
     const key = (c: { id: string; repo: string; bug: number }): string => `${c.id} ${c.repo} ${c.bug}`;
 
     expect(cases.map(key).sort()).toEqual(config.cases.map(key).sort());
+  });
+
+  it('refuses to load when a manifest id has no fixture directory', () => {
+    // Both directions, because a missing directory is silently a smaller
+    // benchmark while a stale one is silently a larger one.
+    const config = JSON.parse(readFileSync(CASES_CONFIG, 'utf8')) as { cases: Array<{ id: string }> };
+    const built = readdirSync(CASES_DIR, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name);
+
+    expect(config.cases.filter((c) => !built.includes(c.id))).toEqual([]);
+    expect(built.filter((name) => !config.cases.some((c) => c.id === name))).toEqual([]);
   });
 
   it('carries no index blob hash headers, which are a lookup key into the fix', () => {

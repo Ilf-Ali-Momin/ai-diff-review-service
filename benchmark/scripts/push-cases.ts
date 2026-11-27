@@ -8,8 +8,18 @@
  *   npm run bench:push -- --dir ../ai-review-benchmark-cases --repo you/ai-review-benchmark-cases
  *
  * Layout in that repository:
- *   main             cases/<slug>/<file> at the fixed version, for every case
+ *   main             a README and nothing else
+ *   base/<slug>      cases/<slug>/<file> at the fixed version, that case only
  *   case/<slug>      the same files at the buggy version, one PR per case
+ *
+ * One base branch per case, rather than every case's fixed source sitting on
+ * the default branch. A reviewer looking at one case used to be able to browse
+ * the repository root and read the correct implementation of a different case,
+ * because several of these bugs are in the same parsing code: express-4's base
+ * holds the fix that express-22 reverses. It is a reduction, not a seal. The
+ * other branches are still in the same repository and a reviewer that goes
+ * looking can find them. Publishing one repository per case is the only way to
+ * close it, and it is not done here.
  *
  * PR titles and bodies are deliberately neutral ("Simplify lib/request.js").
  * Saying what the change does wrong would hand every reviewer the answer.
@@ -28,7 +38,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
 import { CASES_DIR, loadCases, RESULTS_DIR, writeJson } from '../core/io';
@@ -60,6 +70,40 @@ export function neutralTitle(benchCase: BenchCase): string {
   return `Simplify ${benchCase.files.join(', ')}`;
 }
 
+/**
+ * The pull request for this case, opened only if it is not already open.
+ *
+ * A rerun under the same salt pushes the same branch names on purpose, so the
+ * existing pull request updates rather than a second one appearing beside it.
+ * `gh pr create` fails outright when one is already open for the branch, which
+ * would have stopped a rerun at the first case and left prs.json stale.
+ */
+function pullRequestFor(
+  repo: string,
+  base: string,
+  branch: string,
+  benchCase: BenchCase,
+  dir: string,
+): string {
+  const existing = run(
+    'gh',
+    ['pr', 'list', '--repo', repo, '--head', branch, '--state', 'open', '--json', 'url', '--jq', '.[0].url // ""'],
+    dir,
+  );
+  if (existing !== '') {
+    return existing;
+  }
+  return run(
+    'gh',
+    [
+      'pr', 'create', '--repo', repo, '--base', base, '--head', branch,
+      '--title', neutralTitle(benchCase),
+      '--body', `Small cleanup in ${benchCase.files.join(', ')}.`,
+    ],
+    dir,
+  );
+}
+
 function slugSalt(): string {
   const salt = process.env['BENCH_SLUG_SALT'];
   if (salt === undefined || salt.trim() === '') {
@@ -80,10 +124,11 @@ function main(): void {
   }
   const cases = loadCases();
 
-  run('git', ['checkout', '-B', 'main'], dir);
-  for (const benchCase of cases) {
-    copyVersion(benchCase, 'base', dir, salt);
-  }
+  // The default branch carries no case source at all, so the repository root
+  // shows a reviewer nothing about any case but the one it is reviewing.
+  run('git', ['checkout', '-q', '--orphan', 'bench-main'], dir);
+  run('git', ['rm', '-rq', '--cached', '.', '--ignore-unmatch'], dir);
+  rmSync(join(dir, 'cases'), { recursive: true, force: true });
   writeFileSync(
     join(dir, 'README.md'),
     [
@@ -95,28 +140,33 @@ function main(): void {
     ].join('\n'),
   );
   run('git', ['add', '-A'], dir);
-  run('git', ['commit', '-q', '-m', 'Add case base versions', '--allow-empty'], dir);
-  run('git', ['push', '-q', '-u', 'origin', 'main'], dir);
+  run('git', ['commit', '-q', '-m', 'Add README', '--allow-empty'], dir);
+  run('git', ['branch', '-q', '-M', 'main'], dir);
+  run('git', ['push', '-q', '-f', '-u', 'origin', 'main'], dir);
 
   const prs: Array<{ caseId: string; slug: string; repo: string; number: number; url: string }> = [];
   for (const benchCase of cases) {
     const slug = caseSlug(benchCase.id, salt);
+    const base = `base/${slug}`;
     const branch = `case/${slug}`;
-    run('git', ['checkout', '-q', '-B', branch, 'main'], dir);
+
+    // Orphan, so the base branch holds this case's fixed files and nothing
+    // else: no other case, and no history leading to one.
+    run('git', ['checkout', '-q', '--orphan', base], dir);
+    run('git', ['rm', '-rq', '--cached', '.', '--ignore-unmatch'], dir);
+    rmSync(join(dir, 'cases'), { recursive: true, force: true });
+    copyVersion(benchCase, 'base', dir, salt);
+    run('git', ['add', '-A'], dir);
+    run('git', ['commit', '-q', '-m', `Add ${benchCase.files.join(', ')}`], dir);
+    run('git', ['push', '-q', '-f', '-u', 'origin', base], dir);
+
+    run('git', ['checkout', '-q', '-B', branch, base], dir);
     copyVersion(benchCase, 'head', dir, salt);
     run('git', ['add', '-A'], dir);
     run('git', ['commit', '-q', '-m', neutralTitle(benchCase)], dir);
     run('git', ['push', '-q', '-f', '-u', 'origin', branch], dir);
 
-    const url = run(
-      'gh',
-      [
-        'pr', 'create', '--repo', repo, '--base', 'main', '--head', branch,
-        '--title', neutralTitle(benchCase),
-        '--body', `Small cleanup in ${benchCase.files.join(', ')}.`,
-      ],
-      dir,
-    );
+    const url = pullRequestFor(repo, base, branch, benchCase, dir);
     const number = Number(url.split('/').pop());
     prs.push({ caseId: benchCase.id, slug, repo, number, url });
     console.log(`${benchCase.id.padEnd(14)} ${url}`);
