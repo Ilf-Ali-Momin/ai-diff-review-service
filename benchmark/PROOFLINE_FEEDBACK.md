@@ -1,22 +1,56 @@
 # Proofline review of PR #1
 
-Proofline reviewed this pull request three times. This records what it said,
+Proofline reviewed this pull request four times. This records what it said,
 what was done, and where the response differed from the suggestion.
 
-Proofline reports a finding per location, so the same defect can arrive more
-than once and a fixed one can be re reported in a later round. The counts below
-therefore separate **reports** (comments Proofline posted) from **problems**
-(distinct defects). Every entry here is one problem, and names how many reports
-it took.
+## How to read the counts
 
-| Round | Reports | New problems | Commit |
-|---|---|---|---|
-| 1 | 10 | 8 (entries 1 to 10, two of them reported twice) | `c9cf807` |
-| 2 | 7 | 4 (entries 11 to 14) | `91e1426` |
-| 3 | 10 | 5 (entries 15 to 19) | see each entry |
-| **Total** | **27** | **17** | |
+Proofline reports a finding per location, so one defect can arrive as several
+comments, in one round or across rounds, and a fixed one can be re reported
+later. So **reports** are comments Proofline posted and **problems** are
+distinct defects. Every number in this document is derived from the ledger
+below rather than counted by hand, because getting those two mixed up is
+itself entry 17.
 
-The first round's ten reports were all addressed in `c9cf807`.
+One numbered entry is one problem. Entries 1 and 2, and 9 and 10, are the
+exception: each pair is a single problem that arrived as two comments before
+this convention existed, and both numbers are kept so earlier replies on the
+pull request still point somewhere. An entry's prose mentions a report count
+only when it is more than one; the ledger carries the exact figure either way.
+
+| Entry | Problem | Reports | Rounds | Disposition | Commit |
+|---|---|---|---|---|---|
+| 1, 2 | Reviewer facing artifacts carry the case id | 2 | 1 | fixed | `c9cf807` |
+| 3 | Removed cases still run after a rebuild | 2 | 1, 3 | fixed | `c9cf807`, hardened in `1675e71` |
+| 4 | A line past the end of the diff counts as context | 1 | 1 | fixed | `c9cf807` |
+| 5 | Case validation accepts snapshots that disagree with the patch | 1 | 1 | fixed | `c9cf807` |
+| 6 | Documentation implies reviewers receive the diagnoses | 1 | 1 | fixed | `c9cf807` |
+| 7 | The benchmark can count findings the service would reject | 1 | 1 | fixed | `c9cf807` |
+| 8 | The three run command is undocumented | 1 | 1 | fixed | `c9cf807` |
+| 9, 10 | The reviewer table omits the strict row and misstates granularity | 2 | 1 | fixed | `c9cf807` |
+| 11 | The limits section says one run per reviewer | 4 | 2, 3 | fixed | `91e1426` |
+| 12 | The quickstart produces four samples, not three | 1 | 2 | fixed | `91e1426` |
+| 13 | The push command cannot be pasted into a shell | 3 | 2, 4 | fixed | `91e1426` |
+| 14 | karma-3 scores a correct finding as a miss | 2 | 2, 3 | rejected | documented in `91e1426` |
+| 15 | The alternate pull command cannot be pasted into a shell | 1 | 3 | fixed | `1675e71` |
+| 16 | A missing finding on one rerun erases its manual label | 1 | 3 | fixed | `1675e71` |
+| 17 | This file's counts do not add up | 3 | 3 | fixed | `1675e71` |
+| 18 | Prompts carry blob hashes that identify the upstream fix | 1 | 3 | fixed | `1675e71` |
+| 19 | The strict row validated metadata differently | 1 | 3 | fixed | `1675e71` |
+| 20 | The entry numbering convention was never stated | 1 | 4 | fixed | DOCCOMMIT |
+| 21 | Round 3 rows point at commits the entries do not name | 1 | 4 | fixed | DOCCOMMIT |
+| 22 | The recap's repeat counts are wrong and call a rejection fixed | 2 | 4 | fixed | DOCCOMMIT |
+| 23 | The manifest note says descriptions appear only in the report | 1 | 4 | fixed | `852b0cd` |
+| 24 | Published slugs are an unsalted hash of committed ids | 1 | 4 | fixed | `852b0cd` |
+| 25 | The fixture test compares ids only | 1 | 4 | fixed | `852b0cd` |
+| 26 | The root README names test counts that drifted | 2 | 4 | fixed | `852b0cd` |
+| 27 | The report counts an unreviewed case as missed by everyone | 1 | 4 | fixed | `852b0cd` |
+
+38 reports, 25 problems. Round 1 produced 10 reports and 8 new problems,
+round 2 produced 7 and 4, round 3 produced 10 and 5, round 4 produced 11 and 8.
+Nine problems were reported more than once. Seven of those arrived more than
+once inside a single round, and four were re reported in a later round after
+being addressed: entries 3, 11, 13 and 14.
 
 ## The findings
 
@@ -246,8 +280,9 @@ discover it.
 ## Third review, after `91e1426` and `000e40d`
 
 Ten reports covering five new problems (entries 15 to 19), plus three re
-reports of problems already fixed: entry 3, entry 11, and entry 14's
-rejection. The count problem below was itself reported three times.
+reports: entries 3 and 11, both already fixed, and entry 14, which had been
+rejected rather than fixed. The count problem below was itself reported three
+times.
 
 ### 15. The alternate `bench:pull` command cannot be pasted into a shell
 
@@ -263,6 +298,8 @@ beside it untouched, which is the ordinary way a documentation fix misses:
 the reported line was fixed instead of the pattern. It is now a fenced command
 reading `npm run bench:pull -- --reviewer example-reviewer --login
 example-app`, with both values named as examples to replace.
+
+**Commit:** `1675e71`
 
 ### 16. A missing finding on one rerun erases its manual label
 
@@ -281,6 +318,8 @@ previously labelled entry the current report did not produce, marked
 Unlabelled entries are still dropped, because there is nothing in them to lose.
 Four tests cover it.
 
+**Commit:** `1675e71`
+
 ### 17. This file's own counts do not add up
 
 **Proofline said:** the document claims seven second round findings but lists
@@ -297,6 +336,8 @@ of them three times. The opening now separates reports from problems in a table
 per round, each entry states how many reports it took, and the recap counts
 from the same figures. Reported three times, against three lines of the same
 summary.
+
+**Commit:** `1675e71`
 
 ### 18. Benchmark prompts carry Git blob hashes that identify the upstream fix
 
@@ -320,6 +361,8 @@ changed the prompt text, so all three rows were rerun; the table moved from
 12 / 12 / 14 to 11 / 12 / 13 for the service row, which is run to run variance,
 not an effect of the change.
 
+**Commit:** `1675e71`
+
 ### 19. The strict row validated metadata differently from the row it is compared against
 
 **Proofline said:** `strictValidate` in the benchmark runner accepts a finding
@@ -336,6 +379,8 @@ turns off the re anchor and nothing else, and the runner calls it instead of
 keeping a second copy of the rule. A second implementation drifting from the
 first is what caused this, so the second implementation is gone. Six tests
 assert the two rules agree on every check except anchoring.
+
+**Commit:** `1675e71`
 
 ### Re reported and not changed
 
@@ -357,49 +402,207 @@ reviewers. No change.
 The reasoning in entry 14 stands unchanged, and that thread is deliberately
 left unresolved on the pull request so the disagreement is visible.
 
+## Fourth review, after `1675e71`
+
+Eleven reports covering eight new problems (entries 20 to 27), plus one re
+report of entry 13. Four of the eight are about this file and the root README,
+which is to say about the previous round's own repairs again.
+
+### 20. The entry numbering convention was never stated
+
+**Proofline said:** the document says each entry is one distinct problem and
+gives a report count, but entries 2 and 10 repeat earlier problems and entries
+such as 3 give no count, so a reader cannot use the convention to tally
+anything.
+
+**Verdict:** accepted.
+
+**Why:** correct on both halves. The convention was in my head and not on the
+page. The "How to read the counts" section now states it: one entry is one
+problem, except the two legacy pairs, which are kept as pairs so earlier
+replies on the pull request still point somewhere, and an entry's prose gives
+a report count only when it is more than one, with the ledger carrying the
+exact figure for every entry either way.
+
+### 21. Round 3 rows point at commits the entries do not name
+
+**Proofline said:** the round table's commit column said to see each entry, but
+entries 15 to 19 never named a fix commit.
+
+**Verdict:** accepted.
+
+**Why:** correct and plainly careless: the column pointed at entries that
+pointed nowhere. Entries 15 to 19 now carry `1675e71`, and the ledger names a
+commit on every row, so neither place defers to the other.
+
+### 22. The recap's repeat counts are wrong and call a rejection fixed
+
+**Proofline said:** the recap counts four problems reported more than once
+where the real figure is higher, leaves entry 17 out of its repeated report
+counts although it was reported three times, and describes all three of the
+third round's re reports as previously fixed when one of them was rejected.
+
+**Verdict:** accepted, and the fix is structural rather than arithmetic.
+
+**Why:** correct on every point, and this is the second round in a row where
+this file's own counting was the finding. Recomputing the numbers by hand
+would have fixed this round and broken the next one, which is what happened
+between rounds 3 and 4. The counts now come from a ledger with one row per
+problem, and the figures in the prose are generated from it rather than
+counted: nine problems reported more than once, seven of them more than once
+inside a single round, four re reported in a later round, of which entry 14 is
+a rejection and not a fix. Reported twice, from two angles on the same
+summary.
+
+### 23. The manifest note says descriptions appear only in the report
+
+**Proofline said:** `cases.config.json` says descriptions appear only in the
+report, but `build-cases.ts` copies them into the committed fixtures, where
+anyone can read the diagnosis without opening a report.
+
+**Verdict:** accepted.
+
+**Why:** correct. The claim that mattered, that no review path sends a
+description to a reviewer, is true and stays. The claim about where they live
+was wrong: they are in `benchmark/cases`, which is evaluator only, and that is
+where the report reads them from. The note now says both.
+
+**Commit:** `852b0cd`
+
+### 24. Published slugs are an unsalted hash of committed ids
+
+**Proofline said:** `caseSlug` hashes the case id and nothing else, and the ids
+are committed beside the diagnoses, so a reviewer with benchmark source access
+can recover the mapping and match a published pull request to its answer.
+
+**Verdict:** accepted, by a different route than suggested.
+
+**Why:** correct, and it undercuts entry 1's fix rather than merely weakening
+it: fifteen hashes recover the whole mapping. Proofline suggested random per
+case slugs in evaluator only storage. A random slug has to be persisted and
+reused by publishing and scoring alike, and losing that file breaks scoring for
+pull requests already open. A salt gives the same property with nothing extra
+to lose: `caseSlug(id, salt)` is deterministic, so a rerun still updates a
+case's existing pull request, and without the salt the mapping is not
+recoverable. The salt is `BENCH_SLUG_SALT` in `.env`, which is not committed,
+and `caseSlug` throws on an empty one rather than falling back to the old
+unsalted hash.
+
+Two consequences worth stating. The scorer can no longer recompute a slug, so
+`bench:pull` strips the published prefix as it reads each comment, using the
+slug recorded in `prs.json`, and `normalizePath` stops guessing; a model only
+run needs no salt at all. And the slug still only hides the id: a reviewer
+holding this repository could line a case up by its file contents, which the
+README now says.
+
+**Commit:** `852b0cd`
+
+### 25. The fixture test compares ids only
+
+**Proofline said:** the test comparing built cases against the manifest
+compares ids, so changing a case's `repo` or `bug` without rebuilding passes
+while the benchmark keeps scoring the old upstream bug.
+
+**Verdict:** accepted.
+
+**Why:** correct, and a gap I opened in the third round: the test added for
+entry 3 compared exactly the field entry 3 was about and no others. It now
+compares `id`, `repo` and `bug`.
+
+**Commit:** `852b0cd`
+
+### 26. The root README names test counts that drifted
+
+**Proofline said:** the README says the benchmark adds 57 tests where the suite
+registers 80, and omits the report tests entirely.
+
+**Verdict:** accepted, and the remedy is the one Proofline offered second.
+
+**Why:** correct, and it was already stale before this round. Updating the
+number would have made it accurate until the next test, so it is gone: the
+README now says what `npm test` covers and lets the command report the count.
+Reported twice, against two lines of the same section.
+
+**Commit:** `852b0cd`
+
+### 27. The report counts an unreviewed case as missed by everyone
+
+**Proofline said:** the benchmark report conflates missing reviews with misses.
+
+**Verdict:** accepted.
+
+**Why:** correct, and the worst of this round, because it would have published
+an infrastructure failure as a result about the reviewers. A case that errors
+is left out of a run's `caseIds` by design, so it has no score, and
+`missedByAll` tested for the absence of a catch, which an absent score
+satisfies. "Missed by every reviewer" now covers only cases at least one
+reviewer was scored on, and `summary.md` gained a "Not reviewed" section and an
+"Errors" section listing every per case failure, so a timeout is visible as a
+timeout. It has not bitten the published numbers: all three rows carry all
+fifteen cases and both new sections read "None".
+
+**Commit:** `852b0cd`
+
+### Re reported and not changed
+
+**Entry 13, the push command.** Reported again at `1675e71`, re anchored onto
+the quickstart block. The command there reads `npm run bench:push -- --dir
+../ai-review-benchmark-cases --repo
+YOUR_GITHUB_OWNER/ai-review-benchmark-cases`, which pastes into a shell as is.
+The round three change added a `bench:pull` example beside it, which is
+probably what moved the anchor. No change.
+
 ## What the review changed
 
-Twenty seven reports across three rounds, covering seventeen distinct
-problems. Four problems were reported more than once, one of them three times,
-and three already fixed problems were reported again in the third round.
+Every figure here comes from the ledger at the top. 38 reports, 25 problems.
 
-**Eight were real defects in behaviour.** The answer key leak, the stale
+**Eleven were real defects in behaviour.** The answer key leak, the stale
 fixture directories, the phantom context line, the weak snapshot validation,
 the quickstart's four samples, the lost triage labels, the blob hashes in the
-prompts, and the strict row's divergent metadata checks. Of these, the answer
-key leak was the one that would have invalidated the benchmark's results
-rather than merely producing a wrong number, and it was found before anything
-was pushed. The phantom context line was the only finding that reached outside
-the benchmark into the service's own parser.
+prompts, the strict row's divergent metadata checks, the unsalted slugs, the
+fixture test that compared only ids, and the report counting an unreviewed case
+as missed. Two of these would have published a wrong result rather than a wrong
+number: the answer key leak, found before anything was pushed, and the
+unreviewed case counted as a miss, which would have turned a timeout into a
+finding about the reviewers. The phantom context line was the only one that
+reached outside the benchmark into the service's own parser.
 
-**Eight were documentation that claimed more than the code did.** The scoring
-rule described as identical to `validateFinding`, the diagnoses described as
-reviewer facing, the missing strict row with the wrong call granularity, the
-undocumented `--runs` flag, the limits section's run count, the push example
-and the pull example that could not be pasted into a shell, and this file's own
-arithmetic. None of these change what the code does, and all of them would
-have misled someone reading the results.
+**Thirteen were documentation that claimed more than the code did.** The
+scoring rule described as identical to `validateFinding`, the diagnoses
+described as reviewer facing, the missing strict row with the wrong call
+granularity, the undocumented `--runs` flag, the limits section's run count,
+the push and pull examples that could not be pasted into a shell, this file's
+arithmetic twice over, its unstated numbering convention, its commit column
+pointing at entries that named no commit, the manifest note on where
+descriptions live, and the root README's test counts. None of these change what
+the code does, and all of them would have misled someone reading the results.
 
-Eight real defects and eight documentation problems account for sixteen of the
-seventeen. The seventeenth was rejected: the karma-3 alternate scoring
-location, because the remedy would have introduced the first hand written
-label into a set whose value depends on not having any. The limit is documented
-instead.
+**One was rejected.** The karma-3 alternate scoring location, because the
+remedy would have introduced the first hand written label into a set whose
+value depends on not having any. The limit is documented instead, and that
+thread is deliberately left unresolved on the pull request.
 
-The later rounds are worth noting on their own, because each one mostly found
-the previous one's repairs. Six of the second round's seven reports were about
-documentation written in the first, and one of those, the quickstart producing
-four samples instead of three, was a real defect created by a documentation
-fix. The third round then found the pull example beside the push example fixed
-in the second, and the arithmetic of this file. Fixing words introduced ways to
-get numbers wrong twice, which is a useful reminder that a documentation change
-to a benchmark can be a behavioural change.
+The later rounds mostly found the earlier rounds' repairs, and that is the
+pattern worth keeping. Six of round 2's seven reports were about documentation
+written in round 1, and one of those, the quickstart producing four samples,
+was a real defect created by a documentation fix. Round 3 found the pull
+example sitting beside the push example that round 2 had fixed, and found this
+file's arithmetic. Round 4 found this file's arithmetic again, the commit
+references I had added to fix it, and the fixture test I had added for entry 3
+checking only the field entry 3 was about. Each of those is the same mistake in
+a different place: fixing the reported instance instead of the pattern.
 
-The rate of real defects is high across all three rounds, which is partly a
+Fixing words introduced ways to get numbers wrong twice, which is a useful
+reminder that a documentation change to a benchmark can be a behavioural
+change. The response to round 4 is the first one that tries to stop the cycle
+rather than take another turn of it: the counts in this file are now generated
+from one ledger, and the README states no test count at all.
+
+The rate of real defects is high across all four rounds, which is partly a
 reflection of the benchmark having been written quickly around a result rather
-than the other way round. The third round is the clearest case: two of its five
-problems, the lost triage labels and the strict row's metadata checks, were
-places where the code did not do what this file already claimed it did.
+than the other way round. Rounds 3 and 4 are the clearest cases: four of their
+thirteen problems were places where the code did not do what this file already
+claimed it did.
 
 ### A mistake made while fixing finding 1
 
