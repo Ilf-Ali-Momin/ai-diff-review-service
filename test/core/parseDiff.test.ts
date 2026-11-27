@@ -191,6 +191,40 @@ describe('D-018: parseability is signalled by the hunk count', () => {
 });
 
 describe('hunk content handling', () => {
+  it('does not turn the terminating newline into a context line', () => {
+    const diff = [
+      '--- a/src/a.ts',
+      '+++ b/src/a.ts',
+      '@@ -1,2 +1,3 @@',
+      ' const a = 1;',
+      '+const b = 2;',
+      '',
+    ].join('\n');
+
+    // Splitting on \n leaves a final empty element. It is the end of the text,
+    // not line 3 of the file: a finding one line past the diff must read as
+    // pointing outside it, not as correctly located context.
+    const hunk = parseDiff(diff).hunks[0];
+    expect(hunk?.lines.map((l) => l.line)).toEqual([1, 2]);
+  });
+
+  it('keeps a genuinely blank context line inside a hunk', () => {
+    const diff = [
+      '--- a/src/a.ts',
+      '+++ b/src/a.ts',
+      '@@ -1,3 +1,4 @@',
+      ' const a = 1;',
+      '+const b = 2;',
+      '',
+      ' const c = 3;',
+      '',
+    ].join('\n');
+
+    const hunk = parseDiff(diff).hunks[0];
+    expect(hunk?.lines.map((l) => l.line)).toEqual([1, 2, 3, 4]);
+    expect(hunk?.lines[2]?.text).toBe('');
+  });
+
   it('treats a completely empty line inside a hunk as context', () => {
     const diff = [
       '--- a/src/a.ts',

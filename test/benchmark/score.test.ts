@@ -6,6 +6,7 @@ import {
   groundTruthFromDiff,
   hitsBug,
   indexDiff,
+  caseSlug,
   normalizePath,
   scoreCase,
   summarize,
@@ -80,6 +81,18 @@ describe('normalizePath', () => {
     expect(normalizePath('b/lib/a.js', 'demo-1')).toBe('lib/a.js');
     expect(normalizePath('./lib/a.js', 'demo-1')).toBe('lib/a.js');
     expect(normalizePath('cases/demo-2/lib/a.js', 'demo-1')).toBe('cases/demo-2/lib/a.js');
+  });
+
+  it('strips the opaque slug the case is published under', () => {
+    // Reviewers see cases/<slug>/, never cases/<id>/, so both must resolve to
+    // the project's own path or every GitHub finding reads as fabricated.
+    expect(normalizePath(`cases/${caseSlug('demo-1')}/lib/a.js`, 'demo-1')).toBe('lib/a.js');
+  });
+
+  it('leaves another case slug alone', () => {
+    expect(normalizePath(`cases/${caseSlug('demo-2')}/lib/a.js`, 'demo-1')).toBe(
+      `cases/${caseSlug('demo-2')}/lib/a.js`,
+    );
   });
 });
 

@@ -16,6 +16,8 @@
  * left for a human to label (see triage in report.ts) rather than guessed at.
  */
 
+import { createHash } from 'node:crypto';
+
 import { parseDiff } from '../../src/core/parseDiff';
 import type {
   BenchCase,
@@ -72,11 +74,27 @@ export function indexDiff(diff: string): DiffIndex {
  * their paths carry that prefix. Strip it, and any a/ or b/ diff prefix, so
  * every reviewer is compared on the project's own paths.
  */
+/**
+ * The opaque directory name a case is published under in the cases
+ * repository. Reviewer facing artifacts never carry the case id, because the
+ * id would let a reviewer look the answer up instead of finding the bug.
+ * Stable, so a rerun updates a case's pull request rather than opening another.
+ */
+export function caseSlug(caseId: string): string {
+  return createHash('sha256').update(caseId).digest('hex').slice(0, 8);
+}
+
 export function normalizePath(path: string, caseId: string): string {
   let result = path.trim().replace(/^\.\//, '');
-  const prefix = `cases/${caseId}/`;
-  if (result.startsWith(prefix)) {
-    result = result.slice(prefix.length);
+  // Only this case's own directory is stripped, under either the id or the
+  // slug it is published as. A path under another case's directory is left
+  // alone, so a finding pointing into a different case stays fabricated
+  // rather than being quietly remapped onto this one.
+  for (const prefix of [`cases/${caseId}/`, `cases/${caseSlug(caseId)}/`]) {
+    if (result.startsWith(prefix)) {
+      result = result.slice(prefix.length);
+      break;
+    }
   }
   if (result.startsWith('a/') || result.startsWith('b/')) {
     result = result.slice(2);

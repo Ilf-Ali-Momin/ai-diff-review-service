@@ -160,8 +160,15 @@ export function parseDiff(diff: string): ParsedDiff {
     }
 
     if (marker === ' ' || line === '' || line === '\r') {
-      // RULES.md: a completely empty line inside a hunk is a context line that
-      // some producers write without its leading space.
+      // Splitting on \n turns a document's terminating newline into a final
+      // empty element. That is the end of the text, not a line of the file, so
+      // it must not become a context row: a reviewer pointing one line past the
+      // diff would otherwise look correctly located.
+      if (line.replace(/\r$/, '') === '' && i === lines.length - 1) {
+        continue;
+      }
+      // A completely empty line inside a hunk is a context line that some
+      // producers write without its leading space.
       const text = marker === ' ' ? line.slice(1) : line;
       const contextLine: HunkLine = { line: newLineNumber, text, added: false };
       currentHunk?.lines.push(contextLine);

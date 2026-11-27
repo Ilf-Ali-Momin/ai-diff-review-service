@@ -10,7 +10,72 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { CASES_DIR, loadCases } from '../../benchmark/core/io';
+import type { BenchCase } from '../../benchmark/core/types';
 import { groundTruthFromDiff, indexDiff } from '../../benchmark/core/score';
+
+/**
+ * Applies a case's stored unified diff to its base snapshot, the way git would.
+ * Returns the resulting text per file.
+ */
+function applyDiff(benchCase: BenchCase): Map<string, string> {
+  const out = new Map<string, string>();
+  const lines = benchCase.diff.split('\n');
+
+  let path: string | null = null;
+  let source: string[] = [];
+  let result: string[] = [];
+  let cursor = 0;
+
+  const flush = (): void => {
+    if (path !== null) {
+      out.set(path, [...result, ...source.slice(cursor)].join('\n'));
+    }
+  };
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i] as string;
+    const next = lines[i + 1];
+
+    if (line.startsWith('--- ') && next !== undefined && next.startsWith('+++ ')) {
+      flush();
+      path = (next.slice('+++ '.length).split('\t')[0] ?? '').replace(/^b\//, '');
+      source = readFileSync(join(CASES_DIR, benchCase.id, 'base', path), 'utf8').split('\n');
+      result = [];
+      cursor = 0;
+      i += 1;
+      continue;
+    }
+
+    const hunk = /^@@ -(\d+)(?:,\d+)? \+\d+(?:,\d+)? @@/.exec(line);
+    if (hunk !== null) {
+      const start = Number.parseInt(hunk[1] as string, 10) - 1;
+      result.push(...source.slice(cursor, start));
+      cursor = start;
+      continue;
+    }
+
+    if (path === null) {
+      continue;
+    }
+    if (line.startsWith('+')) {
+      result.push(line.slice(1));
+    } else if (line.startsWith('-')) {
+      cursor += 1;
+    } else if (line.startsWith(' ')) {
+      result.push(source[cursor] as string);
+      cursor += 1;
+    } else if (line === '' && i === lines.length - 1) {
+      // The document's terminating newline, not a row of the file.
+      continue;
+    } else if (line === '') {
+      result.push(source[cursor] as string);
+      cursor += 1;
+    }
+  }
+
+  flush();
+  return out;
+}
 
 const cases = loadCases();
 
@@ -32,6 +97,19 @@ describe('benchmark cases', () => {
           for (const line of location.lines) {
             expect(index.get(location.path)?.added.has(line)).toBe(true);
           }
+        }
+      });
+
+      it('applying the stored patch to base reproduces head exactly', () => {
+        // The weaker check below only asks whether each labelled line appears
+        // somewhere in the additions, so two labelled lines could be swapped
+        // in the head snapshot and still pass while the published pull request
+        // no longer matches the patch that scoring uses. Applying the patch is
+        // the only check that ties the three together.
+        const patched = applyDiff(benchCase);
+        for (const file of benchCase.files) {
+          const head = readFileSync(join(CASES_DIR, benchCase.id, 'head', file), 'utf8');
+          expect(patched.get(file), `${file} was not produced by the patch`).toBe(head);
         }
       });
 

@@ -14,7 +14,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
 import { groundTruthFromDiff } from '../core/score';
@@ -111,6 +111,18 @@ function main(): void {
     const built = build(entry);
     const lines = built.groundTruth.reduce((sum, loc) => sum + loc.lines.length, 0);
     console.log(`${built.id.padEnd(14)} ${built.files.join(', ')}  (${lines} bug line${lines === 1 ? '' : 's'})`);
+  }
+
+  // Dropping a case from the manifest has to drop it from the benchmark.
+  // build() only replaces the directory of a case it is building, so without
+  // this a removed id keeps its fixtures, loadCases keeps finding them, and
+  // every later run still scores a case the manifest no longer lists.
+  const wanted = new Set(config.cases.map((entry) => entry.id));
+  for (const dir of readdirSync(CASES, { withFileTypes: true })) {
+    if (dir.isDirectory() && !wanted.has(dir.name)) {
+      rmSync(join(CASES, dir.name), { recursive: true, force: true });
+      console.log(`${dir.name.padEnd(14)} removed, no longer in cases.config.json`);
+    }
   }
 }
 

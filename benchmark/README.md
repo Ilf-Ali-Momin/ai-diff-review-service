@@ -4,9 +4,16 @@ Several AI code reviewers on the same pull requests, scored by one rule: a
 finding counts only if it points at something that is really in the diff, and
 a bug counts as caught only if a finding points at the line where it lives.
 
-This is the same rule the service already applies to its own model
-(`validateFinding` in `src/providers/llm.ts`), turned around and pointed at
-every reviewer, the service included.
+This is the rule the service applies to its own model (`validateFinding` in
+`src/providers/llm.ts`), turned around and pointed at every reviewer, the
+service included.
+
+The two are close but not identical, and the difference matters when reading
+the table. `validateFinding` requires a quote and anchors on it, so a finding
+without one never reaches a client. Scoring here accepts a correctly located
+finding that quotes nothing, because most GitHub review apps never quote the
+line they comment on and judging them on location is the only fair option. So
+a benchmark catch is not always a finding the service would return.
 
 Results: [`results/summary.md`](results/summary.md).
 
@@ -54,20 +61,31 @@ survive reruns.
 | Reviewer | What it is |
 |---|---|
 | `model-raw` | the service's prompt and model, output taken at its word |
-| `diff-review-service` | the same response after `validateFinding` |
+| `diff-review-service` | the same response after `validateFinding`, which anchors a finding on its quote |
+| `diff-review-service-strict` | the same response under the earlier rule: the quote had to match the line the model named, exactly |
 | `proofline` | Proofline reviewing the same cases as real pull requests |
 
-`model-raw` and `diff-review-service` come from **one model call per case**, so
-the only difference between those two rows is the validation step. That
-isolates what verification buys, with nothing else changing.
+The three model rows share **one response per chunk** (a case is one chunk
+unless its diff exceeds the chunk budget, so for these cases it is one call
+each). `bench:model` sends the request once and feeds the same response to all
+three, so the only thing separating those rows is the rule applied afterwards.
+That isolates what verification buys, with nothing else changing, and it is
+why the strict row has to be produced by the same run rather than by an
+earlier one: the model is not deterministic across runs.
 
 ## Running it
 
 ```bash
 npm install
 
-# 1. the service, raw and validated (needs LLM_* in .env, see .env.example)
+# 1. the service: raw, validated, and under the earlier strict rule
+#    (needs LLM_* in .env, see .env.example). One run by default.
 npm run bench:model
+
+#    The model is not deterministic, so one run is an anecdote. The published
+#    numbers use three, and bench:report then reports bugs caught as
+#    min / median / max across them.
+npm run bench:model -- --runs 3
 
 # 2. Proofline: push every case as a PR to an empty repo with Proofline installed
 npm run bench:push -- --dir ../ai-review-benchmark-cases --repo <you>/ai-review-benchmark-cases
@@ -104,7 +122,7 @@ rebuilds them from scratch.
 
 ```
 benchmark/
-  cases.config.json     which BugsJS bugs, with reviewer facing descriptions
+  cases.config.json     which BugsJS bugs, with a diagnosis of each for the report
   cases/<id>/           case.json (diff + ground truth), base/ and head/ files
   core/score.ts         the referee: grounding, matching, summaries (pure)
   runners/model.ts      the service, raw and validated
