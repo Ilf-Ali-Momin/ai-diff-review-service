@@ -1,6 +1,6 @@
 # Proofline review of PR #1
 
-Proofline reviewed this pull request four times. This records what it said,
+Proofline reviewed this pull request five times. This records what it said,
 what was done, and where the response differed from the suggestion.
 
 ## How to read the counts
@@ -45,12 +45,22 @@ only when it is more than one; the ledger carries the exact figure either way.
 | 25 | The fixture test compares ids only | 1 | 4 | fixed | `852b0cd` |
 | 26 | The root README names test counts that drifted | 2 | 4 | fixed | `852b0cd` |
 | 27 | The report counts an unreviewed case as missed by everyone | 1 | 4 | fixed | `852b0cd` |
+| 28 | A rerun aborts at the first pull request already open | 1 | 5 | fixed | `abe70ba` |
+| 29 | The example env file promises an unsalted fallback | 2 | 5 | fixed | `abe70ba` |
+| 30 | The round 1 account of slug stripping is written as current | 1 | 5 | fixed | DOC5COMMIT |
+| 31 | The manifest overstates which misses get a description | 1 | 5 | fixed | `abe70ba` |
+| 32 | The manifest calls published source snapshots evaluator only | 1 | 5 | fixed | `abe70ba` |
+| 33 | Hosted reviewers can reach other cases' fixtures | 1 | 5 | accepted in part | `abe70ba` |
+| 34 | loadCases does not notice a missing fixture directory | 1 | 5 | fixed | `abe70ba` |
+| 35 | The round 3 heading labels entry 3 unchanged | 1 | 5 | fixed | DOC5COMMIT |
+| 36 | The opening blurs rejected and fixed repeats | 1 | 5 | fixed | DOC5COMMIT |
 
-38 reports, 25 problems. Round 1 produced 10 reports and 8 new problems,
-round 2 produced 7 and 4, round 3 produced 10 and 5, round 4 produced 11 and 8.
-Nine problems were reported more than once. Seven of those arrived more than
-once inside a single round, and four were re reported in a later round after
-being addressed: entries 3, 11, 13 and 14.
+48 reports, 34 problems. Round 1 produced 10 reports and 8 new problems,
+round 2 produced 7 and 4, round 3 produced 10 and 5, round 4 produced 11 and 8,
+round 5 produced 10 and 9. Ten problems were reported more than once. Eight of
+those arrived more than once inside a single round, and four were re reported
+in a later round after being dealt with: entries 3, 11 and 13 after being
+fixed, and entry 14 after being rejected.
 
 ## The findings
 
@@ -382,9 +392,11 @@ assert the two rules agree on every check except anchoring.
 
 **Commit:** `1675e71`
 
-### Re reported and not changed
+### Re reports
 
-**Entry 3, removed cases still run after a rebuild.** Reported again at
+Entry 3 prompted a change, entries 11 and 14 did not.
+
+**Entry 3, removed cases still run after a rebuild. Hardened.** Reported again at
 `000e40d`. The prune has been in `build-cases.ts` since `c9cf807` and works.
 The honest residue was narrower than the report: the prune only runs when
 someone runs `bench:cases`, so a stale directory was still loaded until then.
@@ -552,30 +564,194 @@ YOUR_GITHUB_OWNER/ai-review-benchmark-cases`, which pastes into a shell as is.
 The round three change added a `bench:pull` example beside it, which is
 probably what moved the anchor. No change.
 
+## Fifth review, after `ab1cec0`
+
+Ten reports covering nine new problems, entries 28 to 36. Six of the nine are
+consequences of the fourth round's own changes, which is the pattern by now.
+
+### 28. A rerun aborts at the first pull request already open
+
+**Proofline said:** `bench:push` pushes the branch and then calls `gh pr
+create` unconditionally, which fails when a pull request for that branch is
+already open, so a rerun stops at the first case and never writes a refreshed
+mapping.
+
+**Verdict:** accepted.
+
+**Why:** correct, and it contradicted what I had just written in
+`.env.example`, which told the reader to keep the salt stable so a rerun would
+update the existing pull requests. Keeping the salt stable is exactly the case
+that broke. `pullRequestFor` now asks `gh pr list --head <branch> --state
+open` first and creates one only when there is none.
+
+**Commit:** `abe70ba`
+
+### 29. The example env file promises an unsalted fallback
+
+**Proofline said:** `.env.example` describes what an unsalted slug would be,
+which reads as a fallback, while `bench:push` refuses to run on a missing or
+blank salt.
+
+**Verdict:** accepted.
+
+**Why:** correct. The paragraph explained why the salt matters by describing
+the behaviour it replaced, and left the reader expecting that behaviour on a
+blank value. It now says `bench:push` refuses to run without a non blank salt
+and that there is no unsalted fallback, before explaining why. The claim about
+reruns is corrected at the same time: a changed salt publishes a second set of
+branches rather than updating the first, which is a different statement from
+the one entry 28 falsified. Reported twice, against one block.
+
+**Commit:** `abe70ba`
+
+### 30. The round 1 account of slug stripping is written as current
+
+**Proofline said:** the closing section describes `normalizePath` stripping
+published slugs as present behaviour, but it strips only the case id prefix
+now.
+
+**Verdict:** accepted.
+
+**Why:** correct, and a predictable cost of keeping a historical note in a
+living document. Entry 24 moved slug stripping out of the scorer, which made
+that section a true story about the past written in the present tense. It now
+says so at the top and points at entry 24, and the account itself is in the
+past tense.
+
+**Commit:** DOC5COMMIT
+
+### 31. The manifest overstates which misses get a description
+
+**Proofline said:** the note says descriptions explain cases every reviewer
+missed, but the report prints them for cases at least one reviewer was scored
+on and none caught.
+
+**Verdict:** accepted.
+
+**Why:** correct, and it is my own round four change that made the note wrong:
+entry 27 narrowed "missed by every reviewer" to exclude cases nobody reviewed,
+and the note still described the old behaviour. Reworded to match.
+
+**Commit:** `abe70ba`
+
+### 32. The manifest calls published source snapshots evaluator only
+
+**Proofline said:** the note calls the fixture directory evaluator only, but
+`bench:push` copies whole source files out of it into the review repository.
+
+**Verdict:** accepted.
+
+**Why:** correct, and the distinction matters for reading the results: hosted
+reviewers get whole files while the model gets diff chunks, so the comparison
+is not one of equal context. The note now says the descriptions stay
+unpublished and the source snapshots do not.
+
+**Commit:** `abe70ba`
+
+### 33. Hosted reviewers can reach other cases' fixtures
+
+**Proofline said:** every case's fixed source sat on the default branch, so a
+reviewer of one case could read the labelled fix for another. express-4's base
+holds the parsing fix that express-22 reverses.
+
+**Verdict:** accepted in part.
+
+**Why:** correct, and the sharpest finding of this round, because it is about
+the measurement rather than the prose. The default branch now holds a README
+and nothing else, each case gets an orphan `base/<slug>` branch carrying only
+its own files, and its pull request is opened against that branch. A reviewer
+working from the pull request, or from the repository root, sees one case.
+
+Not adopted: one repository per case, which is the only way to close this
+rather than narrow it. The other branches are still in the same repository and
+a reviewer that goes looking will find them. Fifteen repositories to publish,
+install an app on and collect from is a real cost, and the honest summary is
+that this benchmark cannot stop a reviewer that sets out to cheat, only one
+that would have stumbled into the answer. That is recorded as a limit rather
+than claimed as a fix.
+
+This code has not been run against a live repository: the benchmark
+infrastructure was torn down after the exercise, so the change is reviewed and
+type checked but not exercised end to end.
+
+**Commit:** `abe70ba`
+
+### 34. loadCases does not notice a missing fixture directory
+
+**Proofline said:** `loadCases` refuses a directory the manifest does not
+list, but never checks that every manifest id has a directory, so the runner,
+report and publisher can quietly work on a smaller set than the manifest
+declares.
+
+**Verdict:** accepted.
+
+**Why:** correct, and the same half measure as entry 25: the round three guard
+checked the direction the round three finding was about. Fourteen cases
+running as if they were the benchmark is worse than the stale directory case,
+because nothing downstream says the count is short. `loadCases` now fails on
+either mismatch, naming the ids, and a test asserts both directions.
+
+**Commit:** `abe70ba`
+
+### 35. The round 3 heading labels entry 3 unchanged
+
+**Proofline said:** the round three section groups entry 3 under re reports
+that changed nothing, while the entry itself records a new guard and a test.
+
+**Verdict:** accepted.
+
+**Why:** correct. The heading was written for entries 11 and 14 and entry 3
+was filed under it for convenience. The section is now "Re reports", says
+which of the three prompted a change, and entry 3 is marked hardened.
+
+**Commit:** DOC5COMMIT
+
+### 36. The opening blurs rejected and fixed repeats
+
+**Proofline said:** the opening counts four later round repeats as reports
+made after the problems were addressed, without separating entry 14, which was
+rejected rather than fixed.
+
+**Verdict:** accepted.
+
+**Why:** correct, and the third round in a row where this file's own
+bookkeeping is a finding, though a smaller one each time. The sentence now
+reads: entries 3, 11 and 13 after being fixed, and entry 14 after being
+rejected. The total of four is unchanged, which was Proofline's point.
+
+**Commit:** DOC5COMMIT
+
 ## What the review changed
 
-Every figure here comes from the ledger at the top. 38 reports, 25 problems.
+Every figure here comes from the ledger at the top. 48 reports, 34 problems.
 
-**Eleven were real defects in behaviour.** The answer key leak, the stale
+**Fourteen were real defects in behaviour.** The answer key leak, the stale
 fixture directories, the phantom context line, the weak snapshot validation,
 the quickstart's four samples, the lost triage labels, the blob hashes in the
 prompts, the strict row's divergent metadata checks, the unsalted slugs, the
-fixture test that compared only ids, and the report counting an unreviewed case
-as missed. Two of these would have published a wrong result rather than a wrong
-number: the answer key leak, found before anything was pushed, and the
-unreviewed case counted as a miss, which would have turned a timeout into a
-finding about the reviewers. The phantom context line was the only one that
-reached outside the benchmark into the service's own parser.
+fixture test that compared only ids, the report counting an unreviewed case as
+missed, the rerun that aborted on an open pull request, the missing fixture
+directory nothing noticed, and every case's fixed source sitting where a
+reviewer of another case could read it. Three of those would have published a
+wrong result rather than a wrong number: the answer key leak, found before
+anything was pushed; the unreviewed case counted as a miss, which would have
+turned a timeout into a finding about the reviewers; and the shared base
+branch, which would have let a hosted reviewer score on a lookup. The phantom
+context line was the only one that reached outside the benchmark into the
+service's own parser.
 
-**Thirteen were documentation that claimed more than the code did.** The
+**Nineteen were documentation that claimed more than the code did.** The
 scoring rule described as identical to `validateFinding`, the diagnoses
 described as reviewer facing, the missing strict row with the wrong call
 granularity, the undocumented `--runs` flag, the limits section's run count,
 the push and pull examples that could not be pasted into a shell, this file's
-arithmetic twice over, its unstated numbering convention, its commit column
-pointing at entries that named no commit, the manifest note on where
-descriptions live, and the root README's test counts. None of these change what
-the code does, and all of them would have misled someone reading the results.
+arithmetic three times over, its unstated numbering convention, its commit
+column pointing at entries that named no commit, its round three heading, its
+account of slug stripping left in the present tense, the manifest note on
+where descriptions live, on which misses get one and on what publishing
+copies, the promised unsalted fallback, and the root README's test counts.
+None of these change what the code does, and all of them would have misled
+someone reading the results.
 
 **One was rejected.** The karma-3 alternate scoring location, because the
 remedy would have introduced the first hand written label into a set whose
@@ -588,23 +764,30 @@ written in round 1, and one of those, the quickstart producing four samples,
 was a real defect created by a documentation fix. Round 3 found the pull
 example sitting beside the push example that round 2 had fixed, and found this
 file's arithmetic. Round 4 found this file's arithmetic again, the commit
-references I had added to fix it, and the fixture test I had added for entry 3
-checking only the field entry 3 was about. Each of those is the same mistake in
-a different place: fixing the reported instance instead of the pattern.
+references added to fix it, and the fixture test added for entry 3 checking
+only the field entry 3 was about. Round 5 found six consequences of round 4:
+the salt documentation, the rerun the salt documentation promised, two
+manifest claims the report change had made stale, the guard that checked one
+direction, and the historical note left in the present tense.
 
-Fixing words introduced ways to get numbers wrong twice, which is a useful
-reminder that a documentation change to a benchmark can be a behavioural
-change. The response to round 4 is the first one that tries to stop the cycle
-rather than take another turn of it: the counts in this file are now generated
-from one ledger, and the README states no test count at all.
+Each of those is the same mistake in a different place: fixing the reported
+instance instead of the pattern. Twice the answer was structural rather than
+another correction, and those are the two that have held. The counts in this
+file are generated from one ledger, and the root README states no test count
+at all, so neither can drift again. Nothing structural yet prevents the rest:
+a change still has to be chased through the prose that describes it by hand,
+which is what rounds 4 and 5 kept catching.
 
-The rate of real defects is high across all four rounds, which is partly a
+The rate of real defects is high across all five rounds, which is partly a
 reflection of the benchmark having been written quickly around a result rather
-than the other way round. Rounds 3 and 4 are the clearest cases: four of their
-thirteen problems were places where the code did not do what this file already
-claimed it did.
+than the other way round, and partly that each repair was scoped to its report.
 
 ### A mistake made while fixing finding 1
+
+This is the fix as it was in round 1. It no longer describes the code:
+entry 24 moved slug stripping out of the scorer entirely, and `normalizePath`
+now strips only `cases/<id>/`. Kept because the mistake is worth recording, not
+as a description of current behaviour.
 
 Moving to opaque slugs meant `normalizePath` had to strip `cases/<slug>/` as
 well as `cases/<id>/`, or every finding from a GitHub reviewer would have been
@@ -614,7 +797,7 @@ pointing into a different case would have been quietly remapped onto the
 current one instead of being labelled fabricated.
 
 An existing test caught it immediately, the one asserting that
-`cases/demo-2/...` under case `demo-1` is left alone. The fix strips only this
-case's own directory, under either its id or its slug, and two tests were added
-for the slug form of both cases. Worth recording because the broken version
-would have inflated scores rather than failing loudly.
+`cases/demo-2/...` under case `demo-1` is left alone. The fix stripped only
+this case's own directory, under either its id or its slug, and two tests were
+added for the slug form of both cases. Worth recording because the broken
+version would have inflated scores rather than failing loudly.
