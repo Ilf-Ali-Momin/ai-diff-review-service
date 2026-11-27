@@ -56,9 +56,9 @@ only when it is more than one; the ledger carries the exact figure either way.
 | 36 | The opening blurs rejected and fixed repeats | 1 | 5 | fixed | `ca430c1` |
 | 37 | A rerun aborts on an orphan branch that already exists | 1 | 6 | fixed | `37d9104` |
 | 38 | The quickstart never clones the target repository | 2 | 6 | fixed | `37d9104` |
-| 39 | Entry 18's ledger row says fixed, the entry says in part | 1 | 6 | fixed | DOC6COMMIT |
-| 40 | Entries 20 to 22 carry no commit line | 1 | 6 | fixed | DOC6COMMIT |
-| 41 | The recap misattributes the guard and the manifest claims | 1 | 6 | fixed | DOC6COMMIT |
+| 39 | Entry 18's ledger row says fixed, the entry says in part | 1 | 6 | fixed | `86086c3` |
+| 40 | Entries 20 to 22 carry no commit line | 1 | 6 | fixed | `86086c3` |
+| 41 | The recap misattributes the guard and the manifest claims | 1 | 6 | fixed | `86086c3` |
 | 42 | The README omits the limit of branch level isolation | 1 | 6 | fixed | `37d9104` |
 | 43 | The README implies model and hosted reviewers share context | 2 | 6 | fixed | `37d9104` |
 | 44 | A comment on a removed line can count as a catch | 1 | 6 | fixed | `37d9104` |
@@ -786,7 +786,7 @@ was introduced when the ledger was written: the row was filled from memory
 rather than from the entry below it. The disposition now reads `accepted in
 part`.
 
-**Commit:** DOC6COMMIT
+**Commit:** `86086c3`
 
 ### 40. Entries 20 to 22 carry no commit line
 
@@ -800,7 +800,7 @@ entries that fixed it. Entry 21 was about entries 15 to 19 and was fixed for
 entries 15 to 19; the three new entries written in that same commit were left
 without one. Added.
 
-**Commit:** DOC6COMMIT
+**Commit:** `86086c3`
 
 ### 41. The recap misattributes the guard and the manifest claims
 
@@ -816,7 +816,7 @@ failure as the counts it replaced, in prose rather than arithmetic. It now
 names round 3 for the guard, entry 27 for the one manifest claim and entry 23
 for the other.
 
-**Commit:** DOC6COMMIT
+**Commit:** `86086c3`
 
 ### 42. The README omits the limit of branch level isolation
 
