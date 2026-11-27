@@ -56,9 +56,9 @@ only when it is more than one; the ledger carries the exact figure either way.
 | 36 | The opening blurs rejected and fixed repeats | 1 | 5 | fixed | `ca430c1` |
 | 37 | A rerun aborts on an orphan branch that already exists | 1 | 6 | fixed | `37d9104` |
 | 38 | The quickstart never clones the target repository | 2 | 6 | fixed | `37d9104` |
-| 39 | Entry 18's ledger row says fixed, the entry says in part | 1 | 6 | fixed | DOC6COMMIT |
-| 40 | Entries 20 to 22 carry no commit line | 1 | 6 | fixed | DOC6COMMIT |
-| 41 | The recap misattributes the guard and the manifest claims | 1 | 6 | fixed | DOC6COMMIT |
+| 39 | Entry 18's ledger row says fixed, the entry says in part | 1 | 6 | fixed | `86086c3` |
+| 40 | Entries 20 to 22 carry no commit line | 1 | 6 | fixed | `86086c3` |
+| 41 | The recap misattributes the guard and the manifest claims | 1 | 6 | fixed | `86086c3` |
 | 42 | The README omits the limit of branch level isolation | 1 | 6 | fixed | `37d9104` |
 | 43 | The README implies model and hosted reviewers share context | 2 | 6 | fixed | `37d9104` |
 | 44 | A comment on a removed line can count as a catch | 1 | 6 | fixed | `37d9104` |
@@ -122,7 +122,7 @@ directory whose id is absent from the manifest. Reported twice: once here, and
 again in the third round, which added the load time guard recorded under that
 round's re reports.
 
-**Commit:** `c9cf807`
+**Commit:** `c9cf807`, hardened in `1675e71`
 
 ### 4. A line past the end of the diff counts as context
 
@@ -908,7 +908,12 @@ ledger: every ledger row has an entry and every entry a row, dispositions
 agree with verdicts, every entry names a commit, a row with more than one
 report says so in its prose, and the stated totals and per round figures are
 recomputed from the table. It found two of the three omissions itself while
-being written, and the undercount in entry 11.
+being written, and the undercount in entry 11. It then caught two more
+immediately: three ledger rows I had pushed still carried a placeholder where
+their commit should be, and entry 3's row named a second commit its own entry
+did not. The first of those was live on the pull request for a few minutes,
+which is the honest demonstration that the check was the right answer and
+another careful pass was not.
 
 What it does not check is whether a sentence is true, which is most of what
 the previous six rounds found. It closes one class, the class this file kept

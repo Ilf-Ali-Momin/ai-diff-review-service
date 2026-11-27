@@ -82,6 +82,21 @@ describe('PROOFLINE_FEEDBACK.md agrees with its own ledger', () => {
     }
   });
 
+  it('names in each entry the commit its ledger row names', () => {
+    // A placeholder once survived into the ledger because the entries carried
+    // the real hash and nothing compared the two.
+    for (const row of rows) {
+      const last = bodies.get(row.entries[row.entries.length - 1] as string) ?? '';
+      const stated = /\*\*Commit:\*\* (.+)/.exec(last)?.[1] ?? '';
+      const hashes = (text: string): string[] => [...text.matchAll(/`([0-9a-f]{7,40})`/g)].map((m) => m[1] as string);
+
+      expect(hashes(row.commit), `entry ${row.key}`).not.toEqual([]);
+      for (const hash of hashes(row.commit)) {
+        expect(hashes(stated), `entry ${row.key}`).toContain(hash);
+      }
+    }
+  });
+
   it('says in the prose when a problem was reported more than once', () => {
     // The stated convention: an entry mentions a report count only when it is
     // more than one. A pair of entry numbers is itself that statement.
