@@ -1,6 +1,6 @@
 # Proofline review of PR #1
 
-Proofline reviewed this pull request six times. This records what it said,
+Proofline reviewed this pull request seven times. This records what it said,
 what was done, and where the response differed from the suggestion.
 
 ## How to read the counts
@@ -37,7 +37,7 @@ only when it is more than one; the ledger carries the exact figure either way.
 | 17 | This file's counts do not add up | 3 | 3 | fixed | `1675e71` |
 | 18 | Prompts carry blob hashes that identify the upstream fix | 1 | 3 | accepted in part | `1675e71` |
 | 19 | The strict row validated metadata differently | 1 | 3 | fixed | `1675e71` |
-| 20 | The entry numbering convention was never stated | 1 | 4 | fixed | `343f804` |
+| 20 | The entry numbering convention was never stated | 2 | 4, 7 | fixed | `343f804`, enforced in DOC7 |
 | 21 | Round 3 rows point at commits the entries do not name | 1 | 4 | fixed | `343f804` |
 | 22 | The recap's repeat counts are wrong and call a rejection fixed | 2 | 4 | fixed | `343f804` |
 | 23 | The manifest note says descriptions appear only in the report | 1 | 4 | fixed | `852b0cd` |
@@ -56,19 +56,27 @@ only when it is more than one; the ledger carries the exact figure either way.
 | 36 | The opening blurs rejected and fixed repeats | 1 | 5 | fixed | `ca430c1` |
 | 37 | A rerun aborts on an orphan branch that already exists | 1 | 6 | fixed | `37d9104` |
 | 38 | The quickstart never clones the target repository | 2 | 6 | fixed | `37d9104` |
-| 39 | Entry 18's ledger row says fixed, the entry says in part | 1 | 6 | fixed | `86086c3` |
-| 40 | Entries 20 to 22 carry no commit line | 1 | 6 | fixed | `86086c3` |
-| 41 | The recap misattributes the guard and the manifest claims | 1 | 6 | fixed | `86086c3` |
+| 39 | Entry 18's ledger row says fixed, the entry says in part | 1 | 6 | fixed | DOC6COMMIT |
+| 40 | Entries 20 to 22 carry no commit line | 1 | 6 | fixed | DOC6COMMIT |
+| 41 | The recap misattributes the guard and the manifest claims | 1 | 6 | fixed | DOC6COMMIT |
 | 42 | The README omits the limit of branch level isolation | 1 | 6 | fixed | `37d9104` |
 | 43 | The README implies model and hosted reviewers share context | 2 | 6 | fixed | `37d9104` |
 | 44 | A comment on a removed line can count as a catch | 1 | 6 | fixed | `37d9104` |
 
-58 reports, 42 problems. Round 1 produced 10 reports and 8 new problems,
-round 2 produced 7 and 4, round 3 produced 10 and 5, round 4 produced 11 and 8,
-round 5 produced 10 and 9, round 6 produced 10 and 8. Twelve problems were
-reported more than once. Ten of those arrived more than once inside a single
-round, and four were re reported in a later round after being dealt with:
-entries 3, 11 and 13 after being fixed, and entry 14 after being rejected.
+59 reports, 42 problems. Round 1 produced 10 reports and 8 new problems,
+round 2 produced 7 reports and 4 new problems, round 3 produced 10 reports and
+5 new problems, round 4 produced 11 reports and 8 new problems, round 5
+produced 10 reports and 9 new problems, round 6 produced 10 reports and 8 new
+problems, and round 7 produced 1 report and 0 new problems. Thirteen problems
+were reported more than once. Ten of those arrived more than once inside a
+single round, and five were re reported in a later round after being dealt
+with: entries 3, 11, 13 and 20 after being fixed, and entry 14 after being
+rejected.
+
+The ledger and the entries below it are checked against each other by
+`test/benchmark/feedback.test.ts`, which is why entry 20 took two rounds: the
+convention was written down and then not followed, and writing it down again
+would not have caught that either.
 
 ## The findings
 
@@ -110,7 +118,9 @@ directory on disk, and `loadCases` keeps loading it.
 
 **Why:** correct. `build()` only replaces the directory of the case it is
 building, so a removed case kept being scored. A rebuild now deletes any case
-directory whose id is absent from the manifest.
+directory whose id is absent from the manifest. Reported twice: once here, and
+again in the third round, which added the load time guard recorded under that
+round's re reports.
 
 **Commit:** `c9cf807`
 
@@ -238,8 +248,10 @@ results.
 documented in one place and contradicted two sections later. The bullet now
 says three runs for the model and one for hosted reviewers, and explains that
 bugs caught is min / median / max across runs while the finding counts beside
-it are totals, so the two columns are not read the same way. Reported three
-times, against three lines describing the same claim.
+it are totals, so the two columns are not read the same way. Reported four
+times: three in this round, against three lines describing the same claim, and
+once more in the third round, re anchored onto the code that makes the
+distinction, which changed nothing.
 
 **Commit:** `91e1426`
 
@@ -291,7 +303,8 @@ rests on every label being derived from the reversed fix. Adding one by hand
 where a reviewer happened to miss also biases the set toward whichever
 reviewer prompted the addition. The README now records this as a limit, with
 karma-3 named as the example, so a reader can see the cost rather than
-discover it.
+discover it. Reported twice, here and again in the third round, and rejected
+both times. The thread is deliberately left unresolved on the pull request.
 
 **Commit:** `91e1426`
 
@@ -444,7 +457,15 @@ replies on the pull request still point somewhere, and an entry's prose gives
 a report count only when it is more than one, with the ledger carrying the
 exact figure for every entry either way.
 
-**Commit:** `343f804`
+Reported twice. The second report, a round later, was right: three entries
+with more than one report said nothing about it, so the convention written
+here was already broken where it mattered. Writing it more carefully would
+have been the same move a third time, so the ledger and the entries are now
+checked against each other by `test/benchmark/feedback.test.ts`, which fails
+when a row and its entry disagree on disposition, commit or report count, or
+when the stated totals do not add up.
+
+**Commit:** `343f804`, enforced in DOC7COMMIT
 
 ### 21. Round 3 rows point at commits the entries do not name
 
@@ -871,6 +892,28 @@ tests, the first this runner has had.
 
 **Commit:** `37d9104`
 
+## Seventh review, after `bdf8174`
+
+One report, no new problems: entry 20 again, and it was right.
+
+The convention it established says an entry gives a report count when it is
+more than one. Entries 3, 11 and 14 each had more than one and said nothing,
+and entry 11's prose said three where the ledger said four. So the convention
+existed and was not followed, in the same document that argues documentation
+accuracy matters.
+
+Writing it out again would have been the third hand correction of the same
+thing. `test/benchmark/feedback.test.ts` now checks this file against its own
+ledger: every ledger row has an entry and every entry a row, dispositions
+agree with verdicts, every entry names a commit, a row with more than one
+report says so in its prose, and the stated totals and per round figures are
+recomputed from the table. It found two of the three omissions itself while
+being written, and the undercount in entry 11.
+
+What it does not check is whether a sentence is true, which is most of what
+the previous six rounds found. It closes one class, the class this file kept
+failing at.
+
 ## What the review changed
 
 Every figure here comes from the ledger at the top. 58 reports, 42 problems.
@@ -940,13 +983,15 @@ Entry 21 said entries carried no commit reference; it was fixed for the
 entries named in the report, and the three entries written in that very
 commit were left without one, which is entry 40 a round later.
 
-Twice the answer was structural rather than another correction, and those are
-the two that have held: the counts in this file are generated from one ledger,
-and the root README states no test count at all. The ledger is not free of
-this either, as entry 39 shows, since a row filled from memory can still
-disagree with the entry beneath it. Nothing structural prevents the rest. A
-change still has to be chased by hand through the prose that describes it,
-which is what rounds 4, 5 and 6 kept catching.
+Three times the answer was structural rather than another correction, and
+those are the ones that have held: the counts in this file are generated from
+one ledger, the root README states no test count at all, and the ledger is now
+checked against the entries by a test. The ledger alone was not enough, as
+entries 39 and 20 show: a row filled from memory can still disagree with the
+entry beneath it, and a convention can be written down and then not followed.
+Nothing structural prevents the rest. Whether a sentence is true still has to
+be checked by hand against the code it describes, which is what rounds 4, 5
+and 6 kept catching.
 
 The rate of real defects is high across all six rounds, which is partly a
 reflection of the benchmark having been written quickly around a result rather
