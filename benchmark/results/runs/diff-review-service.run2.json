@@ -1,0 +1,137 @@
+{
+  "reviewer": "diff-review-service",
+  "source": "openai/gpt-oss-120b + validateFinding",
+  "ranAt": "2026-11-27T15:17:23.671Z",
+  "caseIds": [
+    "express-3",
+    "express-4",
+    "express-5",
+    "express-9",
+    "express-16",
+    "express-22",
+    "express-26",
+    "hexo-7",
+    "hexo-12",
+    "karma-3",
+    "karma-22",
+    "mongoose-8",
+    "mongoose-11",
+    "mongoose-16",
+    "mongoose-22"
+  ],
+  "findings": [
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-3",
+      "path": "lib/response.js",
+      "line": 609,
+      "title": "Calling req.accepts with empty array may change behavior",
+      "evidence": "  var key = req.accepts(keys);"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-4",
+      "path": "lib/request.js",
+      "line": 457,
+      "title": "Improper handling of IP addresses in subdomain parsing",
+      "evidence": "  var subdomains = host.split('.').reverse();"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-5",
+      "path": "lib/utils.js",
+      "line": 70,
+      "title": "Windows device path detection no longer accepts forward slash separator",
+      "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-9",
+      "path": "lib/application.js",
+      "line": 171,
+      "title": "Incorrect assignment of mount_app.mountpath; uses 'path' instead of 'mount_path'",
+      "evidence": "    mount_app.mountpath = path;"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-22",
+      "path": "lib/request.js",
+      "line": 479,
+      "title": "Host header parsing incorrectly splits on ':' breaking IPv6 handling",
+      "evidence": "  return host.split(':')[0];"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-26",
+      "path": "lib/router/index.js",
+      "line": 129,
+      "title": "Removed leading slash check when extracting FQDN, can misinterpret relative URLs",
+      "evidence": "  var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "hexo-7",
+      "path": "lib/plugins/helper/toc.js",
+      "line": 28,
+      "title": "Using unescaped HTML for TOC entries can lead to XSS",
+      "evidence": "    var text = $(this).html();"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "hexo-12",
+      "path": "lib/hexo/post.js",
+      "line": 50,
+      "title": "Removed .toString() may cause non-string slug values to break slugize",
+      "evidence": "  data.slug = slugize(data.slug || data.title, {transform: config.filename_case});"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "hexo-12",
+      "path": "lib/hexo/post.js",
+      "line": 207,
+      "title": "Removed .toString() may cause non-string slug values to break slugize in publish",
+      "evidence": "  var slug = data.slug = slugize(data.slug, {transform: config.filename_case});"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "karma-3",
+      "path": "lib/reporter.js",
+      "line": 99,
+      "title": "Overwrites msg with formatted error, may cause type errors on concatenation",
+      "evidence": "      msg = config.formatError(msg)"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "mongoose-8",
+      "path": "lib/document.js",
+      "line": 355,
+      "title": "Missing return value from update method",
+      "evidence": "  this.constructor.update.apply(this.constructor, args);"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "mongoose-11",
+      "path": "lib/query.js",
+      "line": 517,
+      "title": "Removed check for existing path in keys, altering inclusion logic",
+      "evidence": "      if (false === exclude && keys.length > 1) {"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "mongoose-16",
+      "path": "lib/model.js",
+      "line": 342,
+      "title": "Removed version check may cause incorrect early return",
+      "evidence": "  if (!dirty.length) return;"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "mongoose-22",
+      "path": "lib/model.js",
+      "line": 767,
+      "title": "Query conditions removed, may delete all documents unintentionally",
+      "evidence": "  var mq = new Query({}, {}, this, this.collection);"
+    }
+  ],
+  "errors": []
+}

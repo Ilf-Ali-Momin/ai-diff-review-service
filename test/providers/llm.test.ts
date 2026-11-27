@@ -203,11 +203,134 @@ describe('probe 83: validation against parsed ground truth', () => {
     expect(await provider(endpoint.baseUrl).review(chunksOf(DIFF), signal)).toEqual([]);
   });
 
-  it('drops a finding for a line that is not an added line', async () => {
-    // Line 1 is a context line, so it is not ours to report on.
+  it('re anchors a correct quote reported at the wrong line', async () => {
+    // Line 1 is a context line, but the quote is exactly line 2. The quote is
+    // the anchor, so the finding moves to line 2 rather than being dropped.
     const endpoint = await fakeEndpoint([{ body: [{ ...validFinding, line: 1 }] }]);
+    const findings = await provider(endpoint.baseUrl).review(chunksOf(DIFF), signal);
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.line).toBe(2);
+    expect(findings[0]?.id).toBe('LLM-SQL:src/db.ts:2');
+    expect(findings[0]?.evidence).toBe('const q = "SELECT * FROM users WHERE id = " + id;');
+  });
+
+  it('keeps a finding whose quote already matches the claimed line', async () => {
+    const endpoint = await fakeEndpoint([{ body: [validFinding] }]);
+    const findings = await provider(endpoint.baseUrl).review(chunksOf(DIFF), signal);
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.line).toBe(2);
+  });
+
+  it('re anchors within the distance limit', async () => {
+    // Line 12 is 10 away from the real line 2, which is the limit.
+    const endpoint = await fakeEndpoint([{ body: [{ ...validFinding, line: 12 }] }]);
+    const findings = await provider(endpoint.baseUrl).review(chunksOf(DIFF), signal);
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.line).toBe(2);
+  });
+
+  it('drops a match further than ten lines from the claimed line', async () => {
+    // 13 is 11 away. A quote matching that far off is coincidence, not an
+    // off by a few mistake.
+    const endpoint = await fakeEndpoint([{ body: [{ ...validFinding, line: 13 }] }]);
 
     expect(await provider(endpoint.baseUrl).review(chunksOf(DIFF), signal)).toEqual([]);
+  });
+
+  it('drops a quote too short or too generic to anchor on', async () => {
+    const punctuation = [
+      'diff --git a/src/brace.ts b/src/brace.ts',
+      '--- a/src/brace.ts',
+      '+++ b/src/brace.ts',
+      '@@ -1,1 +1,4 @@',
+      ' const start = 1;',
+      '+if (a) {',
+      '+});',
+      '+const tail = 2;',
+      '',
+    ].join('\n');
+
+    // `});` is three characters and occurs all over a real file.
+    const short = await fakeEndpoint([
+      { body: [{ ...validFinding, path: 'src/brace.ts', line: 4, evidence: '});' }] },
+    ]);
+    expect(await provider(short.baseUrl).review(chunksOf(punctuation), signal)).toEqual([]);
+
+    // Long enough, but no letter or digit in it.
+    const symbols = await fakeEndpoint([
+      { body: [{ ...validFinding, path: 'src/brace.ts', line: 4, evidence: '}); }); ' }] },
+    ]);
+    expect(await provider(symbols.baseUrl).review(chunksOf(punctuation), signal)).toEqual([]);
+  });
+
+  it('still keeps a short quote when it sits exactly at the claimed line', async () => {
+    // The guardrails gate re anchoring, not an already correct location.
+    const punctuation = [
+      'diff --git a/src/brace.ts b/src/brace.ts',
+      '--- a/src/brace.ts',
+      '+++ b/src/brace.ts',
+      '@@ -1,1 +1,3 @@',
+      ' const start = 1;',
+      '+});',
+      '',
+    ].join('\n');
+    const endpoint = await fakeEndpoint([
+      { body: [{ ...validFinding, path: 'src/brace.ts', line: 2, evidence: '});' }] },
+    ]);
+    const findings = await provider(endpoint.baseUrl).review(chunksOf(punctuation), signal);
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.line).toBe(2);
+  });
+
+  it('drops a quote that appears nowhere in the diff', async () => {
+    const endpoint = await fakeEndpoint([
+      { body: [{ ...validFinding, line: 1, evidence: 'const nothing = "like this";' }] },
+    ]);
+
+    expect(await provider(endpoint.baseUrl).review(chunksOf(DIFF), signal)).toEqual([]);
+  });
+
+  it('never re anchors across files', async () => {
+    // The quote is a real added line, but in src/db.ts, not src/other.ts.
+    const endpoint = await fakeEndpoint([{ body: [{ ...validFinding, path: 'src/other.ts' }] }]);
+
+    expect(await provider(endpoint.baseUrl).review(chunksOf(DIFF), signal)).toEqual([]);
+  });
+
+  it('picks the closest line when the same quote is added twice, lowest on a tie', async () => {
+    // The same statement added at lines 2, 4 and 6 of one file.
+    const repeated = [
+      'diff --git a/src/dup.ts b/src/dup.ts',
+      '--- a/src/dup.ts',
+      '+++ b/src/dup.ts',
+      '@@ -1,1 +1,6 @@',
+      ' const start = 1;',
+      '+doThing();',
+      '+const spacer1 = 1;',
+      '+doThing();',
+      '+const spacer2 = 2;',
+      '+doThing();',
+      '',
+    ].join('\n');
+    const dup = { ...validFinding, path: 'src/dup.ts', evidence: 'doThing();' };
+
+    // Claimed 7 is nearest 6 (distances 5, 3, 1), so it anchors to 6.
+    const near6 = await fakeEndpoint([{ body: [{ ...dup, line: 7 }] }]);
+    expect(
+      (await provider(near6.baseUrl).review(chunksOf(repeated), signal))[0]?.line,
+    ).toBe(6);
+
+    // Claimed 5 is equidistant from 4 and 6, so the tie goes to the lower.
+    const tieHigh = await fakeEndpoint([{ body: [{ ...dup, line: 5 }] }]);
+    expect((await provider(tieHigh.baseUrl).review(chunksOf(repeated), signal))[0]?.line).toBe(4);
+
+    // Claimed 3 is equidistant from 2 and 4, so the tie goes to the lower.
+    const tie = await fakeEndpoint([{ body: [{ ...dup, line: 3 }] }]);
+    expect((await provider(tie.baseUrl).review(chunksOf(repeated), signal))[0]?.line).toBe(2);
   });
 
   it('drops a finding whose evidence does not match the real line', async () => {

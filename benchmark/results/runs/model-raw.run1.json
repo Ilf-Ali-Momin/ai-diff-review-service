@@ -1,0 +1,153 @@
+{
+  "reviewer": "model-raw",
+  "source": "openai/gpt-oss-120b",
+  "ranAt": "2026-11-27T15:16:14.818Z",
+  "caseIds": [
+    "express-3",
+    "express-4",
+    "express-5",
+    "express-9",
+    "express-16",
+    "express-22",
+    "express-26",
+    "hexo-7",
+    "hexo-12",
+    "karma-3",
+    "karma-22",
+    "mongoose-8",
+    "mongoose-11",
+    "mongoose-16",
+    "mongoose-22"
+  ],
+  "findings": [
+    {
+      "reviewer": "model-raw",
+      "caseId": "express-4",
+      "path": "lib/request.js",
+      "line": 457,
+      "title": "Improper subdomain parsing for IP addresses",
+      "evidence": "var subdomains = host.split('.').reverse();"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "express-5",
+      "path": "lib/utils.js",
+      "line": 71,
+      "title": "Windows absolute path detection no longer accepts forward slash after drive letter",
+      "evidence": "if (':' === path[1] && '\\\\' === path[2]) return true;"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "express-9",
+      "path": "lib/application.js",
+      "line": 168,
+      "title": "mount_app.mountpath assigned to user-provided path instead of mount_path",
+      "evidence": "mount_app.mountpath = path;"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "express-16",
+      "path": "lib/response.js",
+      "line": 822,
+      "title": "Potential open redirect vulnerability using unvalidated URL",
+      "evidence": "body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "express-16",
+      "path": "lib/response.js",
+      "line": 826,
+      "title": "Potential open redirect vulnerability using unvalidated URL in HTML output",
+      "evidence": "var u = escapeHtml(url);"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "express-22",
+      "path": "lib/request.js",
+      "line": 485,
+      "title": "Improper host parsing may break IPv6 addresses",
+      "evidence": "return host.split(':')[0];"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "express-26",
+      "path": "lib/router/index.js",
+      "line": 126,
+      "title": "Removed leading slash check when detecting fully qualified URL, may misinterpret relative paths",
+      "evidence": "var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "hexo-7",
+      "path": "lib/plugins/helper/toc.js",
+      "line": 28,
+      "title": "Potential XSS due to unescaped HTML in TOC helper",
+      "evidence": "var text = $(this).html();"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "hexo-12",
+      "path": "lib/hexo/post.js",
+      "line": 51,
+      "title": "Removing .toString() may cause non‑string values to be passed to slugize",
+      "evidence": "data.slug = slugize(data.slug || data.title, {transform: config.filename_case});"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "hexo-12",
+      "path": "lib/hexo/post.js",
+      "line": 204,
+      "title": "Removing .toString() may cause non‑string slug values to be passed to slugize",
+      "evidence": "var slug = data.slug = slugize(data.slug, {transform: config.filename_case});"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "karma-3",
+      "path": "lib/reporter.js",
+      "line": 97,
+      "title": "Potential loss of return value from config.formatError",
+      "evidence": "msg = config.formatError(msg)"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "karma-22",
+      "path": "lib/reporter.js",
+      "line": 27,
+      "title": "Overly permissive URL regular expression may allow malicious hosts",
+      "evidence": "var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/\\s]*)?\\/?' +"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "mongoose-8",
+      "path": "lib/document.js",
+      "line": 355,
+      "title": "Missing return statement in Document.update may break callers expecting a result",
+      "evidence": "this.constructor.update.apply(this.constructor, args);"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "mongoose-11",
+      "path": "lib/query.js",
+      "line": 514,
+      "title": "Removed duplicate field check may cause redundant field inclusion",
+      "evidence": "if (false === exclude && keys.length > 1) {"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "mongoose-16",
+      "path": "lib/model.js",
+      "line": 342,
+      "title": "Removed version check may cause stale data handling",
+      "evidence": "if (!dirty.length) return;"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "mongoose-22",
+      "path": "lib/model.js",
+      "line": 764,
+      "title": "Remove operation uses empty query, potentially deleting all documents",
+      "evidence": "var mq = new Query({}, {}, this, this.collection);"
+    }
+  ],
+  "errors": []
+}

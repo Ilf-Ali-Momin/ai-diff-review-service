@@ -32,6 +32,11 @@ const SEVERITIES: readonly string[] = ['critical', 'high', 'medium', 'low'];
 const CATEGORIES: readonly string[] = ['security', 'correctness', 'performance', 'style'];
 
 const RULE_ID_PATTERN = /^[A-Za-z0-9_-]{1,32}$/;
+
+/** How far a re anchored finding may move from the line the model claimed. */
+const MAX_ANCHOR_DISTANCE = 10;
+/** Shortest quote distinctive enough to anchor on. */
+const MIN_ANCHOR_QUOTE = 8;
 const MAX_TITLE_LENGTH = 200;
 
 /** Raised for a request that ran out of time, the only failure worth retrying. */
@@ -158,6 +163,66 @@ function normalizeRuleId(value: unknown): string | null {
  * contains that path, that line, and text matching what the model claims to
  * have seen there. See D-035.
  */
+/**
+ * Resolves which added line a finding really points at.
+ *
+ * A model routinely quotes the right line and reports the wrong number for
+ * it. Dropping those loses real findings, while trusting the number would let
+ * an unverified claim through. So the quote is the anchor, not the number: it
+ * must match an added line of the same file exactly, after trimming. The
+ * claimed number only chooses between equal matches.
+ *
+ * Never searches another file. An exact quote is required throughout; this is
+ * a re anchor, not a loosening to substring matching.
+ *
+ * Two guardrails stop a re anchor becoming a guess. The match must be within
+ * `MAX_ANCHOR_DISTANCE` lines of the claimed number, because a quote that
+ * matches hundreds of lines away is a coincidence rather than an off by a few
+ * mistake. And the quote must carry `MIN_ANCHOR_QUOTE` characters including
+ * something alphanumeric, because `});` or `}` occurs on dozens of added
+ * lines and anchoring on it would pick a line at random.
+ */
+function anchor(
+  lines: Map<number, string>,
+  claimedLine: number,
+  claimedText: string,
+): { line: number; text: string } | null {
+  const wanted = claimedText.trim();
+
+  const atClaimed = lines.get(claimedLine);
+  if (atClaimed !== undefined && atClaimed.trim() === wanted) {
+    return { line: claimedLine, text: atClaimed };
+  }
+
+  // Too short, or no letters and digits, means the quote is punctuation that
+  // repeats all over the file. An empty quote fails both of these.
+  if (wanted.length < MIN_ANCHOR_QUOTE || !/[A-Za-z0-9]/.test(wanted)) {
+    return null;
+  }
+
+  let best: number | null = null;
+  for (const [candidateLine, text] of lines) {
+    if (text.trim() !== wanted) {
+      continue;
+    }
+    if (Math.abs(candidateLine - claimedLine) > MAX_ANCHOR_DISTANCE) {
+      continue;
+    }
+    if (
+      best === null ||
+      Math.abs(candidateLine - claimedLine) < Math.abs(best - claimedLine) ||
+      (Math.abs(candidateLine - claimedLine) === Math.abs(best - claimedLine) && candidateLine < best)
+    ) {
+      best = candidateLine;
+    }
+  }
+
+  if (best === null) {
+    return null;
+  }
+  return { line: best, text: lines.get(best) as string };
+}
+
 export function validateFinding(raw: unknown, truth: GroundTruth): Finding | null {
   if (typeof raw !== 'object' || raw === null) {
     return null;
@@ -170,15 +235,21 @@ export function validateFinding(raw: unknown, truth: GroundTruth): Finding | nul
     return null;
   }
 
-  const actualText = truth.get(path)?.get(line);
-  if (actualText === undefined) {
+  const linesForPath = truth.get(path);
+  if (linesForPath === undefined) {
     return null;
   }
 
   const claimed = candidate['evidence'];
-  if (typeof claimed !== 'string' || claimed.trim() !== actualText.trim()) {
+  if (typeof claimed !== 'string') {
     return null;
   }
+
+  const anchored = anchor(linesForPath, line, claimed);
+  if (anchored === null) {
+    return null;
+  }
+  const { line: resolvedLine, text: actualText } = anchored;
 
   const severity = candidate['severity'];
   const category = candidate['category'];
@@ -196,10 +267,10 @@ export function validateFinding(raw: unknown, truth: GroundTruth): Finding | nul
   }
 
   return {
-    id: `${ruleId}:${path}:${line}`,
+    id: `${ruleId}:${path}:${resolvedLine}`,
     ruleId,
     path,
-    line,
+    line: resolvedLine,
     severity: severity as Severity,
     category: category as Category,
     title,

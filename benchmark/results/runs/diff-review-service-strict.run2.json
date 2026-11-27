@@ -1,0 +1,41 @@
+{
+  "reviewer": "diff-review-service-strict",
+  "source": "openai/gpt-oss-120b + validateFinding (strict: exact line and quote)",
+  "ranAt": "2026-11-27T15:17:23.671Z",
+  "caseIds": [
+    "express-3",
+    "express-4",
+    "express-5",
+    "express-9",
+    "express-16",
+    "express-22",
+    "express-26",
+    "hexo-7",
+    "hexo-12",
+    "karma-3",
+    "karma-22",
+    "mongoose-8",
+    "mongoose-11",
+    "mongoose-16",
+    "mongoose-22"
+  ],
+  "findings": [
+    {
+      "reviewer": "diff-review-service-strict",
+      "caseId": "express-4",
+      "path": "lib/request.js",
+      "line": 457,
+      "title": "Improper handling of IP addresses in subdomain parsing",
+      "evidence": "  var subdomains = host.split('.').reverse();"
+    },
+    {
+      "reviewer": "diff-review-service-strict",
+      "caseId": "mongoose-8",
+      "path": "lib/document.js",
+      "line": 355,
+      "title": "Missing return value from update method",
+      "evidence": "  this.constructor.update.apply(this.constructor, args);"
+    }
+  ],
+  "errors": []
+}

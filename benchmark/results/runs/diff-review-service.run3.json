@@ -1,0 +1,145 @@
+{
+  "reviewer": "diff-review-service",
+  "source": "openai/gpt-oss-120b + validateFinding",
+  "ranAt": "2026-11-27T15:19:22.818Z",
+  "caseIds": [
+    "express-3",
+    "express-4",
+    "express-5",
+    "express-9",
+    "express-16",
+    "express-22",
+    "express-26",
+    "hexo-7",
+    "hexo-12",
+    "karma-3",
+    "karma-22",
+    "mongoose-8",
+    "mongoose-11",
+    "mongoose-16",
+    "mongoose-22"
+  ],
+  "findings": [
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-3",
+      "path": "lib/response.js",
+      "line": 609,
+      "title": "Unconditional call to req.accepts may alter behavior when keys array is empty",
+      "evidence": "  var key = req.accepts(keys);"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-4",
+      "path": "lib/request.js",
+      "line": 457,
+      "title": "Missing IP address check when computing subdomains",
+      "evidence": "  var subdomains = host.split('.').reverse();"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-5",
+      "path": "lib/utils.js",
+      "line": 70,
+      "title": "Absolute path detection fails for Windows paths using forward slash",
+      "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-9",
+      "path": "lib/application.js",
+      "line": 171,
+      "title": "mount_app.mountpath assigned to raw path argument instead of normalized mount_path",
+      "evidence": "    mount_app.mountpath = path;"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-16",
+      "path": "lib/response.js",
+      "line": 821,
+      "title": "Potential open redirect by using unvalidated URL in response body",
+      "evidence": "      body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-16",
+      "path": "lib/response.js",
+      "line": 825,
+      "title": "HTML escaping may be insufficient for URL attribute context",
+      "evidence": "      var u = escapeHtml(url);"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "express-22",
+      "path": "lib/request.js",
+      "line": 479,
+      "title": "Host parsing using split(':') mishandles IPv6 addresses",
+      "evidence": "  return host.split(':')[0];"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "hexo-7",
+      "path": "lib/plugins/helper/toc.js",
+      "line": 28,
+      "title": "HTML not escaped when generating TOC, potential XSS vulnerability",
+      "evidence": "    var text = $(this).html();"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "hexo-12",
+      "path": "lib/hexo/post.js",
+      "line": 50,
+      "title": "Removing .toString() may cause type errors when slug or title is not a string",
+      "evidence": "  data.slug = slugize(data.slug || data.title, {transform: config.filename_case});"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "hexo-12",
+      "path": "lib/hexo/post.js",
+      "line": 207,
+      "title": "Calling slugize on possibly undefined slug without .toString() can raise errors",
+      "evidence": "  var slug = data.slug = slugize(data.slug, {transform: config.filename_case});"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "karma-3",
+      "path": "lib/reporter.js",
+      "line": 99,
+      "title": "Assigning formatted error to msg changes return semantics and may cause type errors",
+      "evidence": "      msg = config.formatError(msg)"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "mongoose-8",
+      "path": "lib/document.js",
+      "line": 355,
+      "title": "Missing return statement discards result of update operation",
+      "evidence": "  this.constructor.update.apply(this.constructor, args);"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "mongoose-11",
+      "path": "lib/query.js",
+      "line": 517,
+      "title": "Removed check for existing field may overwrite exclusion flag",
+      "evidence": "      if (false === exclude && keys.length > 1) {"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "mongoose-16",
+      "path": "lib/model.js",
+      "line": 342,
+      "title": "Removed version check may cause incorrect delta handling",
+      "evidence": "  if (!dirty.length) return;"
+    },
+    {
+      "reviewer": "diff-review-service",
+      "caseId": "mongoose-22",
+      "path": "lib/model.js",
+      "line": 767,
+      "title": "Remove operation ignores conditions, potentially deleting all documents",
+      "evidence": "  var mq = new Query({}, {}, this, this.collection);"
+    }
+  ],
+  "errors": []
+}

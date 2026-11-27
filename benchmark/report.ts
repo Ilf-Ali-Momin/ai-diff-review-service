@@ -41,42 +41,98 @@ function codeAt(benchCase: BenchCase, finding: ScoredFinding): string {
 
 const pct = (n: number, d: number): string => (d === 0 ? '0%' : `${Math.round((100 * n) / d)}%`);
 
-function summaryTable(rows: ReviewerSummary[]): string[] {
+/** One reviewer, however many runs it has. */
+type ReviewerAggregate = {
+  reviewer: string;
+  runs: ReviewerSummary[];
+};
+
+function median(values: number[]): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1
+    ? (sorted[mid] as number)
+    : ((sorted[mid - 1] as number) + (sorted[mid] as number)) / 2;
+}
+
+const round1 = (n: number): string => (Number.isInteger(n) ? String(n) : n.toFixed(1));
+
+/**
+ * Bugs caught, across runs. A single run prints the plain count; several
+ * print min / median / max, because one run of a non deterministic model is
+ * an anecdote and the spread is the honest summary.
+ */
+function caughtCell(aggregate: ReviewerAggregate): string {
+  const caught = aggregate.runs.map((r) => r.caught);
+  const cases = aggregate.runs[0]?.cases ?? 0;
+  if (caught.length === 1) {
+    return `**${caught[0]}/${cases}** (${pct(caught[0] as number, cases)})`;
+  }
+  const lo = Math.min(...caught);
+  const hi = Math.max(...caught);
+  const mid = median(caught);
+  return `**${lo} / ${round1(mid)} / ${hi}** of ${cases}`;
+}
+
+const total = (aggregate: ReviewerAggregate, pick: (s: ReviewerSummary) => number): number =>
+  aggregate.runs.reduce((sum, run) => sum + pick(run), 0);
+
+function summaryTable(rows: ReviewerAggregate[]): string[] {
+  const multi = rows.some((r) => r.runs.length > 1);
+  const caughtHeader = multi ? 'Bugs caught (min / median / max)' : 'Bugs caught';
   return [
-    '| Reviewer | Bugs caught | Findings | On added lines | On context lines | Fabricated | Misquoted | No location | Extra: valid / noise / unlabeled |',
-    '|---|---|---|---|---|---|---|---|---|',
+    `| Reviewer | Runs | ${caughtHeader} | Findings | On added lines | On context lines | Fabricated | Misquoted | No location | Extra: valid / noise / unlabeled |`,
+    '|---|---|---|---|---|---|---|---|---|---|',
     ...rows.map(
-      (s) =>
-        `| ${s.reviewer} | **${s.caught}/${s.cases}** (${pct(s.caught, s.cases)}) | ${s.findings} | ${s.added} | ${s.context} | ${s.fabricated} | ${s.misquoted} | ${s.unlocated} | ${s.extraValid} / ${s.extraNoise} / ${s.extraUnlabeled} |`,
+      (a) =>
+        `| ${a.reviewer} | ${a.runs.length} | ${caughtCell(a)} | ${total(a, (s) => s.findings)} | ${total(a, (s) => s.added)} | ${total(a, (s) => s.context)} | ${total(a, (s) => s.fabricated)} | ${total(a, (s) => s.misquoted)} | ${total(a, (s) => s.unlocated)} | ${total(a, (s) => s.extraValid)} / ${total(a, (s) => s.extraNoise)} / ${total(a, (s) => s.extraUnlabeled)} |`,
     ),
   ];
 }
 
-export function render(cases: BenchCase[], scores: CaseScore[], summaries: ReviewerSummary[], sources: Map<string, string>): string {
-  const reviewers = summaries.map((s) => s.reviewer);
+export function render(
+  cases: BenchCase[],
+  scores: CaseScore[],
+  aggregates: ReviewerAggregate[],
+  sources: Map<string, string>,
+): string {
+  const reviewers = aggregates.map((a) => a.reviewer);
+  const runsFor = (reviewer: string): number =>
+    aggregates.find((a) => a.reviewer === reviewer)?.runs.length ?? 1;
+
+  /** With several runs, how often the case was caught, not just whether. */
   const caughtBy = (caseId: string, reviewer: string): string => {
-    const score = scores.find((s) => s.caseId === caseId && s.reviewer === reviewer);
-    return score === undefined ? 'n/a' : score.caught ? 'caught' : 'missed';
+    const mine = scores.filter((s) => s.caseId === caseId && s.reviewer === reviewer);
+    if (mine.length === 0) {
+      return 'n/a';
+    }
+    const hits = mine.filter((s) => s.caught).length;
+    return runsFor(reviewer) === 1 ? (hits > 0 ? 'caught' : 'missed') : `${hits}/${mine.length}`;
   };
 
   const missedByAll = cases.filter((c) =>
-    reviewers.every((r) => scores.find((s) => s.caseId === c.id && s.reviewer === r)?.caught !== true),
+    reviewers.every((r) => !scores.some((s) => s.caseId === c.id && s.reviewer === r && s.caught)),
   );
 
-  const fabricated = scores.flatMap((s) =>
-    s.findings.filter((f) => f.grounding === 'fabricated' || f.grounding === 'misquoted'),
-  );
+  const fabricated = [
+    ...new Map(
+      scores
+        .flatMap((s) => s.findings)
+        .filter((f) => f.grounding === 'fabricated' || f.grounding === 'misquoted')
+        .map((f) => [f.key, f]),
+    ).values(),
+  ];
 
   return [
     '# Results',
     '',
     `${cases.length} real bugs from BugsJS, each reintroduced by reversing its upstream fix. A bug counts as caught when a finding points within ${LINE_TOLERANCE} lines of a line the fix had removed, on a line that is really in the diff.`,
     '',
-    ...summaryTable(summaries),
+    ...summaryTable(aggregates),
     '',
     'What ran:',
     '',
-    ...summaries.map((s) => `- **${s.reviewer}**: ${sources.get(s.reviewer) ?? ''}`),
+    ...aggregates.map((a) => `- **${a.reviewer}**: ${sources.get(a.reviewer) ?? ''}`),
     '',
     '## Per case',
     '',
@@ -114,18 +170,35 @@ function main(): void {
     previous.filter((e) => e.label !== null).map((e) => [e.key, e.label as TriageLabel]),
   );
 
+  // Several runs of one reviewer are separate samples, so each is scored on
+  // its own findings and only combined at the summary.
   const scores: CaseScore[] = [];
+  const aggregates: ReviewerAggregate[] = [];
+  const byReviewer = new Map<string, typeof runs>();
   for (const run of runs) {
-    for (const benchCase of cases.filter((c) => run.caseIds.includes(c.id))) {
-      scores.push(scoreCase(benchCase, run.reviewer, run.findings));
-    }
+    byReviewer.set(run.reviewer, [...(byReviewer.get(run.reviewer) ?? []), run]);
   }
-  const summaries = runs.map((run) => summarize(run.reviewer, scores, labels));
 
+  for (const [reviewer, reviewerRuns] of byReviewer) {
+    const perRun: ReviewerSummary[] = [];
+    for (const run of reviewerRuns) {
+      const runScores = cases
+        .filter((c) => run.caseIds.includes(c.id))
+        .map((benchCase) => scoreCase(benchCase, reviewer, run.findings));
+      scores.push(...runScores);
+      perRun.push(summarize(reviewer, runScores, labels));
+    }
+    aggregates.push({ reviewer, runs: perRun });
+  }
+  aggregates.sort((a, b) => a.reviewer.localeCompare(b.reviewer));
+
+  const seenTriage = new Set<string>();
   const triage: TriageEntry[] = scores.flatMap((score) => {
     const benchCase = cases.find((c) => c.id === score.caseId) as BenchCase;
     return score.findings
       .filter((f) => !f.hitsBug && (f.grounding === 'added' || f.grounding === 'context'))
+      // The same finding can appear in several runs; triage it once.
+      .filter((f) => !seenTriage.has(f.key) && seenTriage.add(f.key) !== undefined)
       .map((f) => ({
         key: f.key,
         reviewer: f.reviewer,
@@ -138,15 +211,22 @@ function main(): void {
   });
 
   writeJson(TRIAGE_PATH, triage);
-  writeJson(join(RESULTS_DIR, 'scores.json'), { summaries, scores });
+  writeJson(join(RESULTS_DIR, 'scores.json'), { aggregates, scores });
   const sources = new Map(runs.map((run) => [run.reviewer, run.source]));
-  writeFileSync(join(RESULTS_DIR, 'summary.md'), render(cases, scores, summaries, sources));
+  writeFileSync(join(RESULTS_DIR, 'summary.md'), render(cases, scores, aggregates, sources));
 
-  for (const s of summaries) {
-    console.log(`${s.reviewer.padEnd(22)} caught ${s.caught}/${s.cases}, fabricated ${s.fabricated}, unlabeled extras ${s.extraUnlabeled}`);
+  for (const a of aggregates) {
+    const caught = a.runs.map((r) => r.caught);
+    const spread =
+      caught.length === 1
+        ? `${caught[0]}/${a.runs[0]?.cases ?? 0}`
+        : `${Math.min(...caught)} / ${round1(median(caught))} / ${Math.max(...caught)} of ${a.runs[0]?.cases ?? 0}`;
+    console.log(
+      `${a.reviewer.padEnd(26)} ${a.runs.length} run(s), caught ${spread}, fabricated ${total(a, (r) => r.fabricated)}, misquoted ${total(a, (r) => r.misquoted)}`,
+    );
   }
   for (const run of runs.filter((r) => r.errors.length > 0)) {
-    console.log(`${run.reviewer}: ${run.errors.length} case(s) errored, see results/runs/${run.reviewer}.json`);
+    console.log(`${run.reviewer}: ${run.errors.length} case(s) errored`);
   }
   console.log('\nwrote results/summary.md, results/scores.json, results/triage.json');
 }
