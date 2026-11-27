@@ -14,6 +14,7 @@
  */
 
 import { randomBytes } from 'node:crypto';
+import { existsSync, readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { chunkSegments } from '../../src/core/chunk';
@@ -237,10 +238,33 @@ async function runOnce(
   console.log(`  wrote ${raw.reviewer}${suffix}.json, ${service.reviewer}${suffix}.json, ${strict.reviewer}${suffix}.json\n`);
 }
 
+/**
+ * Clears this runner's files from a previous invocation.
+ *
+ * A single run writes `model-raw.json` and a three run invocation writes
+ * `model-raw.run1.json` and friends. loadRuns reads every file in the
+ * directory, so doing one then the other would leave four samples of a three
+ * run benchmark and silently inflate both the finding totals and the spread.
+ * Only this runner's own reviewers are touched: bench:pull output stays.
+ */
+function clearPreviousRuns(reviewers: string[]): void {
+  if (!existsSync(RUNS_DIR)) {
+    return;
+  }
+  for (const name of readdirSync(RUNS_DIR)) {
+    const stem = name.replace(/\.run\d+\.json$/, '').replace(/\.json$/, '');
+    if (reviewers.includes(stem)) {
+      rmSync(join(RUNS_DIR, name));
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const config = configFromEnv();
   const cases = loadCases();
   const totalRuns = runCountFromArgv();
+
+  clearPreviousRuns(['model-raw', 'diff-review-service', 'diff-review-service-strict']);
 
   for (let runIndex = 1; runIndex <= totalRuns; runIndex += 1) {
     if (totalRuns > 1) {

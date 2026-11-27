@@ -153,10 +153,83 @@ overlapping line range.
 
 **Commit:** `c9cf807`
 
+## Second review, after `c9cf807`
+
+Proofline re-reviewed the fixes and raised seven more, six of them about the
+documentation written in the first round. One is a rejection.
+
+### 11. The limits section still says one run per reviewer
+
+**Proofline said:** the running instructions now document three runs, but the
+limits bullet still states one run, so the published ranges read as single run
+results.
+
+**Verdict:** accepted.
+
+**Why:** correct, and a miss in the first round: the `--runs` flag was
+documented in one place and contradicted two sections later. The bullet now
+says three runs for the model and one for hosted reviewers, and explains that
+bugs caught is min / median / max across runs while the finding counts beside
+it are totals, so the two columns are not read the same way.
+
+**Commit:** `7ca2baa`
+
+### 12. The quickstart produces four samples, not three
+
+**Proofline said:** the quickstart lists both `bench:model` and
+`bench:model -- --runs 3`. The first writes unsuffixed files, the second
+writes suffixed ones, `loadRuns` reads all of them, and each model reviewer
+ends up with four samples.
+
+**Verdict:** accepted, and the fix goes further than suggested.
+
+**Why:** correct, and a defect introduced by the first round's own
+documentation fix. Proofline suggested showing only the three run command.
+That leaves the trap in place for anyone who runs the single form first, so
+`bench:model` now deletes its own previous output before writing, for its
+three reviewers only. The quickstart also shows one path rather than two.
+
+**Commit:** `7ca2baa`
+
+### 13. The push command cannot be pasted into a shell
+
+**Proofline said:** the unquoted `<you>` placeholder in the `bench:push`
+example is redirection syntax to Bash, so pasting the command fails before
+anything is pushed.
+
+**Verdict:** accepted.
+
+**Why:** correct. Replaced with `YOUR_GITHUB_OWNER` and an instruction to
+substitute it. Reported twice, against two lines of the same block.
+
+**Commit:** `7ca2baa`
+
+### 14. karma-3 scores a correct finding as a miss
+
+**Proofline said:** karma-3 labels line 99, but the return that appends the
+unwanted newline is line 102, outside `LINE_TOLERANCE`, so a reviewer that
+correctly flags the return gets no credit. It suggested adding the return as
+an explicit alternate scoring location.
+
+**Verdict:** rejected, limitation documented instead.
+
+**Why:** the facts are right and the remedy is not. The reversal changes line
+99 only; line 102 is context, identical in the base and head snapshots, so
+crediting it means crediting a reviewer for a line the pull request never
+touched. More importantly, an alternate location would be the first hand
+written label in the set, and the benchmark's claim to usable ground truth
+rests on every label being derived from the reversed fix. Adding one by hand
+where a reviewer happened to miss also biases the set toward whichever
+reviewer prompted the addition. The README now records this as a limit, with
+karma-3 named as the example, so a reader can see the cost rather than
+discover it.
+
+**Commit:** `7ca2baa`
+
 ## What the review changed
 
-Ten findings covering eight distinct problems, since two pairs were the same
-defect reported twice.
+Seventeen findings across two rounds, covering twelve distinct problems, since
+three pairs were the same defect reported twice.
 
 **Four were real defects in behaviour.** The answer key leak, the stale fixture
 directories, the phantom context line, and the weak snapshot validation. Of
@@ -171,9 +244,20 @@ reviewer facing, the missing strict row with the wrong call granularity, and
 the undocumented `--runs` flag. None of these change what the code does, and
 all four would have misled someone reading the results.
 
-Nothing was rejected. The rate of real defects is high for a ten finding review,
-which is partly a reflection of the benchmark having been written quickly around
-a result rather than the other way round.
+One finding was rejected: the karma-3 alternate scoring location, because the
+remedy would have introduced the first hand written label into a set whose
+value depends on not having any. The limit is documented instead.
+
+The second round is worth noting on its own. Six of its seven findings were
+about documentation written in the first round, and one of those, the
+quickstart producing four samples instead of three, was a real defect created
+by a documentation fix. Fixing the words introduced a way to get the numbers
+wrong, which is a useful reminder that a documentation change to a benchmark
+can be a behavioural change.
+
+The rate of real defects is high across both rounds, which is partly a
+reflection of the benchmark having been written quickly around a result rather
+than the other way round.
 
 ### A mistake made while fixing finding 1
 

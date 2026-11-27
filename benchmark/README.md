@@ -79,16 +79,18 @@ earlier one: the model is not deterministic across runs.
 npm install
 
 # 1. the service: raw, validated, and under the earlier strict rule
-#    (needs LLM_* in .env, see .env.example). One run by default.
-npm run bench:model
-
-#    The model is not deterministic, so one run is an anecdote. The published
-#    numbers use three, and bench:report then reports bugs caught as
-#    min / median / max across them.
+#    (needs LLM_* in .env, see .env.example). The model is not deterministic,
+#    so one run is an anecdote: the published numbers use three, and
+#    bench:report then reports bugs caught as min / median / max across them.
+#    Each run of bench:model clears the previous one's files, so run it once
+#    with the number of repetitions you want rather than twice.
 npm run bench:model -- --runs 3
 
-# 2. Proofline: push every case as a PR to an empty repo with Proofline installed
-npm run bench:push -- --dir ../ai-review-benchmark-cases --repo <you>/ai-review-benchmark-cases
+#    Omit --runs for a single run. Useful while developing, not for a result.
+
+# 2. Proofline: push every case as a PR to an empty repo with Proofline
+#    installed. Replace YOUR_GITHUB_OWNER with your own user or organisation.
+npm run bench:push -- --dir ../ai-review-benchmark-cases --repo YOUR_GITHUB_OWNER/ai-review-benchmark-cases
 #    wait for the reviews, then collect them
 npm run bench:pull -- --reviewer proofline --login proofline
 
@@ -109,11 +111,25 @@ rebuilds them from scratch.
   reviewers to a decimal place.
 - **Reviewers see only the touched files**, not the whole project. Bugs that
   need cross file knowledge are harder for everyone, equally.
-- **One run per reviewer.** The model runs at temperature 0, but hosted
-  reviewers are not deterministic, so a rerun can move a case either way.
+- **Three runs for the model, one for hosted reviewers.** The model rows are
+  run three times, because temperature 0 does not make the model
+  deterministic. Hosted reviewers are run once, so a rerun can move one of
+  their cases either way. In the results table, bugs caught is min / median /
+  max across a reviewer's runs, while the finding counts beside it are totals
+  across those runs: a three run row therefore shows roughly three times the
+  findings of a one run row, and the two columns are not read the same way.
 - **Location, not explanation.** A finding on the right line with the wrong
   reason still counts as a catch. The triage file is where a human can be
   stricter.
+- **Ground truth is the lines the reversed fix adds, and nothing else.** Where
+  a bug is introduced on one line but only becomes visible a few lines later,
+  a reviewer can describe it correctly, point at the line where it shows, and
+  still score as a miss once that line is more than `LINE_TOLERANCE` away.
+  karma-3 is the clearest example: the reversal changes line 99, and the
+  newline it causes is appended by the unchanged `return msg + '\n'` on line
+  102. Adding the second line by hand would score that case more fairly and
+  would also be the first hand written label in the set, so it is left alone
+  and recorded here instead.
 - **BugsJS projects are public**, so a model may have seen the original fixes
   in training. That favours every reviewer equally, and the reversal means the
   exact diff shown is not the one that was published.
