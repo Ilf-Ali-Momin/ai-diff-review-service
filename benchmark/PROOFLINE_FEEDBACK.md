@@ -1,6 +1,6 @@
 # Proofline review of PR #1
 
-Proofline reviewed this pull request five times. This records what it said,
+Proofline reviewed this pull request six times. This records what it said,
 what was done, and where the response differed from the suggestion.
 
 ## How to read the counts
@@ -35,7 +35,7 @@ only when it is more than one; the ledger carries the exact figure either way.
 | 15 | The alternate pull command cannot be pasted into a shell | 1 | 3 | fixed | `1675e71` |
 | 16 | A missing finding on one rerun erases its manual label | 1 | 3 | fixed | `1675e71` |
 | 17 | This file's counts do not add up | 3 | 3 | fixed | `1675e71` |
-| 18 | Prompts carry blob hashes that identify the upstream fix | 1 | 3 | fixed | `1675e71` |
+| 18 | Prompts carry blob hashes that identify the upstream fix | 1 | 3 | accepted in part | `1675e71` |
 | 19 | The strict row validated metadata differently | 1 | 3 | fixed | `1675e71` |
 | 20 | The entry numbering convention was never stated | 1 | 4 | fixed | `343f804` |
 | 21 | Round 3 rows point at commits the entries do not name | 1 | 4 | fixed | `343f804` |
@@ -54,13 +54,21 @@ only when it is more than one; the ledger carries the exact figure either way.
 | 34 | loadCases does not notice a missing fixture directory | 1 | 5 | fixed | `abe70ba` |
 | 35 | The round 3 heading labels entry 3 unchanged | 1 | 5 | fixed | `ca430c1` |
 | 36 | The opening blurs rejected and fixed repeats | 1 | 5 | fixed | `ca430c1` |
+| 37 | A rerun aborts on an orphan branch that already exists | 1 | 6 | fixed | `37d9104` |
+| 38 | The quickstart never clones the target repository | 2 | 6 | fixed | `37d9104` |
+| 39 | Entry 18's ledger row says fixed, the entry says in part | 1 | 6 | fixed | DOC6COMMIT |
+| 40 | Entries 20 to 22 carry no commit line | 1 | 6 | fixed | DOC6COMMIT |
+| 41 | The recap misattributes the guard and the manifest claims | 1 | 6 | fixed | DOC6COMMIT |
+| 42 | The README omits the limit of branch level isolation | 1 | 6 | fixed | `37d9104` |
+| 43 | The README implies model and hosted reviewers share context | 2 | 6 | fixed | `37d9104` |
+| 44 | A comment on a removed line can count as a catch | 1 | 6 | fixed | `37d9104` |
 
-48 reports, 34 problems. Round 1 produced 10 reports and 8 new problems,
+58 reports, 42 problems. Round 1 produced 10 reports and 8 new problems,
 round 2 produced 7 and 4, round 3 produced 10 and 5, round 4 produced 11 and 8,
-round 5 produced 10 and 9. Ten problems were reported more than once. Eight of
-those arrived more than once inside a single round, and four were re reported
-in a later round after being dealt with: entries 3, 11 and 13 after being
-fixed, and entry 14 after being rejected.
+round 5 produced 10 and 9, round 6 produced 10 and 8. Twelve problems were
+reported more than once. Ten of those arrived more than once inside a single
+round, and four were re reported in a later round after being dealt with:
+entries 3, 11 and 13 after being fixed, and entry 14 after being rejected.
 
 ## The findings
 
@@ -436,6 +444,8 @@ replies on the pull request still point somewhere, and an entry's prose gives
 a report count only when it is more than one, with the ledger carrying the
 exact figure for every entry either way.
 
+**Commit:** `343f804`
+
 ### 21. Round 3 rows point at commits the entries do not name
 
 **Proofline said:** the round table's commit column said to see each entry, but
@@ -446,6 +456,8 @@ entries 15 to 19 never named a fix commit.
 **Why:** correct and plainly careless: the column pointed at entries that
 pointed nowhere. Entries 15 to 19 now carry `1675e71`, and the ledger names a
 commit on every row, so neither place defers to the other.
+
+**Commit:** `343f804`
 
 ### 22. The recap's repeat counts are wrong and call a rejection fixed
 
@@ -465,6 +477,8 @@ counted: nine problems reported more than once, seven of them more than once
 inside a single round, four re reported in a later round, of which entry 14 is
 a rejection and not a fix. Reported twice, from two angles on the same
 summary.
+
+**Commit:** `343f804`
 
 ### 23. The manifest note says descriptions appear only in the report
 
@@ -721,37 +735,182 @@ rejected. The total of four is unchanged, which was Proofline's point.
 
 **Commit:** `ca430c1`
 
+## Sixth review, after `958e12e`
+
+Ten reports covering eight new problems, entries 37 to 44. One is a scoring
+defect that predates this review entirely; the rest are the fifth round's own
+changes and this file.
+
+### 37. A rerun aborts on an orphan branch that already exists
+
+**Proofline said:** `git checkout --orphan` refuses a branch name that already
+exists locally, so a second `bench:push` in the same clone stops before
+reaching any pull request.
+
+**Verdict:** accepted.
+
+**Why:** correct, and the fix for entry 28 caused it. Entry 28 was the same
+failure one step later: a rerun died at `gh pr create`, so I made the pull
+request lookup idempotent and left the branch creation that is not. Keeping
+the salt stable, which `.env.example` tells the reader to do, is exactly the
+case that breaks. Every orphan commit is now built on one scratch branch and
+the real branch is moved onto it with `-B`, which works on a clean clone and
+on a rerun alike.
+
+**Commit:** `37d9104`
+
+### 38. The quickstart never clones the target repository
+
+**Proofline said:** the quickstart passes `--dir ../ai-review-benchmark-cases`
+without saying anything has to be there, and `bench:push` stops with "not a
+git clone".
+
+**Verdict:** accepted.
+
+**Why:** correct. The script header lists both prerequisites and the
+quickstart lists neither, which is the wrong way round: the quickstart is what
+someone follows. It now carries the `git clone` line and says the GitHub CLI
+has to be signed in. Reported twice, against two lines of the same block.
+
+**Commit:** `37d9104`
+
+### 39. Entry 18's ledger row says fixed, the entry says accepted in part
+
+**Proofline said:** the ledger marks entry 18 `fixed` while the entry records
+a declined half, the unpublished holdout cases.
+
+**Verdict:** accepted.
+
+**Why:** correct, and exactly the failure the ledger was built to prevent. It
+was introduced when the ledger was written: the row was filled from memory
+rather than from the entry below it. The disposition now reads `accepted in
+part`.
+
+**Commit:** DOC6COMMIT
+
+### 40. Entries 20 to 22 carry no commit line
+
+**Proofline said:** the ledger names `343f804` for entries 20 to 22, but the
+entries themselves name no commit.
+
+**Verdict:** accepted.
+
+**Why:** correct, and the same gap as entry 21, one round later and in the
+entries that fixed it. Entry 21 was about entries 15 to 19 and was fixed for
+entries 15 to 19; the three new entries written in that same commit were left
+without one. Added.
+
+**Commit:** DOC6COMMIT
+
+### 41. The recap misattributes the guard and the manifest claims
+
+**Proofline said:** the recap credits round 4 with the one sided `loadCases`
+guard, which dates to round 3, and blames both stale manifest claims on the
+report change, when one came from the manifest rewrite.
+
+**Verdict:** accepted.
+
+**Why:** correct on both. The paragraph was written to make a point about
+rounds repairing rounds and rounded the details to fit it, which is the same
+failure as the counts it replaced, in prose rather than arithmetic. It now
+names round 3 for the guard, entry 27 for the one manifest claim and entry 23
+for the other.
+
+**Commit:** DOC6COMMIT
+
+### 42. The README omits the limit of branch level isolation
+
+**Proofline said:** `benchmark/README.md` documents matching published files
+against this repository but not that every case's base branch lives in the
+same review repository, so a reader may think branch separation keeps
+reviewers from other cases.
+
+**Verdict:** accepted.
+
+**Why:** correct, and the limit was written in the commit message, the code
+comment and entry 33 but not in the file a reader of the benchmark reads. A
+limit is only documented where someone looking for limits will find it. Added
+as its own bullet.
+
+**Commit:** `37d9104`
+
+### 43. The README implies model and hosted reviewers share context
+
+**Proofline said:** the limits describe reviewer context uniformly, but the
+model is sent diff chunks while a hosted reviewer can open the whole changed
+file.
+
+**Verdict:** accepted.
+
+**Why:** correct, and it matters for how the table is read. For express-4 the
+diff shows `this.host` without the getter that defines it, which a hosted
+reviewer can simply open. The bullet saying reviewers see only the touched
+files is now joined by one saying the two kinds of reviewer do not get the
+same context, and that the comparison worth trusting is between the three
+model rows, which share one response per chunk. Reported twice.
+
+**Commit:** `37d9104`
+
+### 44. A comment on a removed line can count as a catch
+
+**Proofline said:** `fromInline` drops GitHub's `side`, so a comment on a
+deleted line is scored against the new file line of the same number. On
+express-16 a comment on deleted line 821 would be credited with the bug at new
+line 821.
+
+**Verdict:** accepted.
+
+**Why:** correct, and the most valuable finding since the unreviewed case:
+it is a way for a hosted reviewer to be credited with a catch nobody made, and
+unlike that one it is not visible in the published tables, since no hosted
+reviewer row was ever collected. It predates this review and survived five
+rounds. A comment with `side: "LEFT"` carries an old file coordinate, which
+cannot be scored against new file ground truth, so the finding is now recorded
+without a line: it still counts as a finding, and it cannot catch a bug. Six
+tests, the first this runner has had.
+
+**Commit:** `37d9104`
+
 ## What the review changed
 
-Every figure here comes from the ledger at the top. 48 reports, 34 problems.
+Every figure here comes from the ledger at the top. 58 reports, 42 problems.
 
-**Fourteen were real defects in behaviour.** The answer key leak, the stale
+**Seventeen were real defects in behaviour.** The answer key leak, the stale
 fixture directories, the phantom context line, the weak snapshot validation,
 the quickstart's four samples, the lost triage labels, the blob hashes in the
 prompts, the strict row's divergent metadata checks, the unsalted slugs, the
 fixture test that compared only ids, the report counting an unreviewed case as
 missed, the rerun that aborted on an open pull request, the missing fixture
-directory nothing noticed, and every case's fixed source sitting where a
-reviewer of another case could read it. Three of those would have published a
-wrong result rather than a wrong number: the answer key leak, found before
-anything was pushed; the unreviewed case counted as a miss, which would have
-turned a timeout into a finding about the reviewers; and the shared base
-branch, which would have let a hosted reviewer score on a lookup. The phantom
-context line was the only one that reached outside the benchmark into the
-service's own parser.
+directory nothing noticed, every case's fixed source sitting where a reviewer
+of another case could read it, the rerun that aborted on an existing orphan
+branch, the quickstart that never cloned the repository it pushes to, and a
+comment on a removed line counting as a catch.
 
-**Nineteen were documentation that claimed more than the code did.** The
+Four of those would have published a wrong result rather than a wrong number:
+the answer key leak, found before anything was pushed; the unreviewed case
+counted as a miss, which would have turned a timeout into a finding about the
+reviewers; the shared base branch, which would have let a hosted reviewer
+score on a lookup; and the removed line comment, which would have credited a
+hosted reviewer with a catch nobody made. That last one is the only defect in
+the set that nothing else would have surfaced: it is invisible in the
+published tables, because no hosted reviewer row was ever collected, and it
+survived five rounds of review before anyone saw it. The phantom context line
+was the only finding that reached outside the benchmark into the service's own
+parser.
+
+**Twenty four were documentation that claimed more than the code did.** The
 scoring rule described as identical to `validateFinding`, the diagnoses
 described as reviewer facing, the missing strict row with the wrong call
 granularity, the undocumented `--runs` flag, the limits section's run count,
 the push and pull examples that could not be pasted into a shell, this file's
-arithmetic three times over, its unstated numbering convention, its commit
-column pointing at entries that named no commit, its round three heading, its
-account of slug stripping left in the present tense, the manifest note on
-where descriptions live, on which misses get one and on what publishing
-copies, the promised unsalted fallback, and the root README's test counts.
-None of these change what the code does, and all of them would have misled
-someone reading the results.
+arithmetic three times over, its numbering convention, its commit column, its
+missing commit lines twice over, its round three heading, its account of slug
+stripping, its misattributed recap, its disagreement with its own ledger, the
+manifest note on where descriptions live, on which misses get one and on what
+publishing copies, the promised unsalted fallback, the root README's test
+counts, and the two limits the benchmark README did not state. None of these
+change what the code does, and all of them would have misled someone reading
+the results.
 
 **One was rejected.** The karma-3 alternate scoring location, because the
 remedy would have introduced the first hand written label into a set whose
@@ -765,22 +924,35 @@ was a real defect created by a documentation fix. Round 3 found the pull
 example sitting beside the push example that round 2 had fixed, and found this
 file's arithmetic. Round 4 found this file's arithmetic again, the commit
 references added to fix it, and the fixture test added for entry 3 checking
-only the field entry 3 was about. Round 5 found six consequences of round 4:
-the salt documentation, the rerun the salt documentation promised, two
-manifest claims the report change had made stale, the guard that checked one
-direction, and the historical note left in the present tense.
+only the field entry 3 was about. Round 5 found five consequences of round 4
+and one of round 3: the salt documentation, the rerun that same documentation
+promised, one manifest claim made stale by the report change in entry 27 and
+another introduced by the manifest rewrite in entry 23, and the historical
+note left in the present tense. The one from round 3 is the `loadCases` guard,
+added in `1675e71`, which checked only the direction its own finding named.
+Round 6 then found that the orphan branches added in round 5 made a rerun
+impossible, which is the case round 5's own documentation told the reader to
+expect.
 
 Each of those is the same mistake in a different place: fixing the reported
-instance instead of the pattern. Twice the answer was structural rather than
-another correction, and those are the two that have held. The counts in this
-file are generated from one ledger, and the root README states no test count
-at all, so neither can drift again. Nothing structural yet prevents the rest:
-a change still has to be chased through the prose that describes it by hand,
-which is what rounds 4 and 5 kept catching.
+instance instead of the pattern. Entries 21 and 40 are the clearest pair.
+Entry 21 said entries carried no commit reference; it was fixed for the
+entries named in the report, and the three entries written in that very
+commit were left without one, which is entry 40 a round later.
 
-The rate of real defects is high across all five rounds, which is partly a
+Twice the answer was structural rather than another correction, and those are
+the two that have held: the counts in this file are generated from one ledger,
+and the root README states no test count at all. The ledger is not free of
+this either, as entry 39 shows, since a row filled from memory can still
+disagree with the entry beneath it. Nothing structural prevents the rest. A
+change still has to be chased by hand through the prose that describes it,
+which is what rounds 4, 5 and 6 kept catching.
+
+The rate of real defects is high across all six rounds, which is partly a
 reflection of the benchmark having been written quickly around a result rather
-than the other way round, and partly that each repair was scoped to its report.
+than the other way round, and partly that each repair was scoped to its
+report. The one finding that was not a consequence of an earlier repair, the
+removed line comment, is also the one that matters most.
 
 ### A mistake made while fixing finding 1
 
