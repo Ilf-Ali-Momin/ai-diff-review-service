@@ -37,7 +37,7 @@ only when it is more than one; the ledger carries the exact figure either way.
 | 17 | This file's counts do not add up | 3 | 3 | fixed | `1675e71` |
 | 18 | Prompts carry blob hashes that identify the upstream fix | 1 | 3 | accepted in part | `1675e71` |
 | 19 | The strict row validated metadata differently | 1 | 3 | fixed | `1675e71` |
-| 20 | The entry numbering convention was never stated | 2 | 4, 7 | fixed | `343f804`, enforced in DOC7 |
+| 20 | The entry numbering convention was never stated | 2 | 4, 7 | fixed | `343f804`, enforced in `0f8af71` |
 | 21 | Round 3 rows point at commits the entries do not name | 1 | 4 | fixed | `343f804` |
 | 22 | The recap's repeat counts are wrong and call a rejection fixed | 2 | 4 | fixed | `343f804` |
 | 23 | The manifest note says descriptions appear only in the report | 1 | 4 | fixed | `852b0cd` |
@@ -465,7 +465,7 @@ checked against each other by `test/benchmark/feedback.test.ts`, which fails
 when a row and its entry disagree on disposition, commit or report count, or
 when the stated totals do not add up.
 
-**Commit:** `343f804`, enforced in DOC7COMMIT
+**Commit:** `343f804`, enforced in `0f8af71`
 
 ### 21. Round 3 rows point at commits the entries do not name
 
