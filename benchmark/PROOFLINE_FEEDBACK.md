@@ -47,13 +47,13 @@ only when it is more than one; the ledger carries the exact figure either way.
 | 27 | The report counts an unreviewed case as missed by everyone | 1 | 4 | fixed | `852b0cd` |
 | 28 | A rerun aborts at the first pull request already open | 1 | 5 | fixed | `abe70ba` |
 | 29 | The example env file promises an unsalted fallback | 2 | 5 | fixed | `abe70ba` |
-| 30 | The round 1 account of slug stripping is written as current | 1 | 5 | fixed | DOC5COMMIT |
+| 30 | The round 1 account of slug stripping is written as current | 1 | 5 | fixed | `ca430c1` |
 | 31 | The manifest overstates which misses get a description | 1 | 5 | fixed | `abe70ba` |
 | 32 | The manifest calls published source snapshots evaluator only | 1 | 5 | fixed | `abe70ba` |
 | 33 | Hosted reviewers can reach other cases' fixtures | 1 | 5 | accepted in part | `abe70ba` |
 | 34 | loadCases does not notice a missing fixture directory | 1 | 5 | fixed | `abe70ba` |
-| 35 | The round 3 heading labels entry 3 unchanged | 1 | 5 | fixed | DOC5COMMIT |
-| 36 | The opening blurs rejected and fixed repeats | 1 | 5 | fixed | DOC5COMMIT |
+| 35 | The round 3 heading labels entry 3 unchanged | 1 | 5 | fixed | `ca430c1` |
+| 36 | The opening blurs rejected and fixed repeats | 1 | 5 | fixed | `ca430c1` |
 
 48 reports, 34 problems. Round 1 produced 10 reports and 8 new problems,
 round 2 produced 7 and 4, round 3 produced 10 and 5, round 4 produced 11 and 8,
@@ -618,7 +618,7 @@ that section a true story about the past written in the present tense. It now
 says so at the top and points at entry 24, and the account itself is in the
 past tense.
 
-**Commit:** DOC5COMMIT
+**Commit:** `ca430c1`
 
 ### 31. The manifest overstates which misses get a description
 
@@ -704,7 +704,7 @@ that changed nothing, while the entry itself records a new guard and a test.
 was filed under it for convenience. The section is now "Re reports", says
 which of the three prompted a change, and entry 3 is marked hardened.
 
-**Commit:** DOC5COMMIT
+**Commit:** `ca430c1`
 
 ### 36. The opening blurs rejected and fixed repeats
 
@@ -719,7 +719,7 @@ bookkeeping is a finding, though a smaller one each time. The sentence now
 reads: entries 3, 11 and 13 after being fixed, and entry 14 after being
 rejected. The total of four is unchanged, which was Proofline's point.
 
-**Commit:** DOC5COMMIT
+**Commit:** `ca430c1`
 
 ## What the review changed
 
