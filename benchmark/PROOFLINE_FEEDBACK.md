@@ -172,7 +172,7 @@ says three runs for the model and one for hosted reviewers, and explains that
 bugs caught is min / median / max across runs while the finding counts beside
 it are totals, so the two columns are not read the same way.
 
-**Commit:** `7ca2baa`
+**Commit:** `91e1426`
 
 ### 12. The quickstart produces four samples, not three
 
@@ -189,7 +189,7 @@ That leaves the trap in place for anyone who runs the single form first, so
 `bench:model` now deletes its own previous output before writing, for its
 three reviewers only. The quickstart also shows one path rather than two.
 
-**Commit:** `7ca2baa`
+**Commit:** `91e1426`
 
 ### 13. The push command cannot be pasted into a shell
 
@@ -202,7 +202,7 @@ anything is pushed.
 **Why:** correct. Replaced with `YOUR_GITHUB_OWNER` and an instruction to
 substitute it. Reported twice, against two lines of the same block.
 
-**Commit:** `7ca2baa`
+**Commit:** `91e1426`
 
 ### 14. karma-3 scores a correct finding as a miss
 
@@ -224,7 +224,7 @@ reviewer prompted the addition. The README now records this as a limit, with
 karma-3 named as the example, so a reader can see the cost rather than
 discover it.
 
-**Commit:** `7ca2baa`
+**Commit:** `91e1426`
 
 ## What the review changed
 
