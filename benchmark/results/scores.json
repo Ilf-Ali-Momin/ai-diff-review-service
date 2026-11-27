@@ -6,9 +6,9 @@
         {
           "reviewer": "diff-review-service",
           "cases": 15,
-          "caught": 13,
-          "findings": 15,
-          "added": 15,
+          "caught": 12,
+          "findings": 13,
+          "added": 13,
           "context": 0,
           "fabricated": 0,
           "misquoted": 0,
@@ -20,9 +20,9 @@
         {
           "reviewer": "diff-review-service",
           "cases": 15,
-          "caught": 13,
-          "findings": 14,
-          "added": 14,
+          "caught": 12,
+          "findings": 13,
+          "added": 13,
           "context": 0,
           "fabricated": 0,
           "misquoted": 0,
@@ -34,9 +34,9 @@
         {
           "reviewer": "diff-review-service",
           "cases": 15,
-          "caught": 13,
-          "findings": 15,
-          "added": 15,
+          "caught": 14,
+          "findings": 16,
+          "added": 16,
           "context": 0,
           "fabricated": 0,
           "misquoted": 0,
@@ -50,20 +50,6 @@
     {
       "reviewer": "diff-review-service-strict",
       "runs": [
-        {
-          "reviewer": "diff-review-service-strict",
-          "cases": 15,
-          "caught": 4,
-          "findings": 4,
-          "added": 4,
-          "context": 0,
-          "fabricated": 0,
-          "misquoted": 0,
-          "unlocated": 0,
-          "extraValid": 0,
-          "extraNoise": 0,
-          "extraUnlabeled": 0
-        },
         {
           "reviewer": "diff-review-service-strict",
           "cases": 15,
@@ -91,26 +77,26 @@
           "extraValid": 0,
           "extraNoise": 0,
           "extraUnlabeled": 0
+        },
+        {
+          "reviewer": "diff-review-service-strict",
+          "cases": 15,
+          "caught": 2,
+          "findings": 2,
+          "added": 2,
+          "context": 0,
+          "fabricated": 0,
+          "misquoted": 0,
+          "unlocated": 0,
+          "extraValid": 0,
+          "extraNoise": 0,
+          "extraUnlabeled": 0
         }
       ]
     },
     {
       "reviewer": "model-raw",
       "runs": [
-        {
-          "reviewer": "model-raw",
-          "cases": 15,
-          "caught": 4,
-          "findings": 16,
-          "added": 4,
-          "context": 0,
-          "fabricated": 1,
-          "misquoted": 11,
-          "unlocated": 0,
-          "extraValid": 0,
-          "extraNoise": 0,
-          "extraUnlabeled": 0
-        },
         {
           "reviewer": "model-raw",
           "cases": 15,
@@ -129,11 +115,25 @@
           "reviewer": "model-raw",
           "cases": 15,
           "caught": 4,
-          "findings": 15,
+          "findings": 14,
           "added": 4,
           "context": 0,
           "fabricated": 0,
-          "misquoted": 11,
+          "misquoted": 10,
+          "unlocated": 0,
+          "extraValid": 0,
+          "extraNoise": 0,
+          "extraUnlabeled": 0
+        },
+        {
+          "reviewer": "model-raw",
+          "cases": 15,
+          "caught": 2,
+          "findings": 17,
+          "added": 2,
+          "context": 0,
+          "fabricated": 0,
+          "misquoted": 15,
           "unlocated": 0,
           "extraValid": 0,
           "extraNoise": 0,
@@ -152,20 +152,8 @@
     {
       "caseId": "express-4",
       "reviewer": "diff-review-service-strict",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service-strict",
-          "caseId": "express-4",
-          "path": "lib/request.js",
-          "line": 457,
-          "title": "Improper subdomain parsing for IP addresses",
-          "evidence": "  var subdomains = host.split('.').reverse();",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service-strict|express-4|lib/request.js|457|improper subdomain parsing for ip addresses"
-        }
-      ]
+      "caught": false,
+      "findings": []
     },
     {
       "caseId": "express-5",
@@ -176,8 +164,20 @@
     {
       "caseId": "express-9",
       "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service-strict",
+          "caseId": "express-9",
+          "path": "lib/application.js",
+          "line": 171,
+          "title": "Assigning mount_app.mountpath to raw path argument may break routing",
+          "evidence": "    mount_app.mountpath = path;",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service-strict|express-9|lib/application.js|171|assigning mount_app.mountpath to raw path argument may break routing"
+        }
+      ]
     },
     {
       "caseId": "express-16",
@@ -207,11 +207,137 @@
           "caseId": "hexo-7",
           "path": "lib/plugins/helper/toc.js",
           "line": 28,
-          "title": "Potential XSS due to unescaped HTML in TOC helper",
+          "title": "Unescaped HTML inserted into TOC may lead to XSS",
           "evidence": "    var text = $(this).html();",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service-strict|hexo-7|lib/plugins/helper/toc.js|28|potential xss due to unescaped html in toc helper"
+          "key": "diff-review-service-strict|hexo-7|lib/plugins/helper/toc.js|28|unescaped html inserted into toc may lead to xss"
+        }
+      ]
+    },
+    {
+      "caseId": "hexo-12",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "karma-3",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "karma-22",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "mongoose-8",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "mongoose-11",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "mongoose-16",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "mongoose-22",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "express-3",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "express-4",
+      "reviewer": "diff-review-service-strict",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service-strict",
+          "caseId": "express-4",
+          "path": "lib/request.js",
+          "line": 457,
+          "title": "Removed IP address check when computing subdomains",
+          "evidence": "  var subdomains = host.split('.').reverse();",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service-strict|express-4|lib/request.js|457|removed ip address check when computing subdomains"
+        }
+      ]
+    },
+    {
+      "caseId": "express-5",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "express-9",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "express-16",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "express-22",
+      "reviewer": "diff-review-service-strict",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service-strict",
+          "caseId": "express-22",
+          "path": "lib/request.js",
+          "line": 479,
+          "title": "Incorrect host parsing for IPv6 addresses",
+          "evidence": "  return host.split(':')[0];",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service-strict|express-22|lib/request.js|479|incorrect host parsing for ipv6 addresses"
+        }
+      ]
+    },
+    {
+      "caseId": "express-26",
+      "reviewer": "diff-review-service-strict",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "hexo-7",
+      "reviewer": "diff-review-service-strict",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service-strict",
+          "caseId": "hexo-7",
+          "path": "lib/plugins/helper/toc.js",
+          "line": 28,
+          "title": "Using raw HTML for heading text may introduce XSS",
+          "evidence": "    var text = $(this).html();",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service-strict|hexo-7|lib/plugins/helper/toc.js|28|using raw html for heading text may introduce xss"
         }
       ]
     },
@@ -243,11 +369,11 @@
           "caseId": "mongoose-8",
           "path": "lib/document.js",
           "line": 355,
-          "title": "Missing return statement in Document.update may break callers expecting a result",
+          "title": "Missing return statement in Document.update breaks expected return value",
           "evidence": "  this.constructor.update.apply(this.constructor, args);",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service-strict|mongoose-8|lib/document.js|355|missing return statement in document.update may break callers expecting a result"
+          "key": "diff-review-service-strict|mongoose-8|lib/document.js|355|missing return statement in document.update breaks expected return value"
         }
       ]
     },
@@ -260,20 +386,8 @@
     {
       "caseId": "mongoose-16",
       "reviewer": "diff-review-service-strict",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service-strict",
-          "caseId": "mongoose-16",
-          "path": "lib/model.js",
-          "line": 342,
-          "title": "Removed version check may cause stale data handling",
-          "evidence": "  if (!dirty.length) return;",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service-strict|mongoose-16|lib/model.js|342|removed version check may cause stale data handling"
-        }
-      ]
+      "caught": false,
+      "findings": []
     },
     {
       "caseId": "mongoose-22",
@@ -297,11 +411,11 @@
           "caseId": "express-4",
           "path": "lib/request.js",
           "line": 457,
-          "title": "Improper handling of IP addresses in subdomain parsing",
+          "title": "Subdomain parsing fails for IP addresses after removing isIP check",
           "evidence": "  var subdomains = host.split('.').reverse();",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service-strict|express-4|lib/request.js|457|improper handling of ip addresses in subdomain parsing"
+          "key": "diff-review-service-strict|express-4|lib/request.js|457|subdomain parsing fails for ip addresses after removing isip check"
         }
       ]
     },
@@ -369,11 +483,11 @@
           "caseId": "mongoose-8",
           "path": "lib/document.js",
           "line": 355,
-          "title": "Missing return value from update method",
+          "title": "Missing return statement; function no longer returns result of update",
           "evidence": "  this.constructor.update.apply(this.constructor, args);",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service-strict|mongoose-8|lib/document.js|355|missing return value from update method"
+          "key": "diff-review-service-strict|mongoose-8|lib/document.js|355|missing return statement; function no longer returns result of update"
         }
       ]
     },
@@ -397,147 +511,21 @@
     },
     {
       "caseId": "express-3",
-      "reviewer": "diff-review-service-strict",
+      "reviewer": "diff-review-service",
       "caught": true,
       "findings": [
         {
-          "reviewer": "diff-review-service-strict",
+          "reviewer": "diff-review-service",
           "caseId": "express-3",
           "path": "lib/response.js",
           "line": 609,
-          "title": "Unconditional call to req.accepts may alter behavior when keys array is empty",
+          "title": "Unconditional call to req.accepts may mis-handle empty key list",
           "evidence": "  var key = req.accepts(keys);",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service-strict|express-3|lib/response.js|609|unconditional call to req.accepts may alter behavior when keys array is empty"
+          "key": "diff-review-service|express-3|lib/response.js|609|unconditional call to req.accepts may mis-handle empty key list"
         }
       ]
-    },
-    {
-      "caseId": "express-4",
-      "reviewer": "diff-review-service-strict",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service-strict",
-          "caseId": "express-4",
-          "path": "lib/request.js",
-          "line": 457,
-          "title": "Missing IP address check when computing subdomains",
-          "evidence": "  var subdomains = host.split('.').reverse();",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service-strict|express-4|lib/request.js|457|missing ip address check when computing subdomains"
-        }
-      ]
-    },
-    {
-      "caseId": "express-5",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "express-9",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "express-16",
-      "reviewer": "diff-review-service-strict",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service-strict",
-          "caseId": "express-16",
-          "path": "lib/response.js",
-          "line": 825,
-          "title": "HTML escaping may be insufficient for URL attribute context",
-          "evidence": "      var u = escapeHtml(url);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service-strict|express-16|lib/response.js|825|html escaping may be insufficient for url attribute context"
-        }
-      ]
-    },
-    {
-      "caseId": "express-22",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "express-26",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "hexo-7",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "hexo-12",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "karma-3",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "karma-22",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "mongoose-8",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "mongoose-11",
-      "reviewer": "diff-review-service-strict",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service-strict",
-          "caseId": "mongoose-11",
-          "path": "lib/query.js",
-          "line": 517,
-          "title": "Removed check for existing field may overwrite exclusion flag",
-          "evidence": "      if (false === exclude && keys.length > 1) {",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service-strict|mongoose-11|lib/query.js|517|removed check for existing field may overwrite exclusion flag"
-        }
-      ]
-    },
-    {
-      "caseId": "mongoose-16",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "mongoose-22",
-      "reviewer": "diff-review-service-strict",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "express-3",
-      "reviewer": "diff-review-service",
-      "caught": false,
-      "findings": []
     },
     {
       "caseId": "express-4",
@@ -549,31 +537,19 @@
           "caseId": "express-4",
           "path": "lib/request.js",
           "line": 457,
-          "title": "Improper subdomain parsing for IP addresses",
+          "title": "Improper handling of IP addresses when computing subdomains",
           "evidence": "  var subdomains = host.split('.').reverse();",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|express-4|lib/request.js|457|improper subdomain parsing for ip addresses"
+          "key": "diff-review-service|express-4|lib/request.js|457|improper handling of ip addresses when computing subdomains"
         }
       ]
     },
     {
       "caseId": "express-5",
       "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "express-5",
-          "path": "lib/utils.js",
-          "line": 70,
-          "title": "Windows absolute path detection no longer accepts forward slash after drive letter",
-          "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-5|lib/utils.js|70|windows absolute path detection no longer accepts forward slash after drive lett"
-        }
-      ]
+      "caught": false,
+      "findings": []
     },
     {
       "caseId": "express-9",
@@ -585,42 +561,19 @@
           "caseId": "express-9",
           "path": "lib/application.js",
           "line": 171,
-          "title": "mount_app.mountpath assigned to user-provided path instead of mount_path",
+          "title": "Assigning mount_app.mountpath to raw path argument may break routing",
           "evidence": "    mount_app.mountpath = path;",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|express-9|lib/application.js|171|mount_app.mountpath assigned to user-provided path instead of mount_path"
+          "key": "diff-review-service|express-9|lib/application.js|171|assigning mount_app.mountpath to raw path argument may break routing"
         }
       ]
     },
     {
       "caseId": "express-16",
       "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "express-16",
-          "path": "lib/response.js",
-          "line": 821,
-          "title": "Potential open redirect vulnerability using unvalidated URL",
-          "evidence": "      body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-16|lib/response.js|821|potential open redirect vulnerability using unvalidated url"
-        },
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "express-16",
-          "path": "lib/response.js",
-          "line": 825,
-          "title": "Potential open redirect vulnerability using unvalidated URL in HTML output",
-          "evidence": "      var u = escapeHtml(url);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-16|lib/response.js|825|potential open redirect vulnerability using unvalidated url in html output"
-        }
-      ]
+      "caught": false,
+      "findings": []
     },
     {
       "caseId": "express-22",
@@ -632,11 +585,11 @@
           "caseId": "express-22",
           "path": "lib/request.js",
           "line": 479,
-          "title": "Improper host parsing may break IPv6 addresses",
+          "title": "Naive split on ':' breaks IPv6 host parsing",
           "evidence": "  return host.split(':')[0];",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|express-22|lib/request.js|479|improper host parsing may break ipv6 addresses"
+          "key": "diff-review-service|express-22|lib/request.js|479|naive split on ':' breaks ipv6 host parsing"
         }
       ]
     },
@@ -650,11 +603,11 @@
           "caseId": "express-26",
           "path": "lib/router/index.js",
           "line": 129,
-          "title": "Removed leading slash check when detecting fully qualified URL, may misinterpret relative paths",
+          "title": "Removed leading slash check, may misidentify FQDN for paths starting with '/'",
           "evidence": "  var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|express-26|lib/router/index.js|129|removed leading slash check when detecting fully qualified url, may misinterpret"
+          "key": "diff-review-service|express-26|lib/router/index.js|129|removed leading slash check, may misidentify fqdn for paths starting with '/'"
         }
       ]
     },
@@ -668,11 +621,11 @@
           "caseId": "hexo-7",
           "path": "lib/plugins/helper/toc.js",
           "line": 28,
-          "title": "Potential XSS due to unescaped HTML in TOC helper",
+          "title": "Unescaped HTML inserted into TOC may lead to XSS",
           "evidence": "    var text = $(this).html();",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|hexo-7|lib/plugins/helper/toc.js|28|potential xss due to unescaped html in toc helper"
+          "key": "diff-review-service|hexo-7|lib/plugins/helper/toc.js|28|unescaped html inserted into toc may lead to xss"
         }
       ]
     },
@@ -686,22 +639,22 @@
           "caseId": "hexo-12",
           "path": "lib/hexo/post.js",
           "line": 50,
-          "title": "Removing .toString() may cause non‑string values to be passed to slugize",
+          "title": "Removing .toString() may pass non‑string values to slugize, causing runtime errors",
           "evidence": "  data.slug = slugize(data.slug || data.title, {transform: config.filename_case});",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|hexo-12|lib/hexo/post.js|50|removing .tostring() may cause non‑string values to be passed to slugize"
+          "key": "diff-review-service|hexo-12|lib/hexo/post.js|50|removing .tostring() may pass non‑string values to slugize, causing runtime erro"
         },
         {
           "reviewer": "diff-review-service",
           "caseId": "hexo-12",
           "path": "lib/hexo/post.js",
           "line": 207,
-          "title": "Removing .toString() may cause non‑string slug values to be passed to slugize",
+          "title": "Removing .toString() may pass non‑string values to slugize, leading to unexpected behavior",
           "evidence": "  var slug = data.slug = slugize(data.slug, {transform: config.filename_case});",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|hexo-12|lib/hexo/post.js|207|removing .tostring() may cause non‑string slug values to be passed to slugize"
+          "key": "diff-review-service|hexo-12|lib/hexo/post.js|207|removing .tostring() may pass non‑string values to slugize, leading to unexpecte"
         }
       ]
     },
@@ -715,11 +668,11 @@
           "caseId": "karma-3",
           "path": "lib/reporter.js",
           "line": 99,
-          "title": "Potential loss of return value from config.formatError",
+          "title": "Changing error formatting return behavior and adding newline",
           "evidence": "      msg = config.formatError(msg)",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|karma-3|lib/reporter.js|99|potential loss of return value from config.formaterror"
+          "key": "diff-review-service|karma-3|lib/reporter.js|99|changing error formatting return behavior and adding newline"
         }
       ]
     },
@@ -739,11 +692,11 @@
           "caseId": "mongoose-8",
           "path": "lib/document.js",
           "line": 355,
-          "title": "Missing return statement in Document.update may break callers expecting a result",
+          "title": "Missing return statement may cause undefined result",
           "evidence": "  this.constructor.update.apply(this.constructor, args);",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|mongoose-8|lib/document.js|355|missing return statement in document.update may break callers expecting a result"
+          "key": "diff-review-service|mongoose-8|lib/document.js|355|missing return statement may cause undefined result"
         }
       ]
     },
@@ -757,11 +710,11 @@
           "caseId": "mongoose-11",
           "path": "lib/query.js",
           "line": 517,
-          "title": "Removed duplicate field check may cause redundant field inclusion",
+          "title": "Removed existence check may cause duplicate field inclusion",
           "evidence": "      if (false === exclude && keys.length > 1) {",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|mongoose-11|lib/query.js|517|removed duplicate field check may cause redundant field inclusion"
+          "key": "diff-review-service|mongoose-11|lib/query.js|517|removed existence check may cause duplicate field inclusion"
         }
       ]
     },
@@ -775,11 +728,11 @@
           "caseId": "mongoose-16",
           "path": "lib/model.js",
           "line": 342,
-          "title": "Removed version check may cause stale data handling",
+          "title": "Removed version check may cause premature return",
           "evidence": "  if (!dirty.length) return;",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|mongoose-16|lib/model.js|342|removed version check may cause stale data handling"
+          "key": "diff-review-service|mongoose-16|lib/model.js|342|removed version check may cause premature return"
         }
       ]
     },
@@ -793,11 +746,11 @@
           "caseId": "mongoose-22",
           "path": "lib/model.js",
           "line": 767,
-          "title": "Remove operation uses empty query, potentially deleting all documents",
+          "title": "Removing query conditions may cause deletion of all documents",
           "evidence": "  var mq = new Query({}, {}, this, this.collection);",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|mongoose-22|lib/model.js|767|remove operation uses empty query, potentially deleting all documents"
+          "key": "diff-review-service|mongoose-22|lib/model.js|767|removing query conditions may cause deletion of all documents"
         }
       ]
     },
@@ -811,11 +764,11 @@
           "caseId": "express-3",
           "path": "lib/response.js",
           "line": 609,
-          "title": "Calling req.accepts with empty array may change behavior",
+          "title": "Calling req.accepts with empty array may produce unexpected result",
           "evidence": "  var key = req.accepts(keys);",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|express-3|lib/response.js|609|calling req.accepts with empty array may change behavior"
+          "key": "diff-review-service|express-3|lib/response.js|609|calling req.accepts with empty array may produce unexpected result"
         }
       ]
     },
@@ -829,11 +782,11 @@
           "caseId": "express-4",
           "path": "lib/request.js",
           "line": 457,
-          "title": "Improper handling of IP addresses in subdomain parsing",
+          "title": "Removed IP address check when computing subdomains",
           "evidence": "  var subdomains = host.split('.').reverse();",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|express-4|lib/request.js|457|improper handling of ip addresses in subdomain parsing"
+          "key": "diff-review-service|express-4|lib/request.js|457|removed ip address check when computing subdomains"
         }
       ]
     },
@@ -847,11 +800,11 @@
           "caseId": "express-5",
           "path": "lib/utils.js",
           "line": 70,
-          "title": "Windows device path detection no longer accepts forward slash separator",
+          "title": "Reduced Windows device path detection may misclassify absolute paths",
           "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|express-5|lib/utils.js|70|windows device path detection no longer accepts forward slash separator"
+          "key": "diff-review-service|express-5|lib/utils.js|70|reduced windows device path detection may misclassify absolute paths"
         }
       ]
     },
@@ -865,11 +818,11 @@
           "caseId": "express-9",
           "path": "lib/application.js",
           "line": 171,
-          "title": "Incorrect assignment of mount_app.mountpath; uses 'path' instead of 'mount_path'",
+          "title": "Incorrect assignment to mount_app.mountpath may break routing",
           "evidence": "    mount_app.mountpath = path;",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|express-9|lib/application.js|171|incorrect assignment of mount_app.mountpath; uses 'path' instead of 'mount_path'"
+          "key": "diff-review-service|express-9|lib/application.js|171|incorrect assignment to mount_app.mountpath may break routing"
         }
       ]
     },
@@ -889,31 +842,19 @@
           "caseId": "express-22",
           "path": "lib/request.js",
           "line": 479,
-          "title": "Host header parsing incorrectly splits on ':' breaking IPv6 handling",
+          "title": "Incorrect host parsing for IPv6 addresses",
           "evidence": "  return host.split(':')[0];",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|express-22|lib/request.js|479|host header parsing incorrectly splits on ':' breaking ipv6 handling"
+          "key": "diff-review-service|express-22|lib/request.js|479|incorrect host parsing for ipv6 addresses"
         }
       ]
     },
     {
       "caseId": "express-26",
       "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "express-26",
-          "path": "lib/router/index.js",
-          "line": 129,
-          "title": "Removed leading slash check when extracting FQDN, can misinterpret relative URLs",
-          "evidence": "  var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-26|lib/router/index.js|129|removed leading slash check when extracting fqdn, can misinterpret relative urls"
-        }
-      ]
+      "caught": false,
+      "findings": []
     },
     {
       "caseId": "hexo-7",
@@ -925,11 +866,11 @@
           "caseId": "hexo-7",
           "path": "lib/plugins/helper/toc.js",
           "line": 28,
-          "title": "Using unescaped HTML for TOC entries can lead to XSS",
+          "title": "Using raw HTML for heading text may introduce XSS",
           "evidence": "    var text = $(this).html();",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|hexo-7|lib/plugins/helper/toc.js|28|using unescaped html for toc entries can lead to xss"
+          "key": "diff-review-service|hexo-7|lib/plugins/helper/toc.js|28|using raw html for heading text may introduce xss"
         }
       ]
     },
@@ -943,22 +884,22 @@
           "caseId": "hexo-12",
           "path": "lib/hexo/post.js",
           "line": 50,
-          "title": "Removed .toString() may cause non-string slug values to break slugize",
+          "title": "Removing .toString() may pass non‑string values to slugize, causing runtime errors",
           "evidence": "  data.slug = slugize(data.slug || data.title, {transform: config.filename_case});",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|hexo-12|lib/hexo/post.js|50|removed .tostring() may cause non-string slug values to break slugize"
+          "key": "diff-review-service|hexo-12|lib/hexo/post.js|50|removing .tostring() may pass non‑string values to slugize, causing runtime erro"
         },
         {
           "reviewer": "diff-review-service",
           "caseId": "hexo-12",
           "path": "lib/hexo/post.js",
           "line": 207,
-          "title": "Removed .toString() may cause non-string slug values to break slugize in publish",
+          "title": "Removing .toString() may pass non‑string values to slugize, causing runtime errors",
           "evidence": "  var slug = data.slug = slugize(data.slug, {transform: config.filename_case});",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|hexo-12|lib/hexo/post.js|207|removed .tostring() may cause non-string slug values to break slugize in publish"
+          "key": "diff-review-service|hexo-12|lib/hexo/post.js|207|removing .tostring() may pass non‑string values to slugize, causing runtime erro"
         }
       ]
     },
@@ -972,11 +913,11 @@
           "caseId": "karma-3",
           "path": "lib/reporter.js",
           "line": 99,
-          "title": "Overwrites msg with formatted error, may cause type errors on concatenation",
+          "title": "Overwrites msg with formatted error instead of returning, may cause type errors",
           "evidence": "      msg = config.formatError(msg)",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|karma-3|lib/reporter.js|99|overwrites msg with formatted error, may cause type errors on concatenation"
+          "key": "diff-review-service|karma-3|lib/reporter.js|99|overwrites msg with formatted error instead of returning, may cause type errors"
         }
       ]
     },
@@ -996,11 +937,11 @@
           "caseId": "mongoose-8",
           "path": "lib/document.js",
           "line": 355,
-          "title": "Missing return value from update method",
+          "title": "Missing return statement in Document.update breaks expected return value",
           "evidence": "  this.constructor.update.apply(this.constructor, args);",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|mongoose-8|lib/document.js|355|missing return value from update method"
+          "key": "diff-review-service|mongoose-8|lib/document.js|355|missing return statement in document.update breaks expected return value"
         }
       ]
     },
@@ -1014,11 +955,291 @@
           "caseId": "mongoose-11",
           "path": "lib/query.js",
           "line": 517,
-          "title": "Removed check for existing path in keys, altering inclusion logic",
+          "title": "Removed duplicate field check, may cause redundant field inclusion",
           "evidence": "      if (false === exclude && keys.length > 1) {",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|mongoose-11|lib/query.js|517|removed check for existing path in keys, altering inclusion logic"
+          "key": "diff-review-service|mongoose-11|lib/query.js|517|removed duplicate field check, may cause redundant field inclusion"
+        }
+      ]
+    },
+    {
+      "caseId": "mongoose-16",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "mongoose-16",
+          "path": "lib/model.js",
+          "line": 342,
+          "title": "Removed version check may skip delta handling when version mismatch",
+          "evidence": "  if (!dirty.length) return;",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|mongoose-16|lib/model.js|342|removed version check may skip delta handling when version mismatch"
+        }
+      ]
+    },
+    {
+      "caseId": "mongoose-22",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "mongoose-22",
+          "path": "lib/model.js",
+          "line": 767,
+          "title": "Query conditions ignored, leading to removal of all documents",
+          "evidence": "  var mq = new Query({}, {}, this, this.collection);",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|mongoose-22|lib/model.js|767|query conditions ignored, leading to removal of all documents"
+        }
+      ]
+    },
+    {
+      "caseId": "express-3",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "express-3",
+          "path": "lib/response.js",
+          "line": 609,
+          "title": "Calling req.accepts with empty array may change behavior when no response formats are defined",
+          "evidence": "  var key = req.accepts(keys);",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|express-3|lib/response.js|609|calling req.accepts with empty array may change behavior when no response format"
+        }
+      ]
+    },
+    {
+      "caseId": "express-4",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "express-4",
+          "path": "lib/request.js",
+          "line": 457,
+          "title": "Subdomain parsing fails for IP addresses after removing isIP check",
+          "evidence": "  var subdomains = host.split('.').reverse();",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|express-4|lib/request.js|457|subdomain parsing fails for ip addresses after removing isip check"
+        }
+      ]
+    },
+    {
+      "caseId": "express-5",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "express-5",
+          "path": "lib/utils.js",
+          "line": 70,
+          "title": "Windows absolute path detection no longer accepts forward slash after colon",
+          "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|express-5|lib/utils.js|70|windows absolute path detection no longer accepts forward slash after colon"
+        }
+      ]
+    },
+    {
+      "caseId": "express-9",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "express-9",
+          "path": "lib/application.js",
+          "line": 171,
+          "title": "Assigning mount_app.mountpath to request path instead of mount_path breaks routing",
+          "evidence": "    mount_app.mountpath = path;",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|express-9|lib/application.js|171|assigning mount_app.mountpath to request path instead of mount_path breaks routi"
+        }
+      ]
+    },
+    {
+      "caseId": "express-16",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "express-16",
+          "path": "lib/response.js",
+          "line": 821,
+          "title": "Potential XSS: URL inserted into HTML without proper sanitization",
+          "evidence": "      body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|express-16|lib/response.js|821|potential xss: url inserted into html without proper sanitization"
+        },
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "express-16",
+          "path": "lib/response.js",
+          "line": 825,
+          "title": "Potential XSS: URL inserted into HTML anchor without proper sanitization",
+          "evidence": "      var u = escapeHtml(url);",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|express-16|lib/response.js|825|potential xss: url inserted into html anchor without proper sanitization"
+        }
+      ]
+    },
+    {
+      "caseId": "express-22",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "express-22",
+          "path": "lib/request.js",
+          "line": 479,
+          "title": "Improper host parsing breaks IPv6 handling",
+          "evidence": "  return host.split(':')[0];",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|express-22|lib/request.js|479|improper host parsing breaks ipv6 handling"
+        }
+      ]
+    },
+    {
+      "caseId": "express-26",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "express-26",
+          "path": "lib/router/index.js",
+          "line": 129,
+          "title": "Removed leading slash check when detecting protocol in URL",
+          "evidence": "  var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|express-26|lib/router/index.js|129|removed leading slash check when detecting protocol in url"
+        }
+      ]
+    },
+    {
+      "caseId": "hexo-7",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "hexo-7",
+          "path": "lib/plugins/helper/toc.js",
+          "line": 28,
+          "title": "Unescaped HTML inserted into TOC can lead to XSS",
+          "evidence": "    var text = $(this).html();",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|hexo-7|lib/plugins/helper/toc.js|28|unescaped html inserted into toc can lead to xss"
+        }
+      ]
+    },
+    {
+      "caseId": "hexo-12",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "hexo-12",
+          "path": "lib/hexo/post.js",
+          "line": 50,
+          "title": "Removing .toString() may cause non-string slug values leading to errors",
+          "evidence": "  data.slug = slugize(data.slug || data.title, {transform: config.filename_case});",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|hexo-12|lib/hexo/post.js|50|removing .tostring() may cause non-string slug values leading to errors"
+        },
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "hexo-12",
+          "path": "lib/hexo/post.js",
+          "line": 207,
+          "title": "Removing .toString() may cause undefined slug to cause slugize error",
+          "evidence": "  var slug = data.slug = slugize(data.slug, {transform: config.filename_case});",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|hexo-12|lib/hexo/post.js|207|removing .tostring() may cause undefined slug to cause slugize error"
+        }
+      ]
+    },
+    {
+      "caseId": "karma-3",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "karma-3",
+          "path": "lib/reporter.js",
+          "line": 99,
+          "title": "Changing return behavior may cause type errors",
+          "evidence": "      msg = config.formatError(msg)",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|karma-3|lib/reporter.js|99|changing return behavior may cause type errors"
+        }
+      ]
+    },
+    {
+      "caseId": "karma-22",
+      "reviewer": "diff-review-service",
+      "caught": false,
+      "findings": []
+    },
+    {
+      "caseId": "mongoose-8",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "mongoose-8",
+          "path": "lib/document.js",
+          "line": 355,
+          "title": "Missing return statement; function no longer returns result of update",
+          "evidence": "  this.constructor.update.apply(this.constructor, args);",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|mongoose-8|lib/document.js|355|missing return statement; function no longer returns result of update"
+        }
+      ]
+    },
+    {
+      "caseId": "mongoose-11",
+      "reviewer": "diff-review-service",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "diff-review-service",
+          "caseId": "mongoose-11",
+          "path": "lib/query.js",
+          "line": 517,
+          "title": "Removed check for existing key may cause duplicate field inclusion",
+          "evidence": "      if (false === exclude && keys.length > 1) {",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "diff-review-service|mongoose-11|lib/query.js|517|removed check for existing key may cause duplicate field inclusion"
         }
       ]
     },
@@ -1050,303 +1271,47 @@
           "caseId": "mongoose-22",
           "path": "lib/model.js",
           "line": 767,
-          "title": "Query conditions removed, may delete all documents unintentionally",
+          "title": "Remove operation ignores conditions, may delete all documents",
           "evidence": "  var mq = new Query({}, {}, this, this.collection);",
           "grounding": "added",
           "hitsBug": true,
-          "key": "diff-review-service|mongoose-22|lib/model.js|767|query conditions removed, may delete all documents unintentionally"
+          "key": "diff-review-service|mongoose-22|lib/model.js|767|remove operation ignores conditions, may delete all documents"
         }
       ]
     },
     {
       "caseId": "express-3",
-      "reviewer": "diff-review-service",
-      "caught": true,
+      "reviewer": "model-raw",
+      "caught": false,
       "findings": [
         {
-          "reviewer": "diff-review-service",
+          "reviewer": "model-raw",
           "caseId": "express-3",
           "path": "lib/response.js",
-          "line": 609,
-          "title": "Unconditional call to req.accepts may alter behavior when keys array is empty",
-          "evidence": "  var key = req.accepts(keys);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-3|lib/response.js|609|unconditional call to req.accepts may alter behavior when keys array is empty"
+          "line": 608,
+          "title": "Unconditional call to req.accepts may mis-handle empty key list",
+          "evidence": "var key = req.accepts(keys);",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|express-3|lib/response.js|608|unconditional call to req.accepts may mis-handle empty key list"
         }
       ]
     },
     {
       "caseId": "express-4",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "express-4",
-          "path": "lib/request.js",
-          "line": 457,
-          "title": "Missing IP address check when computing subdomains",
-          "evidence": "  var subdomains = host.split('.').reverse();",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-4|lib/request.js|457|missing ip address check when computing subdomains"
-        }
-      ]
-    },
-    {
-      "caseId": "express-5",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "express-5",
-          "path": "lib/utils.js",
-          "line": 70,
-          "title": "Absolute path detection fails for Windows paths using forward slash",
-          "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-5|lib/utils.js|70|absolute path detection fails for windows paths using forward slash"
-        }
-      ]
-    },
-    {
-      "caseId": "express-9",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "express-9",
-          "path": "lib/application.js",
-          "line": 171,
-          "title": "mount_app.mountpath assigned to raw path argument instead of normalized mount_path",
-          "evidence": "    mount_app.mountpath = path;",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-9|lib/application.js|171|mount_app.mountpath assigned to raw path argument instead of normalized mount_pa"
-        }
-      ]
-    },
-    {
-      "caseId": "express-16",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "express-16",
-          "path": "lib/response.js",
-          "line": 821,
-          "title": "Potential open redirect by using unvalidated URL in response body",
-          "evidence": "      body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-16|lib/response.js|821|potential open redirect by using unvalidated url in response body"
-        },
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "express-16",
-          "path": "lib/response.js",
-          "line": 825,
-          "title": "HTML escaping may be insufficient for URL attribute context",
-          "evidence": "      var u = escapeHtml(url);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-16|lib/response.js|825|html escaping may be insufficient for url attribute context"
-        }
-      ]
-    },
-    {
-      "caseId": "express-22",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "express-22",
-          "path": "lib/request.js",
-          "line": 479,
-          "title": "Host parsing using split(':') mishandles IPv6 addresses",
-          "evidence": "  return host.split(':')[0];",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|express-22|lib/request.js|479|host parsing using split(':') mishandles ipv6 addresses"
-        }
-      ]
-    },
-    {
-      "caseId": "express-26",
-      "reviewer": "diff-review-service",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "hexo-7",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "hexo-7",
-          "path": "lib/plugins/helper/toc.js",
-          "line": 28,
-          "title": "HTML not escaped when generating TOC, potential XSS vulnerability",
-          "evidence": "    var text = $(this).html();",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|hexo-7|lib/plugins/helper/toc.js|28|html not escaped when generating toc, potential xss vulnerability"
-        }
-      ]
-    },
-    {
-      "caseId": "hexo-12",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "hexo-12",
-          "path": "lib/hexo/post.js",
-          "line": 50,
-          "title": "Removing .toString() may cause type errors when slug or title is not a string",
-          "evidence": "  data.slug = slugize(data.slug || data.title, {transform: config.filename_case});",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|hexo-12|lib/hexo/post.js|50|removing .tostring() may cause type errors when slug or title is not a string"
-        },
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "hexo-12",
-          "path": "lib/hexo/post.js",
-          "line": 207,
-          "title": "Calling slugize on possibly undefined slug without .toString() can raise errors",
-          "evidence": "  var slug = data.slug = slugize(data.slug, {transform: config.filename_case});",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|hexo-12|lib/hexo/post.js|207|calling slugize on possibly undefined slug without .tostring() can raise errors"
-        }
-      ]
-    },
-    {
-      "caseId": "karma-3",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "karma-3",
-          "path": "lib/reporter.js",
-          "line": 99,
-          "title": "Assigning formatted error to msg changes return semantics and may cause type errors",
-          "evidence": "      msg = config.formatError(msg)",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|karma-3|lib/reporter.js|99|assigning formatted error to msg changes return semantics and may cause type err"
-        }
-      ]
-    },
-    {
-      "caseId": "karma-22",
-      "reviewer": "diff-review-service",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "mongoose-8",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "mongoose-8",
-          "path": "lib/document.js",
-          "line": 355,
-          "title": "Missing return statement discards result of update operation",
-          "evidence": "  this.constructor.update.apply(this.constructor, args);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|mongoose-8|lib/document.js|355|missing return statement discards result of update operation"
-        }
-      ]
-    },
-    {
-      "caseId": "mongoose-11",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "mongoose-11",
-          "path": "lib/query.js",
-          "line": 517,
-          "title": "Removed check for existing field may overwrite exclusion flag",
-          "evidence": "      if (false === exclude && keys.length > 1) {",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|mongoose-11|lib/query.js|517|removed check for existing field may overwrite exclusion flag"
-        }
-      ]
-    },
-    {
-      "caseId": "mongoose-16",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "mongoose-16",
-          "path": "lib/model.js",
-          "line": 342,
-          "title": "Removed version check may cause incorrect delta handling",
-          "evidence": "  if (!dirty.length) return;",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|mongoose-16|lib/model.js|342|removed version check may cause incorrect delta handling"
-        }
-      ]
-    },
-    {
-      "caseId": "mongoose-22",
-      "reviewer": "diff-review-service",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "diff-review-service",
-          "caseId": "mongoose-22",
-          "path": "lib/model.js",
-          "line": 767,
-          "title": "Remove operation ignores conditions, potentially deleting all documents",
-          "evidence": "  var mq = new Query({}, {}, this, this.collection);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "diff-review-service|mongoose-22|lib/model.js|767|remove operation ignores conditions, potentially deleting all documents"
-        }
-      ]
-    },
-    {
-      "caseId": "express-3",
       "reviewer": "model-raw",
       "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "express-4",
-      "reviewer": "model-raw",
-      "caught": true,
       "findings": [
         {
           "reviewer": "model-raw",
           "caseId": "express-4",
           "path": "lib/request.js",
-          "line": 457,
-          "title": "Improper subdomain parsing for IP addresses",
+          "line": 454,
+          "title": "Improper handling of IP addresses when computing subdomains",
           "evidence": "var subdomains = host.split('.').reverse();",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "model-raw|express-4|lib/request.js|457|improper subdomain parsing for ip addresses"
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|express-4|lib/request.js|454|improper handling of ip addresses when computing subdomains"
         }
       ]
     },
@@ -1360,29 +1325,29 @@
           "caseId": "express-5",
           "path": "lib/utils.js",
           "line": 71,
-          "title": "Windows absolute path detection no longer accepts forward slash after drive letter",
-          "evidence": "if (':' === path[1] && '\\\\' === path[2]) return true;",
+          "title": "Removed support for forward slash in Windows device paths",
+          "evidence": "if (':' === path[1] && '\\' === path[2]) return true;",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|express-5|lib/utils.js|71|windows absolute path detection no longer accepts forward slash after drive lett"
+          "key": "model-raw|express-5|lib/utils.js|71|removed support for forward slash in windows device paths"
         }
       ]
     },
     {
       "caseId": "express-9",
       "reviewer": "model-raw",
-      "caught": false,
+      "caught": true,
       "findings": [
         {
           "reviewer": "model-raw",
           "caseId": "express-9",
           "path": "lib/application.js",
-          "line": 168,
-          "title": "mount_app.mountpath assigned to user-provided path instead of mount_path",
+          "line": 171,
+          "title": "Assigning mount_app.mountpath to raw path argument may break routing",
           "evidence": "mount_app.mountpath = path;",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|express-9|lib/application.js|168|mount_app.mountpath assigned to user-provided path instead of mount_path"
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "model-raw|express-9|lib/application.js|171|assigning mount_app.mountpath to raw path argument may break routing"
         }
       ]
     },
@@ -1390,30 +1355,7 @@
       "caseId": "express-16",
       "reviewer": "model-raw",
       "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "express-16",
-          "path": "lib/response.js",
-          "line": 822,
-          "title": "Potential open redirect vulnerability using unvalidated URL",
-          "evidence": "body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|express-16|lib/response.js|822|potential open redirect vulnerability using unvalidated url"
-        },
-        {
-          "reviewer": "model-raw",
-          "caseId": "express-16",
-          "path": "lib/response.js",
-          "line": 826,
-          "title": "Potential open redirect vulnerability using unvalidated URL in HTML output",
-          "evidence": "var u = escapeHtml(url);",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|express-16|lib/response.js|826|potential open redirect vulnerability using unvalidated url in html output"
-        }
-      ]
+      "findings": []
     },
     {
       "caseId": "express-22",
@@ -1424,12 +1366,12 @@
           "reviewer": "model-raw",
           "caseId": "express-22",
           "path": "lib/request.js",
-          "line": 485,
-          "title": "Improper host parsing may break IPv6 addresses",
+          "line": 476,
+          "title": "Naive split on ':' breaks IPv6 host parsing",
           "evidence": "return host.split(':')[0];",
-          "grounding": "fabricated",
+          "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|express-22|lib/request.js|485|improper host parsing may break ipv6 addresses"
+          "key": "model-raw|express-22|lib/request.js|476|naive split on ':' breaks ipv6 host parsing"
         }
       ]
     },
@@ -1443,11 +1385,11 @@
           "caseId": "express-26",
           "path": "lib/router/index.js",
           "line": 126,
-          "title": "Removed leading slash check when detecting fully qualified URL, may misinterpret relative paths",
+          "title": "Removed leading slash check, may misidentify FQDN for paths starting with '/'",
           "evidence": "var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|express-26|lib/router/index.js|126|removed leading slash check when detecting fully qualified url, may misinterpret"
+          "key": "model-raw|express-26|lib/router/index.js|126|removed leading slash check, may misidentify fqdn for paths starting with '/'"
         }
       ]
     },
@@ -1461,11 +1403,11 @@
           "caseId": "hexo-7",
           "path": "lib/plugins/helper/toc.js",
           "line": 28,
-          "title": "Potential XSS due to unescaped HTML in TOC helper",
+          "title": "Unescaped HTML inserted into TOC may lead to XSS",
           "evidence": "var text = $(this).html();",
           "grounding": "added",
           "hitsBug": true,
-          "key": "model-raw|hexo-7|lib/plugins/helper/toc.js|28|potential xss due to unescaped html in toc helper"
+          "key": "model-raw|hexo-7|lib/plugins/helper/toc.js|28|unescaped html inserted into toc may lead to xss"
         }
       ]
     },
@@ -1478,23 +1420,23 @@
           "reviewer": "model-raw",
           "caseId": "hexo-12",
           "path": "lib/hexo/post.js",
-          "line": 51,
-          "title": "Removing .toString() may cause non‑string values to be passed to slugize",
+          "line": 49,
+          "title": "Removing .toString() may pass non‑string values to slugize, causing runtime errors",
           "evidence": "data.slug = slugize(data.slug || data.title, {transform: config.filename_case});",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|hexo-12|lib/hexo/post.js|51|removing .tostring() may cause non‑string values to be passed to slugize"
+          "key": "model-raw|hexo-12|lib/hexo/post.js|49|removing .tostring() may pass non‑string values to slugize, causing runtime erro"
         },
         {
           "reviewer": "model-raw",
           "caseId": "hexo-12",
           "path": "lib/hexo/post.js",
-          "line": 204,
-          "title": "Removing .toString() may cause non‑string slug values to be passed to slugize",
+          "line": 205,
+          "title": "Removing .toString() may pass non‑string values to slugize, leading to unexpected behavior",
           "evidence": "var slug = data.slug = slugize(data.slug, {transform: config.filename_case});",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|hexo-12|lib/hexo/post.js|204|removing .tostring() may cause non‑string slug values to be passed to slugize"
+          "key": "model-raw|hexo-12|lib/hexo/post.js|205|removing .tostring() may pass non‑string values to slugize, leading to unexpecte"
         }
       ]
     },
@@ -1507,12 +1449,12 @@
           "reviewer": "model-raw",
           "caseId": "karma-3",
           "path": "lib/reporter.js",
-          "line": 97,
-          "title": "Potential loss of return value from config.formatError",
+          "line": 96,
+          "title": "Changing error formatting return behavior and adding newline",
           "evidence": "msg = config.formatError(msg)",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|karma-3|lib/reporter.js|97|potential loss of return value from config.formaterror"
+          "key": "model-raw|karma-3|lib/reporter.js|96|changing error formatting return behavior and adding newline"
         }
       ]
     },
@@ -1525,30 +1467,30 @@
           "reviewer": "model-raw",
           "caseId": "karma-22",
           "path": "lib/reporter.js",
-          "line": 27,
-          "title": "Overly permissive URL regular expression may allow malicious hosts",
-          "evidence": "var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/\\s]*)?\\/?' +",
+          "line": 31,
+          "title": "Broad URL regex permits any host, weakening URL validation",
+          "evidence": "var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/\\s]*)?\\/?'",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|karma-22|lib/reporter.js|27|overly permissive url regular expression may allow malicious hosts"
+          "key": "model-raw|karma-22|lib/reporter.js|31|broad url regex permits any host, weakening url validation"
         }
       ]
     },
     {
       "caseId": "mongoose-8",
       "reviewer": "model-raw",
-      "caught": true,
+      "caught": false,
       "findings": [
         {
           "reviewer": "model-raw",
           "caseId": "mongoose-8",
           "path": "lib/document.js",
-          "line": 355,
-          "title": "Missing return statement in Document.update may break callers expecting a result",
+          "line": 353,
+          "title": "Missing return statement may cause undefined result",
           "evidence": "this.constructor.update.apply(this.constructor, args);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "model-raw|mongoose-8|lib/document.js|355|missing return statement in document.update may break callers expecting a result"
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|mongoose-8|lib/document.js|353|missing return statement may cause undefined result"
         }
       ]
     },
@@ -1562,29 +1504,29 @@
           "caseId": "mongoose-11",
           "path": "lib/query.js",
           "line": 514,
-          "title": "Removed duplicate field check may cause redundant field inclusion",
+          "title": "Removed existence check may cause duplicate field inclusion",
           "evidence": "if (false === exclude && keys.length > 1) {",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|mongoose-11|lib/query.js|514|removed duplicate field check may cause redundant field inclusion"
+          "key": "model-raw|mongoose-11|lib/query.js|514|removed existence check may cause duplicate field inclusion"
         }
       ]
     },
     {
       "caseId": "mongoose-16",
       "reviewer": "model-raw",
-      "caught": true,
+      "caught": false,
       "findings": [
         {
           "reviewer": "model-raw",
           "caseId": "mongoose-16",
           "path": "lib/model.js",
-          "line": 342,
-          "title": "Removed version check may cause stale data handling",
+          "line": 339,
+          "title": "Removed version check may cause premature return",
           "evidence": "if (!dirty.length) return;",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "model-raw|mongoose-16|lib/model.js|342|removed version check may cause stale data handling"
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|mongoose-16|lib/model.js|339|removed version check may cause premature return"
         }
       ]
     },
@@ -1598,11 +1540,11 @@
           "caseId": "mongoose-22",
           "path": "lib/model.js",
           "line": 764,
-          "title": "Remove operation uses empty query, potentially deleting all documents",
+          "title": "Removing query conditions may cause deletion of all documents",
           "evidence": "var mq = new Query({}, {}, this, this.collection);",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|mongoose-22|lib/model.js|764|remove operation uses empty query, potentially deleting all documents"
+          "key": "model-raw|mongoose-22|lib/model.js|764|removing query conditions may cause deletion of all documents"
         }
       ]
     },
@@ -1615,12 +1557,12 @@
           "reviewer": "model-raw",
           "caseId": "express-3",
           "path": "lib/response.js",
-          "line": 607,
-          "title": "Calling req.accepts with empty array may change behavior",
+          "line": 606,
+          "title": "Calling req.accepts with empty array may produce unexpected result",
           "evidence": "var key = req.accepts(keys);",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|express-3|lib/response.js|607|calling req.accepts with empty array may change behavior"
+          "key": "model-raw|express-3|lib/response.js|606|calling req.accepts with empty array may produce unexpected result"
         }
       ]
     },
@@ -1634,280 +1576,11 @@
           "caseId": "express-4",
           "path": "lib/request.js",
           "line": 457,
-          "title": "Improper handling of IP addresses in subdomain parsing",
+          "title": "Removed IP address check when computing subdomains",
           "evidence": "var subdomains = host.split('.').reverse();",
           "grounding": "added",
           "hitsBug": true,
-          "key": "model-raw|express-4|lib/request.js|457|improper handling of ip addresses in subdomain parsing"
-        }
-      ]
-    },
-    {
-      "caseId": "express-5",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "express-5",
-          "path": "lib/utils.js",
-          "line": 69,
-          "title": "Windows device path detection no longer accepts forward slash separator",
-          "evidence": "if (':' === path[1] && '\\\\' === path[2]) return true;",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|express-5|lib/utils.js|69|windows device path detection no longer accepts forward slash separator"
-        }
-      ]
-    },
-    {
-      "caseId": "express-9",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "express-9",
-          "path": "lib/application.js",
-          "line": 168,
-          "title": "Incorrect assignment of mount_app.mountpath; uses 'path' instead of 'mount_path'",
-          "evidence": "mount_app.mountpath = path;",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|express-9|lib/application.js|168|incorrect assignment of mount_app.mountpath; uses 'path' instead of 'mount_path'"
-        }
-      ]
-    },
-    {
-      "caseId": "express-16",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": []
-    },
-    {
-      "caseId": "express-22",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "express-22",
-          "path": "lib/request.js",
-          "line": 480,
-          "title": "Host header parsing incorrectly splits on ':' breaking IPv6 handling",
-          "evidence": "return host.split(':')[0];",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|express-22|lib/request.js|480|host header parsing incorrectly splits on ':' breaking ipv6 handling"
-        }
-      ]
-    },
-    {
-      "caseId": "express-26",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "express-26",
-          "path": "lib/router/index.js",
-          "line": 126,
-          "title": "Removed leading slash check when extracting FQDN, can misinterpret relative URLs",
-          "evidence": "var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|express-26|lib/router/index.js|126|removed leading slash check when extracting fqdn, can misinterpret relative urls"
-        }
-      ]
-    },
-    {
-      "caseId": "hexo-7",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "hexo-7",
-          "path": "lib/plugins/helper/toc.js",
-          "line": 25,
-          "title": "Using unescaped HTML for TOC entries can lead to XSS",
-          "evidence": "var text = $(this).html();",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|hexo-7|lib/plugins/helper/toc.js|25|using unescaped html for toc entries can lead to xss"
-        }
-      ]
-    },
-    {
-      "caseId": "hexo-12",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "hexo-12",
-          "path": "lib/hexo/post.js",
-          "line": 47,
-          "title": "Removed .toString() may cause non-string slug values to break slugize",
-          "evidence": "data.slug = slugize(data.slug || data.title, {transform: config.filename_case});",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|hexo-12|lib/hexo/post.js|47|removed .tostring() may cause non-string slug values to break slugize"
-        },
-        {
-          "reviewer": "model-raw",
-          "caseId": "hexo-12",
-          "path": "lib/hexo/post.js",
-          "line": 204,
-          "title": "Removed .toString() may cause non-string slug values to break slugize in publish",
-          "evidence": "var slug = data.slug = slugize(data.slug, {transform: config.filename_case});",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|hexo-12|lib/hexo/post.js|204|removed .tostring() may cause non-string slug values to break slugize in publish"
-        }
-      ]
-    },
-    {
-      "caseId": "karma-3",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "karma-3",
-          "path": "lib/reporter.js",
-          "line": 97,
-          "title": "Overwrites msg with formatted error, may cause type errors on concatenation",
-          "evidence": "msg = config.formatError(msg)",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|karma-3|lib/reporter.js|97|overwrites msg with formatted error, may cause type errors on concatenation"
-        }
-      ]
-    },
-    {
-      "caseId": "karma-22",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "karma-22",
-          "path": "lib/reporter.js",
-          "line": 25,
-          "title": "Broad URL regex may match unintended hosts",
-          "evidence": "var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/\\s]*)?\\/?' +",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|karma-22|lib/reporter.js|25|broad url regex may match unintended hosts"
-        }
-      ]
-    },
-    {
-      "caseId": "mongoose-8",
-      "reviewer": "model-raw",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "mongoose-8",
-          "path": "lib/document.js",
-          "line": 355,
-          "title": "Missing return value from update method",
-          "evidence": "this.constructor.update.apply(this.constructor, args);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "model-raw|mongoose-8|lib/document.js|355|missing return value from update method"
-        }
-      ]
-    },
-    {
-      "caseId": "mongoose-11",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "mongoose-11",
-          "path": "lib/query.js",
-          "line": 514,
-          "title": "Removed check for existing path in keys, altering inclusion logic",
-          "evidence": "if (false === exclude && keys.length > 1) {",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|mongoose-11|lib/query.js|514|removed check for existing path in keys, altering inclusion logic"
-        }
-      ]
-    },
-    {
-      "caseId": "mongoose-16",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "mongoose-16",
-          "path": "lib/model.js",
-          "line": 340,
-          "title": "Removed version check may cause incorrect early return",
-          "evidence": "if (!dirty.length) return;",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|mongoose-16|lib/model.js|340|removed version check may cause incorrect early return"
-        }
-      ]
-    },
-    {
-      "caseId": "mongoose-22",
-      "reviewer": "model-raw",
-      "caught": false,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "mongoose-22",
-          "path": "lib/model.js",
-          "line": 764,
-          "title": "Query conditions removed, may delete all documents unintentionally",
-          "evidence": "var mq = new Query({}, {}, this, this.collection);",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|mongoose-22|lib/model.js|764|query conditions removed, may delete all documents unintentionally"
-        }
-      ]
-    },
-    {
-      "caseId": "express-3",
-      "reviewer": "model-raw",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "express-3",
-          "path": "lib/response.js",
-          "line": 609,
-          "title": "Unconditional call to req.accepts may alter behavior when keys array is empty",
-          "evidence": "var key = req.accepts(keys);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "model-raw|express-3|lib/response.js|609|unconditional call to req.accepts may alter behavior when keys array is empty"
-        }
-      ]
-    },
-    {
-      "caseId": "express-4",
-      "reviewer": "model-raw",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "express-4",
-          "path": "lib/request.js",
-          "line": 457,
-          "title": "Missing IP address check when computing subdomains",
-          "evidence": "var subdomains = host.split('.').reverse();",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "model-raw|express-4|lib/request.js|457|missing ip address check when computing subdomains"
+          "key": "model-raw|express-4|lib/request.js|457|removed ip address check when computing subdomains"
         }
       ]
     },
@@ -1921,11 +1594,11 @@
           "caseId": "express-5",
           "path": "lib/utils.js",
           "line": 68,
-          "title": "Absolute path detection fails for Windows paths using forward slash",
+          "title": "Reduced Windows device path detection may misclassify absolute paths",
           "evidence": "if (':' === path[1] && '\\\\' === path[2]) return true;",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|express-5|lib/utils.js|68|absolute path detection fails for windows paths using forward slash"
+          "key": "model-raw|express-5|lib/utils.js|68|reduced windows device path detection may misclassify absolute paths"
         }
       ]
     },
@@ -1939,58 +1612,35 @@
           "caseId": "express-9",
           "path": "lib/application.js",
           "line": 168,
-          "title": "mount_app.mountpath assigned to raw path argument instead of normalized mount_path",
+          "title": "Incorrect assignment to mount_app.mountpath may break routing",
           "evidence": "mount_app.mountpath = path;",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|express-9|lib/application.js|168|mount_app.mountpath assigned to raw path argument instead of normalized mount_pa"
+          "key": "model-raw|express-9|lib/application.js|168|incorrect assignment to mount_app.mountpath may break routing"
         }
       ]
     },
     {
       "caseId": "express-16",
       "reviewer": "model-raw",
-      "caught": true,
-      "findings": [
-        {
-          "reviewer": "model-raw",
-          "caseId": "express-16",
-          "path": "lib/response.js",
-          "line": 822,
-          "title": "Potential open redirect by using unvalidated URL in response body",
-          "evidence": "body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|express-16|lib/response.js|822|potential open redirect by using unvalidated url in response body"
-        },
-        {
-          "reviewer": "model-raw",
-          "caseId": "express-16",
-          "path": "lib/response.js",
-          "line": 825,
-          "title": "HTML escaping may be insufficient for URL attribute context",
-          "evidence": "var u = escapeHtml(url);",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "model-raw|express-16|lib/response.js|825|html escaping may be insufficient for url attribute context"
-        }
-      ]
+      "caught": false,
+      "findings": []
     },
     {
       "caseId": "express-22",
       "reviewer": "model-raw",
-      "caught": false,
+      "caught": true,
       "findings": [
         {
           "reviewer": "model-raw",
           "caseId": "express-22",
           "path": "lib/request.js",
-          "line": 476,
-          "title": "Host parsing using split(':') mishandles IPv6 addresses",
+          "line": 479,
+          "title": "Incorrect host parsing for IPv6 addresses",
           "evidence": "return host.split(':')[0];",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|express-22|lib/request.js|476|host parsing using split(':') mishandles ipv6 addresses"
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "model-raw|express-22|lib/request.js|479|incorrect host parsing for ipv6 addresses"
         }
       ]
     },
@@ -2003,18 +1653,18 @@
     {
       "caseId": "hexo-7",
       "reviewer": "model-raw",
-      "caught": false,
+      "caught": true,
       "findings": [
         {
           "reviewer": "model-raw",
           "caseId": "hexo-7",
           "path": "lib/plugins/helper/toc.js",
-          "line": 27,
-          "title": "HTML not escaped when generating TOC, potential XSS vulnerability",
+          "line": 28,
+          "title": "Using raw HTML for heading text may introduce XSS",
           "evidence": "var text = $(this).html();",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|hexo-7|lib/plugins/helper/toc.js|27|html not escaped when generating toc, potential xss vulnerability"
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "model-raw|hexo-7|lib/plugins/helper/toc.js|28|using raw html for heading text may introduce xss"
         }
       ]
     },
@@ -2027,23 +1677,23 @@
           "reviewer": "model-raw",
           "caseId": "hexo-12",
           "path": "lib/hexo/post.js",
-          "line": 47,
-          "title": "Removing .toString() may cause type errors when slug or title is not a string",
+          "line": 51,
+          "title": "Removing .toString() may pass non‑string values to slugize, causing runtime errors",
           "evidence": "data.slug = slugize(data.slug || data.title, {transform: config.filename_case});",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|hexo-12|lib/hexo/post.js|47|removing .tostring() may cause type errors when slug or title is not a string"
+          "key": "model-raw|hexo-12|lib/hexo/post.js|51|removing .tostring() may pass non‑string values to slugize, causing runtime erro"
         },
         {
           "reviewer": "model-raw",
           "caseId": "hexo-12",
           "path": "lib/hexo/post.js",
-          "line": 204,
-          "title": "Calling slugize on possibly undefined slug without .toString() can raise errors",
+          "line": 208,
+          "title": "Removing .toString() may pass non‑string values to slugize, causing runtime errors",
           "evidence": "var slug = data.slug = slugize(data.slug, {transform: config.filename_case});",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|hexo-12|lib/hexo/post.js|204|calling slugize on possibly undefined slug without .tostring() can raise errors"
+          "key": "model-raw|hexo-12|lib/hexo/post.js|208|removing .tostring() may pass non‑string values to slugize, causing runtime erro"
         }
       ]
     },
@@ -2056,12 +1706,12 @@
           "reviewer": "model-raw",
           "caseId": "karma-3",
           "path": "lib/reporter.js",
-          "line": 98,
-          "title": "Assigning formatted error to msg changes return semantics and may cause type errors",
+          "line": 101,
+          "title": "Overwrites msg with formatted error instead of returning, may cause type errors",
           "evidence": "msg = config.formatError(msg)",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|karma-3|lib/reporter.js|98|assigning formatted error to msg changes return semantics and may cause type err"
+          "key": "model-raw|karma-3|lib/reporter.js|101|overwrites msg with formatted error instead of returning, may cause type errors"
         }
       ]
     },
@@ -2069,41 +1719,53 @@
       "caseId": "karma-22",
       "reviewer": "model-raw",
       "caught": false,
-      "findings": []
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "karma-22",
+          "path": "lib/reporter.js",
+          "line": 25,
+          "title": "Regex now permits any hostname, potentially allowing untrusted URLs",
+          "evidence": "var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/\\s]*)?\\/?' +",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|karma-22|lib/reporter.js|25|regex now permits any hostname, potentially allowing untrusted urls"
+        }
+      ]
     },
     {
       "caseId": "mongoose-8",
       "reviewer": "model-raw",
-      "caught": false,
+      "caught": true,
       "findings": [
         {
           "reviewer": "model-raw",
           "caseId": "mongoose-8",
           "path": "lib/document.js",
-          "line": 353,
-          "title": "Missing return statement discards result of update operation",
+          "line": 355,
+          "title": "Missing return statement in Document.update breaks expected return value",
           "evidence": "this.constructor.update.apply(this.constructor, args);",
-          "grounding": "misquoted",
-          "hitsBug": false,
-          "key": "model-raw|mongoose-8|lib/document.js|353|missing return statement discards result of update operation"
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "model-raw|mongoose-8|lib/document.js|355|missing return statement in document.update breaks expected return value"
         }
       ]
     },
     {
       "caseId": "mongoose-11",
       "reviewer": "model-raw",
-      "caught": true,
+      "caught": false,
       "findings": [
         {
           "reviewer": "model-raw",
           "caseId": "mongoose-11",
           "path": "lib/query.js",
-          "line": 517,
-          "title": "Removed check for existing field may overwrite exclusion flag",
+          "line": 518,
+          "title": "Removed duplicate field check, may cause redundant field inclusion",
           "evidence": "if (false === exclude && keys.length > 1) {",
-          "grounding": "added",
-          "hitsBug": true,
-          "key": "model-raw|mongoose-11|lib/query.js|517|removed check for existing field may overwrite exclusion flag"
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|mongoose-11|lib/query.js|518|removed duplicate field check, may cause redundant field inclusion"
         }
       ]
     },
@@ -2116,12 +1778,12 @@
           "reviewer": "model-raw",
           "caseId": "mongoose-16",
           "path": "lib/model.js",
-          "line": 341,
-          "title": "Removed version check may cause incorrect delta handling",
+          "line": 339,
+          "title": "Removed version check may skip delta handling when version mismatch",
           "evidence": "if (!dirty.length) return;",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|mongoose-16|lib/model.js|341|removed version check may cause incorrect delta handling"
+          "key": "model-raw|mongoose-16|lib/model.js|339|removed version check may skip delta handling when version mismatch"
         }
       ]
     },
@@ -2135,11 +1797,303 @@
           "caseId": "mongoose-22",
           "path": "lib/model.js",
           "line": 764,
-          "title": "Remove operation ignores conditions, potentially deleting all documents",
+          "title": "Query conditions ignored, leading to removal of all documents",
           "evidence": "var mq = new Query({}, {}, this, this.collection);",
           "grounding": "misquoted",
           "hitsBug": false,
-          "key": "model-raw|mongoose-22|lib/model.js|764|remove operation ignores conditions, potentially deleting all documents"
+          "key": "model-raw|mongoose-22|lib/model.js|764|query conditions ignored, leading to removal of all documents"
+        }
+      ]
+    },
+    {
+      "caseId": "express-3",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "express-3",
+          "path": "lib/response.js",
+          "line": 606,
+          "title": "Calling req.accepts with empty array may change behavior when no response formats are defined",
+          "evidence": "var key = req.accepts(keys);",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|express-3|lib/response.js|606|calling req.accepts with empty array may change behavior when no response format"
+        }
+      ]
+    },
+    {
+      "caseId": "express-4",
+      "reviewer": "model-raw",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "express-4",
+          "path": "lib/request.js",
+          "line": 457,
+          "title": "Subdomain parsing fails for IP addresses after removing isIP check",
+          "evidence": "var subdomains = host.split('.').reverse();",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "model-raw|express-4|lib/request.js|457|subdomain parsing fails for ip addresses after removing isip check"
+        }
+      ]
+    },
+    {
+      "caseId": "express-5",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "express-5",
+          "path": "lib/utils.js",
+          "line": 68,
+          "title": "Windows absolute path detection no longer accepts forward slash after colon",
+          "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|express-5|lib/utils.js|68|windows absolute path detection no longer accepts forward slash after colon"
+        }
+      ]
+    },
+    {
+      "caseId": "express-9",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "express-9",
+          "path": "lib/application.js",
+          "line": 172,
+          "title": "Assigning mount_app.mountpath to request path instead of mount_path breaks routing",
+          "evidence": "mount_app.mountpath = path;",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|express-9|lib/application.js|172|assigning mount_app.mountpath to request path instead of mount_path breaks routi"
+        }
+      ]
+    },
+    {
+      "caseId": "express-16",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "express-16",
+          "path": "lib/response.js",
+          "line": 822,
+          "title": "Potential XSS: URL inserted into HTML without proper sanitization",
+          "evidence": "body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|express-16|lib/response.js|822|potential xss: url inserted into html without proper sanitization"
+        },
+        {
+          "reviewer": "model-raw",
+          "caseId": "express-16",
+          "path": "lib/response.js",
+          "line": 828,
+          "title": "Potential XSS: URL inserted into HTML anchor without proper sanitization",
+          "evidence": "var u = escapeHtml(url);",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|express-16|lib/response.js|828|potential xss: url inserted into html anchor without proper sanitization"
+        }
+      ]
+    },
+    {
+      "caseId": "express-22",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "express-22",
+          "path": "lib/request.js",
+          "line": 480,
+          "title": "Improper host parsing breaks IPv6 handling",
+          "evidence": "return host.split(':')[0];",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|express-22|lib/request.js|480|improper host parsing breaks ipv6 handling"
+        }
+      ]
+    },
+    {
+      "caseId": "express-26",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "express-26",
+          "path": "lib/router/index.js",
+          "line": 126,
+          "title": "Removed leading slash check when detecting protocol in URL",
+          "evidence": "var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|express-26|lib/router/index.js|126|removed leading slash check when detecting protocol in url"
+        }
+      ]
+    },
+    {
+      "caseId": "hexo-7",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "hexo-7",
+          "path": "lib/plugins/helper/toc.js",
+          "line": 25,
+          "title": "Unescaped HTML inserted into TOC can lead to XSS",
+          "evidence": "var text = $(this).html();",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|hexo-7|lib/plugins/helper/toc.js|25|unescaped html inserted into toc can lead to xss"
+        }
+      ]
+    },
+    {
+      "caseId": "hexo-12",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "hexo-12",
+          "path": "lib/hexo/post.js",
+          "line": 51,
+          "title": "Removing .toString() may cause non-string slug values leading to errors",
+          "evidence": "data.slug = slugize(data.slug || data.title, {transform: config.filename_case});",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|hexo-12|lib/hexo/post.js|51|removing .tostring() may cause non-string slug values leading to errors"
+        },
+        {
+          "reviewer": "model-raw",
+          "caseId": "hexo-12",
+          "path": "lib/hexo/post.js",
+          "line": 208,
+          "title": "Removing .toString() may cause undefined slug to cause slugize error",
+          "evidence": "var slug = data.slug = slugize(data.slug, {transform: config.filename_case});",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|hexo-12|lib/hexo/post.js|208|removing .tostring() may cause undefined slug to cause slugize error"
+        }
+      ]
+    },
+    {
+      "caseId": "karma-3",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "karma-3",
+          "path": "lib/reporter.js",
+          "line": 98,
+          "title": "Changing return behavior may cause type errors",
+          "evidence": "msg = config.formatError(msg)",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|karma-3|lib/reporter.js|98|changing return behavior may cause type errors"
+        }
+      ]
+    },
+    {
+      "caseId": "karma-22",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "karma-22",
+          "path": "lib/reporter.js",
+          "line": 27,
+          "title": "Overly permissive URL regular expression allows any hostname",
+          "evidence": "var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/\\s]*)?\\/?' +",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|karma-22|lib/reporter.js|27|overly permissive url regular expression allows any hostname"
+        }
+      ]
+    },
+    {
+      "caseId": "mongoose-8",
+      "reviewer": "model-raw",
+      "caught": true,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "mongoose-8",
+          "path": "lib/document.js",
+          "line": 355,
+          "title": "Missing return statement; function no longer returns result of update",
+          "evidence": "this.constructor.update.apply(this.constructor, args);",
+          "grounding": "added",
+          "hitsBug": true,
+          "key": "model-raw|mongoose-8|lib/document.js|355|missing return statement; function no longer returns result of update"
+        }
+      ]
+    },
+    {
+      "caseId": "mongoose-11",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "mongoose-11",
+          "path": "lib/query.js",
+          "line": 514,
+          "title": "Removed check for existing key may cause duplicate field inclusion",
+          "evidence": "if (false === exclude && keys.length > 1) {",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|mongoose-11|lib/query.js|514|removed check for existing key may cause duplicate field inclusion"
+        }
+      ]
+    },
+    {
+      "caseId": "mongoose-16",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "mongoose-16",
+          "path": "lib/model.js",
+          "line": 339,
+          "title": "Removed version check may cause incorrect early return",
+          "evidence": "if (!dirty.length) return;",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|mongoose-16|lib/model.js|339|removed version check may cause incorrect early return"
+        }
+      ]
+    },
+    {
+      "caseId": "mongoose-22",
+      "reviewer": "model-raw",
+      "caught": false,
+      "findings": [
+        {
+          "reviewer": "model-raw",
+          "caseId": "mongoose-22",
+          "path": "lib/model.js",
+          "line": 764,
+          "title": "Remove operation ignores conditions, may delete all documents",
+          "evidence": "var mq = new Query({}, {}, this, this.collection);",
+          "grounding": "misquoted",
+          "hitsBug": false,
+          "key": "model-raw|mongoose-22|lib/model.js|764|remove operation ignores conditions, may delete all documents"
         }
       ]
     }

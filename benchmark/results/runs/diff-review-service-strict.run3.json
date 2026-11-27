@@ -1,7 +1,7 @@
 {
   "reviewer": "diff-review-service-strict",
   "source": "openai/gpt-oss-120b + validateFinding (strict: exact line and quote)",
-  "ranAt": "2026-11-27T15:19:22.818Z",
+  "ranAt": "2026-11-27T16:42:21.346Z",
   "caseIds": [
     "express-3",
     "express-4",
@@ -22,35 +22,19 @@
   "findings": [
     {
       "reviewer": "diff-review-service-strict",
-      "caseId": "express-3",
-      "path": "lib/response.js",
-      "line": 609,
-      "title": "Unconditional call to req.accepts may alter behavior when keys array is empty",
-      "evidence": "  var key = req.accepts(keys);"
-    },
-    {
-      "reviewer": "diff-review-service-strict",
       "caseId": "express-4",
       "path": "lib/request.js",
       "line": 457,
-      "title": "Missing IP address check when computing subdomains",
+      "title": "Subdomain parsing fails for IP addresses after removing isIP check",
       "evidence": "  var subdomains = host.split('.').reverse();"
     },
     {
       "reviewer": "diff-review-service-strict",
-      "caseId": "express-16",
-      "path": "lib/response.js",
-      "line": 825,
-      "title": "HTML escaping may be insufficient for URL attribute context",
-      "evidence": "      var u = escapeHtml(url);"
-    },
-    {
-      "reviewer": "diff-review-service-strict",
-      "caseId": "mongoose-11",
-      "path": "lib/query.js",
-      "line": 517,
-      "title": "Removed check for existing field may overwrite exclusion flag",
-      "evidence": "      if (false === exclude && keys.length > 1) {"
+      "caseId": "mongoose-8",
+      "path": "lib/document.js",
+      "line": 355,
+      "title": "Missing return statement; function no longer returns result of update",
+      "evidence": "  this.constructor.update.apply(this.constructor, args);"
     }
   ],
   "errors": []

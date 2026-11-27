@@ -1,7 +1,7 @@
 {
   "reviewer": "diff-review-service-strict",
   "source": "openai/gpt-oss-120b + validateFinding (strict: exact line and quote)",
-  "ranAt": "2026-11-27T15:16:14.818Z",
+  "ranAt": "2026-11-27T16:39:08.384Z",
   "caseIds": [
     "express-3",
     "express-4",
@@ -22,35 +22,19 @@
   "findings": [
     {
       "reviewer": "diff-review-service-strict",
-      "caseId": "express-4",
-      "path": "lib/request.js",
-      "line": 457,
-      "title": "Improper subdomain parsing for IP addresses",
-      "evidence": "  var subdomains = host.split('.').reverse();"
+      "caseId": "express-9",
+      "path": "lib/application.js",
+      "line": 171,
+      "title": "Assigning mount_app.mountpath to raw path argument may break routing",
+      "evidence": "    mount_app.mountpath = path;"
     },
     {
       "reviewer": "diff-review-service-strict",
       "caseId": "hexo-7",
       "path": "lib/plugins/helper/toc.js",
       "line": 28,
-      "title": "Potential XSS due to unescaped HTML in TOC helper",
+      "title": "Unescaped HTML inserted into TOC may lead to XSS",
       "evidence": "    var text = $(this).html();"
-    },
-    {
-      "reviewer": "diff-review-service-strict",
-      "caseId": "mongoose-8",
-      "path": "lib/document.js",
-      "line": 355,
-      "title": "Missing return statement in Document.update may break callers expecting a result",
-      "evidence": "  this.constructor.update.apply(this.constructor, args);"
-    },
-    {
-      "reviewer": "diff-review-service-strict",
-      "caseId": "mongoose-16",
-      "path": "lib/model.js",
-      "line": 342,
-      "title": "Removed version check may cause stale data handling",
-      "evidence": "  if (!dirty.length) return;"
     }
   ],
   "errors": []

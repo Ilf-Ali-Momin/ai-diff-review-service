@@ -1,7 +1,7 @@
 {
   "reviewer": "model-raw",
   "source": "openai/gpt-oss-120b",
-  "ranAt": "2026-11-27T15:19:22.818Z",
+  "ranAt": "2026-11-27T16:42:21.346Z",
   "caseIds": [
     "express-3",
     "express-4",
@@ -24,8 +24,8 @@
       "reviewer": "model-raw",
       "caseId": "express-3",
       "path": "lib/response.js",
-      "line": 609,
-      "title": "Unconditional call to req.accepts may alter behavior when keys array is empty",
+      "line": 606,
+      "title": "Calling req.accepts with empty array may change behavior when no response formats are defined",
       "evidence": "var key = req.accepts(keys);"
     },
     {
@@ -33,7 +33,7 @@
       "caseId": "express-4",
       "path": "lib/request.js",
       "line": 457,
-      "title": "Missing IP address check when computing subdomains",
+      "title": "Subdomain parsing fails for IP addresses after removing isIP check",
       "evidence": "var subdomains = host.split('.').reverse();"
     },
     {
@@ -41,15 +41,15 @@
       "caseId": "express-5",
       "path": "lib/utils.js",
       "line": 68,
-      "title": "Absolute path detection fails for Windows paths using forward slash",
-      "evidence": "if (':' === path[1] && '\\\\' === path[2]) return true;"
+      "title": "Windows absolute path detection no longer accepts forward slash after colon",
+      "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;"
     },
     {
       "reviewer": "model-raw",
       "caseId": "express-9",
       "path": "lib/application.js",
-      "line": 168,
-      "title": "mount_app.mountpath assigned to raw path argument instead of normalized mount_path",
+      "line": 172,
+      "title": "Assigning mount_app.mountpath to request path instead of mount_path breaks routing",
       "evidence": "mount_app.mountpath = path;"
     },
     {
@@ -57,47 +57,55 @@
       "caseId": "express-16",
       "path": "lib/response.js",
       "line": 822,
-      "title": "Potential open redirect by using unvalidated URL in response body",
+      "title": "Potential XSS: URL inserted into HTML without proper sanitization",
       "evidence": "body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);"
     },
     {
       "reviewer": "model-raw",
       "caseId": "express-16",
       "path": "lib/response.js",
-      "line": 825,
-      "title": "HTML escaping may be insufficient for URL attribute context",
+      "line": 828,
+      "title": "Potential XSS: URL inserted into HTML anchor without proper sanitization",
       "evidence": "var u = escapeHtml(url);"
     },
     {
       "reviewer": "model-raw",
       "caseId": "express-22",
       "path": "lib/request.js",
-      "line": 476,
-      "title": "Host parsing using split(':') mishandles IPv6 addresses",
+      "line": 480,
+      "title": "Improper host parsing breaks IPv6 handling",
       "evidence": "return host.split(':')[0];"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "express-26",
+      "path": "lib/router/index.js",
+      "line": 126,
+      "title": "Removed leading slash check when detecting protocol in URL",
+      "evidence": "var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');"
     },
     {
       "reviewer": "model-raw",
       "caseId": "hexo-7",
       "path": "lib/plugins/helper/toc.js",
-      "line": 27,
-      "title": "HTML not escaped when generating TOC, potential XSS vulnerability",
+      "line": 25,
+      "title": "Unescaped HTML inserted into TOC can lead to XSS",
       "evidence": "var text = $(this).html();"
     },
     {
       "reviewer": "model-raw",
       "caseId": "hexo-12",
       "path": "lib/hexo/post.js",
-      "line": 47,
-      "title": "Removing .toString() may cause type errors when slug or title is not a string",
+      "line": 51,
+      "title": "Removing .toString() may cause non-string slug values leading to errors",
       "evidence": "data.slug = slugize(data.slug || data.title, {transform: config.filename_case});"
     },
     {
       "reviewer": "model-raw",
       "caseId": "hexo-12",
       "path": "lib/hexo/post.js",
-      "line": 204,
-      "title": "Calling slugize on possibly undefined slug without .toString() can raise errors",
+      "line": 208,
+      "title": "Removing .toString() may cause undefined slug to cause slugize error",
       "evidence": "var slug = data.slug = slugize(data.slug, {transform: config.filename_case});"
     },
     {
@@ -105,31 +113,39 @@
       "caseId": "karma-3",
       "path": "lib/reporter.js",
       "line": 98,
-      "title": "Assigning formatted error to msg changes return semantics and may cause type errors",
+      "title": "Changing return behavior may cause type errors",
       "evidence": "msg = config.formatError(msg)"
+    },
+    {
+      "reviewer": "model-raw",
+      "caseId": "karma-22",
+      "path": "lib/reporter.js",
+      "line": 27,
+      "title": "Overly permissive URL regular expression allows any hostname",
+      "evidence": "var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/\\s]*)?\\/?' +"
     },
     {
       "reviewer": "model-raw",
       "caseId": "mongoose-8",
       "path": "lib/document.js",
-      "line": 353,
-      "title": "Missing return statement discards result of update operation",
+      "line": 355,
+      "title": "Missing return statement; function no longer returns result of update",
       "evidence": "this.constructor.update.apply(this.constructor, args);"
     },
     {
       "reviewer": "model-raw",
       "caseId": "mongoose-11",
       "path": "lib/query.js",
-      "line": 517,
-      "title": "Removed check for existing field may overwrite exclusion flag",
+      "line": 514,
+      "title": "Removed check for existing key may cause duplicate field inclusion",
       "evidence": "if (false === exclude && keys.length > 1) {"
     },
     {
       "reviewer": "model-raw",
       "caseId": "mongoose-16",
       "path": "lib/model.js",
-      "line": 341,
-      "title": "Removed version check may cause incorrect delta handling",
+      "line": 339,
+      "title": "Removed version check may cause incorrect early return",
       "evidence": "if (!dirty.length) return;"
     },
     {
@@ -137,7 +153,7 @@
       "caseId": "mongoose-22",
       "path": "lib/model.js",
       "line": 764,
-      "title": "Remove operation ignores conditions, potentially deleting all documents",
+      "title": "Remove operation ignores conditions, may delete all documents",
       "evidence": "var mq = new Query({}, {}, this, this.collection);"
     }
   ],

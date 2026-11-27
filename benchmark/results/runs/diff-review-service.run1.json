@@ -1,7 +1,7 @@
 {
   "reviewer": "diff-review-service",
   "source": "openai/gpt-oss-120b + validateFinding",
-  "ranAt": "2026-11-27T15:16:14.818Z",
+  "ranAt": "2026-11-27T16:39:08.384Z",
   "caseIds": [
     "express-3",
     "express-4",
@@ -22,50 +22,34 @@
   "findings": [
     {
       "reviewer": "diff-review-service",
-      "caseId": "express-4",
-      "path": "lib/request.js",
-      "line": 457,
-      "title": "Improper subdomain parsing for IP addresses",
-      "evidence": "  var subdomains = host.split('.').reverse();"
+      "caseId": "express-3",
+      "path": "lib/response.js",
+      "line": 609,
+      "title": "Unconditional call to req.accepts may mis-handle empty key list",
+      "evidence": "  var key = req.accepts(keys);"
     },
     {
       "reviewer": "diff-review-service",
-      "caseId": "express-5",
-      "path": "lib/utils.js",
-      "line": 70,
-      "title": "Windows absolute path detection no longer accepts forward slash after drive letter",
-      "evidence": "  if (':' === path[1] && '\\\\' === path[2]) return true;"
+      "caseId": "express-4",
+      "path": "lib/request.js",
+      "line": 457,
+      "title": "Improper handling of IP addresses when computing subdomains",
+      "evidence": "  var subdomains = host.split('.').reverse();"
     },
     {
       "reviewer": "diff-review-service",
       "caseId": "express-9",
       "path": "lib/application.js",
       "line": 171,
-      "title": "mount_app.mountpath assigned to user-provided path instead of mount_path",
+      "title": "Assigning mount_app.mountpath to raw path argument may break routing",
       "evidence": "    mount_app.mountpath = path;"
-    },
-    {
-      "reviewer": "diff-review-service",
-      "caseId": "express-16",
-      "path": "lib/response.js",
-      "line": 821,
-      "title": "Potential open redirect vulnerability using unvalidated URL",
-      "evidence": "      body = statusCodes[status] + '. Redirecting to ' + encodeURI(url);"
-    },
-    {
-      "reviewer": "diff-review-service",
-      "caseId": "express-16",
-      "path": "lib/response.js",
-      "line": 825,
-      "title": "Potential open redirect vulnerability using unvalidated URL in HTML output",
-      "evidence": "      var u = escapeHtml(url);"
     },
     {
       "reviewer": "diff-review-service",
       "caseId": "express-22",
       "path": "lib/request.js",
       "line": 479,
-      "title": "Improper host parsing may break IPv6 addresses",
+      "title": "Naive split on ':' breaks IPv6 host parsing",
       "evidence": "  return host.split(':')[0];"
     },
     {
@@ -73,7 +57,7 @@
       "caseId": "express-26",
       "path": "lib/router/index.js",
       "line": 129,
-      "title": "Removed leading slash check when detecting fully qualified URL, may misinterpret relative paths",
+      "title": "Removed leading slash check, may misidentify FQDN for paths starting with '/'",
       "evidence": "  var fqdn = 1 + req.url.substr(0, pathlength).indexOf('://');"
     },
     {
@@ -81,7 +65,7 @@
       "caseId": "hexo-7",
       "path": "lib/plugins/helper/toc.js",
       "line": 28,
-      "title": "Potential XSS due to unescaped HTML in TOC helper",
+      "title": "Unescaped HTML inserted into TOC may lead to XSS",
       "evidence": "    var text = $(this).html();"
     },
     {
@@ -89,7 +73,7 @@
       "caseId": "hexo-12",
       "path": "lib/hexo/post.js",
       "line": 50,
-      "title": "Removing .toString() may cause non‑string values to be passed to slugize",
+      "title": "Removing .toString() may pass non‑string values to slugize, causing runtime errors",
       "evidence": "  data.slug = slugize(data.slug || data.title, {transform: config.filename_case});"
     },
     {
@@ -97,7 +81,7 @@
       "caseId": "hexo-12",
       "path": "lib/hexo/post.js",
       "line": 207,
-      "title": "Removing .toString() may cause non‑string slug values to be passed to slugize",
+      "title": "Removing .toString() may pass non‑string values to slugize, leading to unexpected behavior",
       "evidence": "  var slug = data.slug = slugize(data.slug, {transform: config.filename_case});"
     },
     {
@@ -105,7 +89,7 @@
       "caseId": "karma-3",
       "path": "lib/reporter.js",
       "line": 99,
-      "title": "Potential loss of return value from config.formatError",
+      "title": "Changing error formatting return behavior and adding newline",
       "evidence": "      msg = config.formatError(msg)"
     },
     {
@@ -113,7 +97,7 @@
       "caseId": "mongoose-8",
       "path": "lib/document.js",
       "line": 355,
-      "title": "Missing return statement in Document.update may break callers expecting a result",
+      "title": "Missing return statement may cause undefined result",
       "evidence": "  this.constructor.update.apply(this.constructor, args);"
     },
     {
@@ -121,7 +105,7 @@
       "caseId": "mongoose-11",
       "path": "lib/query.js",
       "line": 517,
-      "title": "Removed duplicate field check may cause redundant field inclusion",
+      "title": "Removed existence check may cause duplicate field inclusion",
       "evidence": "      if (false === exclude && keys.length > 1) {"
     },
     {
@@ -129,7 +113,7 @@
       "caseId": "mongoose-16",
       "path": "lib/model.js",
       "line": 342,
-      "title": "Removed version check may cause stale data handling",
+      "title": "Removed version check may cause premature return",
       "evidence": "  if (!dirty.length) return;"
     },
     {
@@ -137,7 +121,7 @@
       "caseId": "mongoose-22",
       "path": "lib/model.js",
       "line": 767,
-      "title": "Remove operation uses empty query, potentially deleting all documents",
+      "title": "Removing query conditions may cause deletion of all documents",
       "evidence": "  var mq = new Query({}, {}, this, this.collection);"
     }
   ],
