@@ -78,23 +78,37 @@ export function indexDiff(diff: string): DiffIndex {
  * The opaque directory name a case is published under in the cases
  * repository. Reviewer facing artifacts never carry the case id, because the
  * id would let a reviewer look the answer up instead of finding the bug.
- * Stable, so a rerun updates a case's pull request rather than opening another.
+ *
+ * The salt is what makes it opaque. Hashing the id alone is reversible by
+ * anyone holding this repository: the ids are committed in
+ * cases.config.json, so computing fifteen hashes recovers the whole mapping,
+ * and a reviewer with both the published pull requests and this source could
+ * read the diagnosis for the case it was looking at. The salt is secret and
+ * lives in .env, which is not committed. It must be stable for the life of a
+ * published set, so a rerun updates a case's pull request rather than opening
+ * another one beside it.
  */
-export function caseSlug(caseId: string): string {
-  return createHash('sha256').update(caseId).digest('hex').slice(0, 8);
+export function caseSlug(caseId: string, salt: string): string {
+  if (salt.trim() === '') {
+    throw new Error('caseSlug needs a non empty salt: set BENCH_SLUG_SALT in .env');
+  }
+  return createHash('sha256').update(`${salt}\u0000${caseId}`).digest('hex').slice(0, 8);
 }
 
+/**
+ * Only this case's own directory is stripped. A path under another case's
+ * directory is left alone, so a finding pointing into a different case stays
+ * fabricated rather than being quietly remapped onto this one.
+ *
+ * Published slugs are not stripped here. bench:pull knows each case's slug
+ * from prs.json and removes the prefix as it reads the comments, which keeps
+ * the salt out of scoring entirely: a model only run needs no salt at all.
+ */
 export function normalizePath(path: string, caseId: string): string {
   let result = path.trim().replace(/^\.\//, '');
-  // Only this case's own directory is stripped, under either the id or the
-  // slug it is published as. A path under another case's directory is left
-  // alone, so a finding pointing into a different case stays fabricated
-  // rather than being quietly remapped onto this one.
-  for (const prefix of [`cases/${caseId}/`, `cases/${caseSlug(caseId)}/`]) {
-    if (result.startsWith(prefix)) {
-      result = result.slice(prefix.length);
-      break;
-    }
+  const prefix = `cases/${caseId}/`;
+  if (result.startsWith(prefix)) {
+    result = result.slice(prefix.length);
   }
   if (result.startsWith('a/') || result.startsWith('b/')) {
     result = result.slice(2);

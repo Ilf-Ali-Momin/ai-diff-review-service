@@ -1,6 +1,6 @@
 {
   "source": "BugsJS (Gyimesi et al., ICST 2019), https://bugsjs.github.io",
-  "note": "Each case reverses a real upstream bug fix, so the pull request reads like a small refactor that reintroduces the bug. Ground truth is the set of lines the fix had removed. Descriptions say what the change breaks. No reviewer is given them: neither review path sends a description, and they appear only in the report, to explain cases every reviewer missed.",
+  "note": "Each case reverses a real upstream bug fix, so the pull request reads like a small refactor that reintroduces the bug. Ground truth is the set of lines the fix had removed. Descriptions say what the change breaks. No reviewer is given them: neither review path sends a description. They stay in the built fixtures under benchmark/cases, which is evaluator only, and the report uses them to explain cases every reviewer missed.",
   "cases": [
     { "id": "express-3", "repo": "express", "bug": 3, "severity": "medium",
       "description": "Drops the guard for an empty key list, so res.format with only a default handler passes an empty array to req.accepts and errors instead of using the default." },

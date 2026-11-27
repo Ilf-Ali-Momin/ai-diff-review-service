@@ -90,6 +90,8 @@ npm run bench:model -- --runs 3
 
 # 2. Proofline: push every case as a PR to an empty repo with Proofline
 #    installed. Replace YOUR_GITHUB_OWNER with your own user or organisation.
+#    Needs BENCH_SLUG_SALT in .env: it salts the slug each case is published
+#    under, and must stay the same for the life of a published set.
 npm run bench:push -- --dir ../ai-review-benchmark-cases --repo YOUR_GITHUB_OWNER/ai-review-benchmark-cases
 #    wait for the reviews, then collect them
 npm run bench:pull -- --reviewer proofline --login proofline
@@ -134,6 +136,12 @@ rebuilds them from scratch.
   102. Adding the second line by hand would score that case more fairly and
   would also be the first hand written label in the set, so it is left alone
   and recorded here instead.
+- **The published slugs hide the case id, not the case.** A reviewer holding
+  this repository as well as the published pull requests could still line a
+  case up by its file contents. The slug stops a reviewer reading
+  `express-16` off a branch name and fetching the diagnosis, and the salt
+  stops the mapping being recomputed from the committed ids. Neither stops
+  someone who sets out to match the files.
 - **BugsJS projects are public**, so a model may have seen the original fixes
   in training. That favours every reviewer equally, and the reversal means the
   exact diff shown is not the one that was published. The cases carry no

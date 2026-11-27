@@ -102,6 +102,7 @@ export function render(
   scores: CaseScore[],
   aggregates: ReviewerAggregate[],
   sources: Map<string, string>,
+  errors: Array<{ reviewer: string; caseId: string; message: string }>,
 ): string {
   const reviewers = aggregates.map((a) => a.reviewer);
   const runsFor = (reviewer: string): number =>
@@ -117,9 +118,19 @@ export function render(
     return runsFor(reviewer) === 1 ? (hits > 0 ? 'caught' : 'missed') : `${hits}/${mine.length}`;
   };
 
-  const missedByAll = cases.filter((c) =>
-    reviewers.every((r) => !scores.some((s) => s.caseId === c.id && s.reviewer === r && s.caught)),
+  /** A case at least one reviewer was actually scored on. */
+  const reviewed = (caseId: string): boolean => scores.some((s) => s.caseId === caseId);
+
+  // A case nobody reviewed is not a case everybody missed. A timeout or an
+  // API failure leaves a case out of every run's caseIds, and counting it as
+  // missed by every reviewer would turn an infrastructure failure into a
+  // result about the reviewers.
+  const missedByAll = cases.filter(
+    (c) =>
+      reviewed(c.id) &&
+      reviewers.every((r) => !scores.some((s) => s.caseId === c.id && s.reviewer === r && s.caught)),
   );
+  const notReviewed = cases.filter((c) => !reviewed(c.id));
 
   const fabricated = [
     ...new Map(
@@ -149,9 +160,25 @@ export function render(
     '',
     '## Missed by every reviewer',
     '',
+    'Only cases at least one reviewer was scored on. A case no reviewer reached is listed below instead.',
+    '',
     ...(missedByAll.length === 0
       ? ['None.']
       : missedByAll.map((c) => `- **${c.id}** (${c.severity}): ${c.description}`)),
+    '',
+    '## Not reviewed',
+    '',
+    'Cases no reviewer was scored on, because every run errored or skipped them. These are not misses.',
+    '',
+    ...(notReviewed.length === 0 ? ['None.'] : notReviewed.map((c) => `- **${c.id}**`)),
+    '',
+    '## Errors',
+    '',
+    'Cases a reviewer could not be scored on, per run. A reviewer missing a case here was not asked, not wrong.',
+    '',
+    ...(errors.length === 0
+      ? ['None.']
+      : errors.map((e) => `- ${e.reviewer} on ${e.caseId}: ${e.message}`)),
     '',
     '## Fabricated and misquoted findings',
     '',
@@ -241,7 +268,10 @@ function main(): void {
   writeJson(TRIAGE_PATH, mergeTriage(previous, triage));
   writeJson(join(RESULTS_DIR, 'scores.json'), { aggregates, scores });
   const sources = new Map(runs.map((run) => [run.reviewer, run.source]));
-  writeFileSync(join(RESULTS_DIR, 'summary.md'), render(cases, scores, aggregates, sources));
+  const errors = runs.flatMap((run) =>
+    run.errors.map((e) => ({ reviewer: run.reviewer, caseId: e.caseId, message: e.message })),
+  );
+  writeFileSync(join(RESULTS_DIR, 'summary.md'), render(cases, scores, aggregates, sources, errors));
 
   for (const a of aggregates) {
     const caught = a.runs.map((r) => r.caught);

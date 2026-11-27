@@ -36,8 +36,22 @@ What ran:
 
 ## Missed by every reviewer
 
+Only cases at least one reviewer was scored on. A case no reviewer reached is listed below instead.
+
 - **express-16** (low): The redirect body uses the raw url argument instead of the resolved address, so the body shows a different target than the Location header.
 - **karma-22** (medium): The URL pattern now strips any host from stack traces instead of only karma's own hostname and port, mangling third party URLs.
+
+## Not reviewed
+
+Cases no reviewer was scored on, because every run errored or skipped them. These are not misses.
+
+None.
+
+## Errors
+
+Cases a reviewer could not be scored on, per run. A reviewer missing a case here was not asked, not wrong.
+
+None.
 
 ## Fabricated and misquoted findings
 

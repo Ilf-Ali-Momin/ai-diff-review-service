@@ -83,16 +83,40 @@ describe('normalizePath', () => {
     expect(normalizePath('cases/demo-2/lib/a.js', 'demo-1')).toBe('cases/demo-2/lib/a.js');
   });
 
-  it('strips the opaque slug the case is published under', () => {
-    // Reviewers see cases/<slug>/, never cases/<id>/, so both must resolve to
-    // the project's own path or every GitHub finding reads as fabricated.
-    expect(normalizePath(`cases/${caseSlug('demo-1')}/lib/a.js`, 'demo-1')).toBe('lib/a.js');
+  it('leaves a published slug prefix alone, because bench:pull strips it', () => {
+    // The slug is salted, so the scorer cannot recompute it and does not try.
+    // bench:pull removes the prefix as it reads each comment, using the slug
+    // recorded in prs.json.
+    const slug = caseSlug('demo-1', 'a-secret');
+
+    expect(normalizePath(`cases/${slug}/lib/a.js`, 'demo-1')).toBe(`cases/${slug}/lib/a.js`);
+  });
+});
+
+describe('caseSlug', () => {
+  it('is stable for one id and salt', () => {
+    expect(caseSlug('demo-1', 'a-secret')).toBe(caseSlug('demo-1', 'a-secret'));
   });
 
-  it('leaves another case slug alone', () => {
-    expect(normalizePath(`cases/${caseSlug('demo-2')}/lib/a.js`, 'demo-1')).toBe(
-      `cases/${caseSlug('demo-2')}/lib/a.js`,
-    );
+  it('differs between salts, which is the point of salting it', () => {
+    // Without this, the slug is a hash of an id committed to this repository
+    // and anyone holding the repository recovers the whole mapping.
+    expect(caseSlug('demo-1', 'a-secret')).not.toBe(caseSlug('demo-1', 'another-secret'));
+  });
+
+  it('differs between ids under one salt', () => {
+    expect(caseSlug('demo-1', 'a-secret')).not.toBe(caseSlug('demo-2', 'a-secret'));
+  });
+
+  it('refuses an empty salt rather than falling back to an unsalted hash', () => {
+    expect(() => caseSlug('demo-1', '')).toThrow(/BENCH_SLUG_SALT/);
+    expect(() => caseSlug('demo-1', '   ')).toThrow(/BENCH_SLUG_SALT/);
+  });
+
+  it('does not collide between an id and salt pair that concatenate the same way', () => {
+    // The salt and the id are separated by a NUL, so "ab" + "c" and "a" + "bc"
+    // cannot hash to the same slug.
+    expect(caseSlug('c', 'ab')).not.toBe(caseSlug('bc', 'a'));
   });
 });
 

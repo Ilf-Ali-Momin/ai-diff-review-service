@@ -20,6 +20,11 @@
  * finding the bug, and would be scored on an easier task than the model, which
  * only ever sees diff text. Reviewer facing artifacts use an opaque slug; the
  * slug to id mapping is written to results/, which is evaluator only.
+ *
+ * The slug is salted with BENCH_SLUG_SALT from .env, which is not committed.
+ * Without a salt the slug is a hash of a committed id, so anyone holding this
+ * repository could recompute the mapping and the slug would hide the answer
+ * only from someone who did not need it hidden.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -43,9 +48,9 @@ function run(cmd: string, args: string[], cwd: string): string {
   return execFileSync(cmd, args, { cwd, encoding: 'utf8' }).trim();
 }
 
-function copyVersion(benchCase: BenchCase, version: 'base' | 'head', repoDir: string): void {
+function copyVersion(benchCase: BenchCase, version: 'base' | 'head', repoDir: string, salt: string): void {
   for (const file of benchCase.files) {
-    const target = join(repoDir, 'cases', caseSlug(benchCase.id), file);
+    const target = join(repoDir, 'cases', caseSlug(benchCase.id, salt), file);
     mkdirSync(dirname(target), { recursive: true });
     copyFileSync(join(CASES_DIR, benchCase.id, version, file), target);
   }
@@ -55,9 +60,21 @@ export function neutralTitle(benchCase: BenchCase): string {
   return `Simplify ${benchCase.files.join(', ')}`;
 }
 
+function slugSalt(): string {
+  const salt = process.env['BENCH_SLUG_SALT'];
+  if (salt === undefined || salt.trim() === '') {
+    throw new Error(
+      'set BENCH_SLUG_SALT in .env to a secret of your own. It salts the published ' +
+        'case slugs, and it has to stay the same for the life of a published set.',
+    );
+  }
+  return salt;
+}
+
 function main(): void {
   const dir = arg('dir');
   const repo = arg('repo');
+  const salt = slugSalt();
   if (!existsSync(join(dir, '.git'))) {
     throw new Error(`${dir} is not a git clone`);
   }
@@ -65,7 +82,7 @@ function main(): void {
 
   run('git', ['checkout', '-B', 'main'], dir);
   for (const benchCase of cases) {
-    copyVersion(benchCase, 'base', dir);
+    copyVersion(benchCase, 'base', dir, salt);
   }
   writeFileSync(
     join(dir, 'README.md'),
@@ -83,9 +100,10 @@ function main(): void {
 
   const prs: Array<{ caseId: string; slug: string; repo: string; number: number; url: string }> = [];
   for (const benchCase of cases) {
-    const branch = `case/${caseSlug(benchCase.id)}`;
+    const slug = caseSlug(benchCase.id, salt);
+    const branch = `case/${slug}`;
     run('git', ['checkout', '-q', '-B', branch, 'main'], dir);
-    copyVersion(benchCase, 'head', dir);
+    copyVersion(benchCase, 'head', dir, salt);
     run('git', ['add', '-A'], dir);
     run('git', ['commit', '-q', '-m', neutralTitle(benchCase)], dir);
     run('git', ['push', '-q', '-f', '-u', 'origin', branch], dir);
@@ -100,7 +118,7 @@ function main(): void {
       dir,
     );
     const number = Number(url.split('/').pop());
-    prs.push({ caseId: benchCase.id, slug: caseSlug(benchCase.id), repo, number, url });
+    prs.push({ caseId: benchCase.id, slug, repo, number, url });
     console.log(`${benchCase.id.padEnd(14)} ${url}`);
   }
   run('git', ['checkout', '-q', 'main'], dir);

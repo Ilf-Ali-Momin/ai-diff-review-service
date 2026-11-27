@@ -85,9 +85,16 @@ describe('benchmark cases', () => {
     expect(new Set(cases.map((c) => c.id)).size).toBe(15);
   });
 
-  it('is exactly what cases.config.json lists', () => {
-    const config = JSON.parse(readFileSync(CASES_CONFIG, 'utf8')) as { cases: Array<{ id: string }> };
-    expect(cases.map((c) => c.id).sort()).toEqual(config.cases.map((c) => c.id).sort());
+  it('is exactly what cases.config.json lists, upstream bug included', () => {
+    // Comparing ids alone would pass after someone pointed an existing id at a
+    // different upstream bug without rebuilding, so the benchmark would keep
+    // scoring the old bug while the manifest declared the new one.
+    const config = JSON.parse(readFileSync(CASES_CONFIG, 'utf8')) as {
+      cases: Array<{ id: string; repo: string; bug: number }>;
+    };
+    const key = (c: { id: string; repo: string; bug: number }): string => `${c.id} ${c.repo} ${c.bug}`;
+
+    expect(cases.map(key).sort()).toEqual(config.cases.map(key).sort());
   });
 
   it('carries no index blob hash headers, which are a lookup key into the fix', () => {

@@ -19,7 +19,19 @@ import { join } from 'node:path';
 import { readJson, RESULTS_DIR, RUNS_DIR, titleFrom, writeJson, type RunFile } from '../core/io';
 import type { ReviewerFinding } from '../core/types';
 
-type Pr = { caseId: string; repo: string; number: number };
+type Pr = { caseId: string; slug: string; repo: string; number: number };
+
+/**
+ * Reviewers see the case under `cases/<slug>/`, so every path they report
+ * carries that prefix. It is stripped here, where the slug is known from
+ * prs.json, rather than in the scorer: the scorer would have to recompute the
+ * slug, which means knowing the salt, which a model only run has no reason to
+ * have.
+ */
+function stripSlug(path: string, slug: string): string {
+  const prefix = `cases/${slug}/`;
+  return path.startsWith(prefix) ? path.slice(prefix.length) : path;
+}
 
 type InlineComment = { user: { login: string }; path: string; line: number | null; original_line: number | null; body: string };
 type BodyComment = { user: { login: string } | null; body: string | null };
@@ -45,8 +57,19 @@ function gh<T>(path: string): T {
   return pages.flatMap((page) => (Array.isArray(page) ? page : [page])) as T;
 }
 
-export function fromInline(c: InlineComment, reviewer: string, caseId: string): ReviewerFinding {
-  return { reviewer, caseId, path: c.path, line: c.line ?? c.original_line, title: titleFrom(c.body) };
+export function fromInline(
+  c: InlineComment,
+  reviewer: string,
+  caseId: string,
+  slug: string,
+): ReviewerFinding {
+  return {
+    reviewer,
+    caseId,
+    path: stripSlug(c.path, slug),
+    line: c.line ?? c.original_line,
+    title: titleFrom(c.body),
+  };
 }
 
 function main(): void {
@@ -70,7 +93,7 @@ function main(): void {
       const issueComments = gh<BodyComment[]>(`${base}/issues/${pr.number}/comments`);
 
       for (const c of inline.filter((c) => login.test(c.user.login))) {
-        run.findings.push(fromInline(c, reviewer, pr.caseId));
+        run.findings.push(fromInline(c, reviewer, pr.caseId, pr.slug));
       }
       for (const c of [...reviews, ...issueComments]) {
         if (c.user && login.test(c.user.login) && c.body && c.body.trim() !== '') {
@@ -82,7 +105,13 @@ function main(): void {
       const checks = execFileSync('gh', ['api', `${base}/commits/${head}/check-runs`, '--jq', '.check_runs'], { encoding: 'utf8' });
       for (const check of (JSON.parse(checks) as CheckRun[]).filter((c) => c.app && login.test(c.app.slug))) {
         for (const a of gh<Annotation[]>(`${base}/check-runs/${check.id}/annotations`)) {
-          run.findings.push({ reviewer, caseId: pr.caseId, path: a.path, line: a.start_line, title: titleFrom(a.title ?? a.message) });
+          run.findings.push({
+            reviewer,
+            caseId: pr.caseId,
+            path: stripSlug(a.path, pr.slug),
+            line: a.start_line,
+            title: titleFrom(a.title ?? a.message),
+          });
         }
       }
 

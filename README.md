@@ -57,9 +57,14 @@ without them; only a job asking for that provider fails, with a clear message.
 npm test
 ```
 
-219 unit and integration tests for the service, in process, about two seconds,
-plus 57 for the benchmark scorer and case data. A separate black
-box suite runs the full probe plan over real HTTP against any running instance:
+`npm test` runs the whole suite in process in about ten seconds: unit and
+integration tests for the service, plus tests for the benchmark's case data,
+scorer and report. The counts are deliberately not written down here, because
+a number in prose goes stale the first time a test is added and says nothing
+the command itself does not say more accurately.
+
+A separate black box suite runs the full probe plan over real HTTP against any
+running instance:
 
 ```bash
 PROBE_BASE_URL=http://127.0.0.1:3000 PROBE_TOKEN=local-dev-token npm run probe
