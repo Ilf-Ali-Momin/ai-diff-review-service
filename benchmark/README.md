@@ -91,7 +91,11 @@ npm run bench:model -- --runs 3
 # 2. Proofline: push every case as a PR to an empty repo with Proofline
 #    installed. Replace YOUR_GITHUB_OWNER with your own user or organisation.
 #    Needs BENCH_SLUG_SALT in .env: it salts the slug each case is published
-#    under, and must stay the same for the life of a published set.
+#    under, and must stay the same for the life of a published set. Needs the
+#    GitHub CLI signed in (gh auth status), and --dir has to be a clone of
+#    that repository, not an empty directory: bench:push pushes branches from
+#    it. Create the repository, then
+git clone https://github.com/YOUR_GITHUB_OWNER/ai-review-benchmark-cases ../ai-review-benchmark-cases
 npm run bench:push -- --dir ../ai-review-benchmark-cases --repo YOUR_GITHUB_OWNER/ai-review-benchmark-cases
 #    wait for the reviews, then collect them
 npm run bench:pull -- --reviewer proofline --login proofline
@@ -116,7 +120,15 @@ rebuilds them from scratch.
   invent lines, does it catch the obvious data loss bug), not to rank
   reviewers to a decimal place.
 - **Reviewers see only the touched files**, not the whole project. Bugs that
-  need cross file knowledge are harder for everyone, equally.
+  need cross file knowledge are harder for everyone.
+- **The model and hosted reviewers do not get the same context.** The model is
+  sent diff chunks and nothing else: for express-4 it reads `this.host`
+  without the getter that defines it. A hosted reviewer gets a real pull
+  request and can open the whole changed file, and on GitHub could open the
+  rest of the branch. So a catch rate difference between the model rows and a
+  hosted row is a difference in context as well as in reviewer, and the
+  comparison worth trusting is between the three model rows, which share one
+  response per chunk.
 - **Three runs for the model, one for hosted reviewers.** The model rows are
   run three times, because temperature 0 does not make the model
   deterministic. Hosted reviewers are run once, so a rerun can move one of
@@ -136,6 +148,12 @@ rebuilds them from scratch.
   102. Adding the second line by hand would score that case more fairly and
   would also be the first hand written label in the set, so it is left alone
   and recorded here instead.
+- **Separate branches isolate the pull request, not the repository.** Each
+  case is published on its own orphan `base/<slug>` branch and the default
+  branch holds only a README, so a reviewer working from the pull request sees
+  one case. Every case's branches are still in the same repository, and a
+  reviewer that lists them can read another case's fixed source. Publishing
+  one repository per case would close that; this does not.
 - **The published slugs hide the case id, not the case.** A reviewer holding
   this repository as well as the published pull requests could still line a
   case up by its file contents. The slug stops a reviewer reading

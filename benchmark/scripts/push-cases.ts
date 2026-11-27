@@ -54,6 +54,9 @@ function arg(name: string): string {
   return value;
 }
 
+/** Every orphan commit is built here, then the real branch is moved onto it. */
+const SCRATCH_BRANCH = 'bench-scratch';
+
 function run(cmd: string, args: string[], cwd: string): string {
   return execFileSync(cmd, args, { cwd, encoding: 'utf8' }).trim();
 }
@@ -78,6 +81,30 @@ export function neutralTitle(benchCase: BenchCase): string {
  * `gh pr create` fails outright when one is already open for the branch, which
  * would have stopped a rerun at the first case and left prs.json stale.
  */
+/**
+ * Replaces `branch` with a fresh orphan commit holding `files`, whatever
+ * state the clone is in.
+ *
+ * `git checkout --orphan <name>` refuses when a local branch of that name
+ * already exists, which is every rerun in the same clone: the slug is
+ * deterministic, so the second run asks for the branch the first one left
+ * behind and stops before it reaches any pull request. Building on a fixed
+ * scratch branch and moving the ref afterwards works the first time and every
+ * time after.
+ */
+function orphanBranch(branch: string, dir: string, write: () => void): void {
+  run('git', ['checkout', '-q', '--orphan', SCRATCH_BRANCH], dir);
+  run('git', ['rm', '-rq', '--cached', '.', '--ignore-unmatch'], dir);
+  rmSync(join(dir, 'cases'), { recursive: true, force: true });
+  rmSync(join(dir, 'README.md'), { force: true });
+  write();
+  run('git', ['add', '-A'], dir);
+  run('git', ['commit', '-q', '-m', `Add ${branch}`, '--allow-empty'], dir);
+  // -B moves an existing branch rather than failing on it.
+  run('git', ['checkout', '-q', '-B', branch], dir);
+  run('git', ['branch', '-q', '-D', SCRATCH_BRANCH], dir);
+}
+
 function pullRequestFor(
   repo: string,
   base: string,
@@ -126,22 +153,18 @@ function main(): void {
 
   // The default branch carries no case source at all, so the repository root
   // shows a reviewer nothing about any case but the one it is reviewing.
-  run('git', ['checkout', '-q', '--orphan', 'bench-main'], dir);
-  run('git', ['rm', '-rq', '--cached', '.', '--ignore-unmatch'], dir);
-  rmSync(join(dir, 'cases'), { recursive: true, force: true });
-  writeFileSync(
-    join(dir, 'README.md'),
-    [
-      '# AI review benchmark cases',
-      '',
-      'Each pull request in this repository is one benchmark case: a small change to',
-      'real open source code.',
-      '',
-    ].join('\n'),
-  );
-  run('git', ['add', '-A'], dir);
-  run('git', ['commit', '-q', '-m', 'Add README', '--allow-empty'], dir);
-  run('git', ['branch', '-q', '-M', 'main'], dir);
+  orphanBranch('main', dir, () => {
+    writeFileSync(
+      join(dir, 'README.md'),
+      [
+        '# AI review benchmark cases',
+        '',
+        'Each pull request in this repository is one benchmark case: a small change to',
+        'real open source code.',
+        '',
+      ].join('\n'),
+    );
+  });
   run('git', ['push', '-q', '-f', '-u', 'origin', 'main'], dir);
 
   const prs: Array<{ caseId: string; slug: string; repo: string; number: number; url: string }> = [];
@@ -152,12 +175,7 @@ function main(): void {
 
     // Orphan, so the base branch holds this case's fixed files and nothing
     // else: no other case, and no history leading to one.
-    run('git', ['checkout', '-q', '--orphan', base], dir);
-    run('git', ['rm', '-rq', '--cached', '.', '--ignore-unmatch'], dir);
-    rmSync(join(dir, 'cases'), { recursive: true, force: true });
-    copyVersion(benchCase, 'base', dir, salt);
-    run('git', ['add', '-A'], dir);
-    run('git', ['commit', '-q', '-m', `Add ${benchCase.files.join(', ')}`], dir);
+    orphanBranch(base, dir, () => copyVersion(benchCase, 'base', dir, salt));
     run('git', ['push', '-q', '-f', '-u', 'origin', base], dir);
 
     run('git', ['checkout', '-q', '-B', branch, base], dir);

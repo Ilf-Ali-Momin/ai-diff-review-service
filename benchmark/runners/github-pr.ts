@@ -33,7 +33,15 @@ function stripSlug(path: string, slug: string): string {
   return path.startsWith(prefix) ? path.slice(prefix.length) : path;
 }
 
-type InlineComment = { user: { login: string }; path: string; line: number | null; original_line: number | null; body: string };
+type InlineComment = {
+  user: { login: string };
+  path: string;
+  line: number | null;
+  original_line: number | null;
+  /** "RIGHT" (the default) numbers the new file, "LEFT" the old one. */
+  side?: 'LEFT' | 'RIGHT' | null;
+  body: string;
+};
 type BodyComment = { user: { login: string } | null; body: string | null };
 type CheckRun = { app: { slug: string } | null; id: number };
 type Annotation = { path: string; start_line: number; title: string | null; message: string };
@@ -57,17 +65,30 @@ function gh<T>(path: string): T {
   return pages.flatMap((page) => (Array.isArray(page) ? page : [page])) as T;
 }
 
+/**
+ * A review comment, as a finding the scorer can use.
+ *
+ * GitHub numbers a comment against one side of the diff. A comment on a
+ * removed line carries `side: "LEFT"` and a line number in the *old* file,
+ * which collides with a different line of the new file: on express-16 a
+ * comment on deleted line 821 would otherwise be scored against the
+ * replacement at 821 and credited with a catch nobody made. Ground truth is
+ * new file lines, so an old file coordinate cannot be scored against it and
+ * the finding is recorded without a line. It still counts as a finding; it
+ * cannot catch a bug.
+ */
 export function fromInline(
   c: InlineComment,
   reviewer: string,
   caseId: string,
   slug: string,
 ): ReviewerFinding {
+  const onOldFile = c.side === 'LEFT';
   return {
     reviewer,
     caseId,
     path: stripSlug(c.path, slug),
-    line: c.line ?? c.original_line,
+    line: onOldFile ? null : c.line ?? c.original_line,
     title: titleFrom(c.body),
   };
 }
